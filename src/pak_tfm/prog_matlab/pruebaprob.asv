@@ -1,0 +1,3 @@
+function [y] = pruebaprob (vp)
+    a=100
+    for i=

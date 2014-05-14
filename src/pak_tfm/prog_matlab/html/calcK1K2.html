@@ -1,0 +1,211 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>calcK1K2</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-08-14"><meta name="DC.source" content="calcK1K2.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput">b12 = 0.000041850;
+
+c1 = 0.00004;
+alpha1 = 0.000035;
+r1 =0.02-0.036;
+
+b21=0.00008750;
+<span class="comment">%b21= 0.000063185</span>
+c2 = 0.0001;
+alpha2 = 0.000035;
+r2 =0.05-0.07;
+
+K1_A = (c2*b21*alpha1+c1*b12*b21);
+K1_B = (alpha1*alpha2 + c1*b12*r2 - c2*b21*r1 -b12*b21);
+K1_C = -1*(r1*alpha2 + b12* r2);
+
+raiz_K1_1 = (-1*K1_B+sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A)
+raiz_K1_2 = (-1*K1_B-sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A)
+
+
+K2_A = (c1*b12*alpha2+c2*b21*b12);
+K2_B = (alpha2*alpha1 + c2*b21*r1 - c1*b12*r2 -b21*b12);
+K2_C = -1*(r2*alpha1 + b21* r1);
+
+
+raiz_K2_1 = (-1*K2_B+sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A)
+raiz_K2_2 = (-1*K2_B-sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A)
+
+N1 = linspace(0,5000);
+N2=  (alpha1*N1-r1)./(b12 - c1*b12*N1);
+
+plot(N1,N2,<span class="string">'-r'</span>);
+hold <span class="string">on</span>;
+xlimit = ([0 5000]);
+ylimit = ([0 5000]);
+
+N2 = linspace(0,5500);
+N1=  (alpha2*N2-r2)./((b21 - c2*b21*N2));
+
+plot(N1,N2,<span class="string">'-b'</span>);
+hold <span class="string">on</span>;
+
+<span class="comment">% Calculo de b21 critico</span>
+
+m = c2*alpha1+c1*b12;
+n = c2*r1+b12;
+p = alpha1*alpha2 + c1*b12*r2;
+c = K1_C;
+
+BA = n^2;
+BB = -4*m*c-2*n*p;
+BC = p^2;
+
+
+raiz_b21_1 = (-1*BB+sqrt(BB^2-4*BA*BC))/(2*BA)
+raiz_b21_2 = (-1*BB-sqrt(BB^2-4*BA*BC))/(2*BA)
+</pre><pre class="codeoutput">
+raiz_K1_1 =
+
+  4.4547e+003
+
+
+raiz_K1_2 =
+
+  692.6974
+
+
+raiz_K2_1 =
+
+  4.9986e+003
+
+
+raiz_K2_2 =
+
+  989.0388
+
+
+raiz_b21_1 =
+
+  6.3182e-005
+
+
+raiz_b21_2 =
+
+  1.3870e-005
+
+</pre><img vspace="5" hspace="5" src="calcK1K2_01.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+b12 = 0.000041850;
+
+c1 = 0.00004;
+alpha1 = 0.000035;
+r1 =0.02-0.036;
+
+b21=0.00008750;
+%b21= 0.000063185
+c2 = 0.0001;
+alpha2 = 0.000035;
+r2 =0.05-0.07;
+
+K1_A = (c2*b21*alpha1+c1*b12*b21);
+K1_B = (alpha1*alpha2 + c1*b12*r2 - c2*b21*r1 -b12*b21);
+K1_C = -1*(r1*alpha2 + b12* r2);
+
+raiz_K1_1 = (-1*K1_B+sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A)
+raiz_K1_2 = (-1*K1_B-sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A)
+
+
+K2_A = (c1*b12*alpha2+c2*b21*b12);
+K2_B = (alpha2*alpha1 + c2*b21*r1 - c1*b12*r2 -b21*b12);
+K2_C = -1*(r2*alpha1 + b21* r1);
+
+
+raiz_K2_1 = (-1*K2_B+sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A)
+raiz_K2_2 = (-1*K2_B-sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A)
+ 
+N1 = linspace(0,5000);
+N2=  (alpha1*N1-r1)./(b12 - c1*b12*N1);
+
+plot(N1,N2,'-r');
+hold on;
+xlimit = ([0 5000]);
+ylimit = ([0 5000]);
+
+N2 = linspace(0,5500);
+N1=  (alpha2*N2-r2)./((b21 - c2*b21*N2));
+
+plot(N1,N2,'-b');
+hold on;
+
+% Calculo de b21 critico
+
+m = c2*alpha1+c1*b12;
+n = c2*r1+b12;
+p = alpha1*alpha2 + c1*b12*r2;
+c = K1_C;
+
+BA = n^2;
+BB = -4*m*c-2*n*p;
+BC = p^2;
+
+
+raiz_b21_1 = (-1*BB+sqrt(BB^2-4*BA*BC))/(2*BA)
+raiz_b21_2 = (-1*BB-sqrt(BB^2-4*BA*BC))/(2*BA)
+##### SOURCE END #####
+--></body></html>

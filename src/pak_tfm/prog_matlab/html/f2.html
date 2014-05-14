@@ -1,0 +1,89 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>f2</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-09-12"><meta name="DC.source" content="f2.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [f] = f2(x)
+<span class="comment">% f2(x) = 0, with x = [x(1);x(2)]</span>
+<span class="comment">% represents a system of 2 non-linear equations</span>
+f1 = x(1)^2 + x(2)^2 - 50;
+f2 = x(1)*x(2) -25;
+f = [f1;f2];
+<span class="comment">% end function</span>
+</pre><pre class="codeoutput">Input argument "x" is undefined.
+
+Error in ==&gt; f2 at 4
+f1 = x(1)^2 + x(2)^2 - 50;
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function [f] = f2(x)
+% f2(x) = 0, with x = [x(1);x(2)]
+% represents a system of 2 non-linear equations
+f1 = x(1)^2 + x(2)^2 - 50;
+f2 = x(1)*x(2) -25;
+f = [f1;f2];
+% end function
+
+
+##### SOURCE END #####
+--></body></html>

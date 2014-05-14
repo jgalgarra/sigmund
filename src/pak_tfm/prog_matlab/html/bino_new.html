@@ -1,0 +1,285 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>bino_new</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-03-14"><meta name="DC.source" content="bino_new.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> bino_new(dias)
+    fn=mfilename();
+    fnwp = mfilename(<span class="string">'fullpath'</span>);
+    fdat=strrep(fnwp, fn, <span class="string">''</span>);
+    Ma=dlmread(strcat(fdat,<span class="string">'..\input\1dat_new_a.txt'</span>));
+    Mb=dlmread(strcat(fdat,<span class="string">'..\input\1dat_new_b.txt'</span>));
+
+    r1=Ma(4);  <span class="comment">% nacimientos a&ntilde;o por bicho</span>
+    r1d=Ma(5);
+    period=365
+    N1_0=Ma(2);
+    N1log=N1_0;
+    K1=Ma(3); <span class="comment">% capcidad limite</span>
+    <span class="comment">%beta12=Ma(1)*K1/r1</span>
+    beta12=Ma(1)
+
+    <span class="comment">%beta12period=beta12/period;</span>
+
+    r2=Mb(4);  <span class="comment">% nacimientos a&ntilde;o por bicho</span>
+    r2d=Mb(5);
+    N2_0=Mb(2);
+    N2log=N2_0;
+    K2=Mb(3); <span class="comment">% capcidad limite</span>
+    <span class="comment">%beta21=Mb(1)*K2/r2</span>
+
+    beta21=Mb(1)
+
+
+    <span class="keyword">for</span> k=1:dias-1
+
+        <span class="keyword">if</span> k==366
+            z=N1logAnt
+            w=N2logAnt
+        <span class="keyword">end</span>
+
+        N1logAnt = N1log;
+        N2logAnt = N2log;
+        rmut1 = beta12*N2logAnt;
+        r1b = r1+rmut1;
+        <span class="keyword">if</span> (r1b==0)
+            p1period = 0;
+            incN1log = 0;
+            t1b=0;
+        <span class="keyword">else</span>
+            t1b = -1*abs((r1d-r1b))*(N1logAnt/K1)+r1b;
+            p1period = rp(t1b,period);
+            incN1log=binornd(N1logAnt,abs(p1period));
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> (r1d==0)
+            decN1log = 0;
+        <span class="keyword">else</span>
+            p1dperiod = rp(r1d,period);
+            decN1log = binornd(N1logAnt,abs(p1dperiod));
+        <span class="keyword">end</span>
+        N1log=N1logAnt+sign(p1period)*incN1log-decN1log;
+
+        rmut2= beta21*N1logAnt;
+        r2b = r2+rmut2;
+        <span class="keyword">if</span> (r2b==0)
+            p2period = 0;
+            incN2log = 0;
+            t2b=0;
+        <span class="keyword">else</span>
+            t2b = -1*abs(r2d-r2b)*(N2logAnt/K2)+r2b;
+            p2period = rp(t2b,period);
+            incN2log=binornd(N2logAnt,abs(p2period));
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> (r2d==0)
+            decN2log = 0;
+        <span class="keyword">else</span>
+            p2dperiod = rp(r2d,period);
+            decN2log = binornd(N2logAnt,abs(p2dperiod));
+        <span class="keyword">end</span>
+        N2log=N2logAnt+sign(p2period)*incN2log-decN2log;
+
+        N1(k) = N1log;
+        N2(k) = N2log;
+        r1eq(k)=t1b-r1d;
+        r2eq(k)=t2b-r2d;
+
+
+    <span class="keyword">end</span>
+
+    hold <span class="string">on</span>;
+        subplot(2, 1, 1)
+        plot(N1,<span class="string">'-r'</span>,<span class="string">'LineWidth'</span>,2);
+        hold <span class="string">on</span>;
+        plot(N2,<span class="string">'-k'</span>,<span class="string">'LineWidth'</span>,2);
+        title(sprintf(<span class="string">'N1inic=%d K1=%d r1b=%0.2f r1d=%0.2f beta12=%0.6f (red); N2inic=%d K2=%d r2b=%0.2f r2d=%0.2f beta21=%0.8f (black)'</span>,N1_0,K1,r1,r1d,beta12,N2_0,K2,r2,r2d,beta21));
+        hold <span class="string">on</span>;
+        subplot(2, 1, 2)
+        <span class="comment">%plot(k,t1b-r1d,'-r');</span>
+        <span class="comment">%hold on;</span>
+        plot(r1eq,<span class="string">'--r'</span>,<span class="string">'LineWidth'</span>,1);
+        hold <span class="string">on</span>;
+        plot(r2eq,<span class="string">'--k'</span>,<span class="string">'LineWidth'</span>,1);
+        title(sprintf(<span class="string">'r1eq (red); r2eq (black)'</span>));
+</pre><pre class="codeoutput">
+period =
+
+   365
+
+
+beta12 =
+
+     0
+
+
+beta21 =
+
+     0
+
+</pre><pre class="codeoutput">Input argument "dias" is undefined.
+
+Error in ==&gt; bino_new at 30
+    for k=1:dias-1
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+
+function bino_new(dias)
+    fn=mfilename();
+    fnwp = mfilename('fullpath');
+    fdat=strrep(fnwp, fn, '');
+    Ma=dlmread(strcat(fdat,'..\input\1dat_new_a.txt'));
+    Mb=dlmread(strcat(fdat,'..\input\1dat_new_b.txt'));
+
+    r1=Ma(4);  % nacimientos año por bicho
+    r1d=Ma(5);
+    period=365
+    N1_0=Ma(2);
+    N1log=N1_0;
+    K1=Ma(3); % capcidad limite
+    %beta12=Ma(1)*K1/r1
+    beta12=Ma(1)
+    
+    %beta12period=beta12/period;
+
+    r2=Mb(4);  % nacimientos año por bicho
+    r2d=Mb(5);
+    N2_0=Mb(2);
+    N2log=N2_0;
+    K2=Mb(3); % capcidad limite
+    %beta21=Mb(1)*K2/r2
+    
+    beta21=Mb(1)
+
+
+    for k=1:dias-1
+        
+        if k==366
+            z=N1logAnt
+            w=N2logAnt
+        end
+        
+        N1logAnt = N1log;
+        N2logAnt = N2log;
+        rmut1 = beta12*N2logAnt;
+        r1b = r1+rmut1;
+        if (r1b==0)
+            p1period = 0;
+            incN1log = 0;
+            t1b=0;
+        else
+            t1b = -1*abs((r1d-r1b))*(N1logAnt/K1)+r1b;
+            p1period = rp(t1b,period);
+            incN1log=binornd(N1logAnt,abs(p1period));
+        end
+        if (r1d==0)
+            decN1log = 0;
+        else
+            p1dperiod = rp(r1d,period);
+            decN1log = binornd(N1logAnt,abs(p1dperiod));
+        end
+        N1log=N1logAnt+sign(p1period)*incN1log-decN1log;
+        
+        rmut2= beta21*N1logAnt;
+        r2b = r2+rmut2;
+        if (r2b==0)
+            p2period = 0;
+            incN2log = 0;
+            t2b=0;
+        else
+            t2b = -1*abs(r2d-r2b)*(N2logAnt/K2)+r2b;
+            p2period = rp(t2b,period);
+            incN2log=binornd(N2logAnt,abs(p2period));
+        end
+        if (r2d==0)
+            decN2log = 0;
+        else
+            p2dperiod = rp(r2d,period);
+            decN2log = binornd(N2logAnt,abs(p2dperiod));
+        end
+        N2log=N2logAnt+sign(p2period)*incN2log-decN2log;
+        
+        N1(k) = N1log;
+        N2(k) = N2log;
+        r1eq(k)=t1b-r1d;
+        r2eq(k)=t2b-r2d;
+
+        
+    end
+
+    hold on;
+        subplot(2, 1, 1)
+        plot(N1,'-r','LineWidth',2);
+        hold on;
+        plot(N2,'-k','LineWidth',2);
+        title(sprintf('N1inic=%d K1=%d r1b=%0.2f r1d=%0.2f beta12=%0.6f (red); N2inic=%d K2=%d r2b=%0.2f r2d=%0.2f beta21=%0.8f (black)',N1_0,K1,r1,r1d,beta12,N2_0,K2,r2,r2d,beta21));
+        hold on;
+        subplot(2, 1, 2)
+        %plot(k,t1b-r1d,'-r');
+        %hold on;
+        plot(r1eq,'REPLACE_WITH_DASH_DASHr','LineWidth',1);
+        hold on;
+        plot(r2eq,'REPLACE_WITH_DASH_DASHk','LineWidth',1);
+        title(sprintf('r1eq (red); r2eq (black)'));
+        
+
+##### SOURCE END #####
+--></body></html>

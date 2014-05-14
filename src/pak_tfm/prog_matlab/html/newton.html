@@ -1,0 +1,115 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>newton</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-09-12"><meta name="DC.source" content="newton.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [x,iter]=newton(x0,f,fp)
+<span class="comment">% newton-raphson algorithm</span>
+N = 100; eps = 1.e-5; <span class="comment">% define max. no. iterations and error</span>
+maxval = 10000.0; <span class="comment">% define value for divergence</span>
+xx = x0;
+<span class="keyword">while</span> (N&gt;0)
+xn = xx-f(xx)/fp(xx);
+<span class="keyword">if</span> abs(f(xn))&lt;eps
+x=xn;iter=100-N;
+<span class="keyword">return</span>;
+<span class="keyword">end</span>;
+<span class="keyword">if</span> abs(f(xx))&gt;maxval
+disp([<span class="string">'iterations = '</span>,num2str(iter)]);
+error(<span class="string">'Solution diverges'</span>);
+<span class="keyword">break</span>;
+<span class="keyword">end</span>;
+N = N - 1;
+xx = xn;
+<span class="keyword">end</span>;
+error(<span class="string">'No convergence'</span>);
+<span class="keyword">break</span>;
+<span class="comment">% end function</span>
+</pre><pre class="codeoutput">Error: File: D:\eclipseworkspace\sigmund\src\pak_tfm\prog_matlab\newton.m Line: 21 Column: 1
+A BREAK statement appeared outside of a loop. Use RETURN instead.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function [x,iter]=newton(x0,f,fp)
+% newton-raphson algorithm
+N = 100; eps = 1.e-5; % define max. no. iterations and error
+maxval = 10000.0; % define value for divergence
+xx = x0;
+while (N>0)
+xn = xx-f(xx)/fp(xx);
+if abs(f(xn))<eps
+x=xn;iter=100-N;
+return;
+end;
+if abs(f(xx))>maxval
+disp(['iterations = ',num2str(iter)]);
+error('Solution diverges');
+break;
+end;
+N = N - 1;
+xx = xn;
+end;
+error('No convergence');
+break;
+% end function
+##### SOURCE END #####
+--></body></html>

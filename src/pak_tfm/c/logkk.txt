@@ -1,0 +1,18 @@
+Con C. Elapsed time 9.56 s
+Python solo. Elapsed time 9.46 s
+         20000017 function calls in 19.019 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        4    0.000    0.000    0.000    0.000 cp1252.py:18(encode)
+        1   14.554   14.554   19.019   19.019 prueba.py:1(<module>)
+        4    0.000    0.000    0.000    0.000 {built-in method charmap_encode}
+        1    0.000    0.000   19.019   19.019 {built-in method exec}
+ 10000000    2.169    0.000    2.169    0.000 {built-in method expm1}
+ 10000000    2.296    0.000    2.296    0.000 {built-in method helloworld}
+        2    0.000    0.000    0.000    0.000 {built-in method print}
+        4    0.000    0.000    0.000    0.000 {built-in method time}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+

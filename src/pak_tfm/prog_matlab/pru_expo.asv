@@ -1,0 +1,60 @@
+
+function pru_expo(dias,N0,ranual)
+    
+    rdiaria = rp(ranual,365)
+    for k=1:dias-1
+        
+        N1logAnt = N1log;
+        incN1log=binornd(N1logAnt,abs(rdiaria));
+        N1log = N1logAnt+sign(rdiaria)*incN1log
+    end
+        if (r1d==0)
+            decN1log = 0;
+        else
+            p1dperiod = rp(r1d,period);
+            decN1log = binornd(N1logAnt,abs(p1dperiod));
+        end
+        N1log=N1logAnt+sign(p1period)*incN1log-decN1log;
+        
+        rmut2= beta21*N1logAnt;
+        r2b = r2+rmut2;
+        if (r2b==0)
+            p2period = 0;
+            incN2log = 0;
+            t2b=0;
+        else
+            t2b = -1*abs(r2d-r2b)*(N2logAnt/K2)+r2b;
+            p2period = rp(t2b,period);
+            incN2log=binornd(N2logAnt,abs(p2period));
+        end
+        if (r2d==0)
+            decN2log = 0;
+        else
+            p2dperiod = rp(r2d,period);
+            decN2log = binornd(N2logAnt,abs(p2dperiod));
+        end
+        N2log=N2logAnt+sign(p2period)*incN2log-decN2log;
+        
+        N1(k) = N1log;
+        N2(k) = N2log;
+        r1eq(k)=t1b-r1d;
+        r2eq(k)=t2b-r2d;
+
+        
+    end
+
+    hold on;
+        subplot(2, 1, 1)
+        plot(N1,'-r','LineWidth',2);
+        hold on;
+        plot(N2,'-k','LineWidth',2);
+        title(sprintf('N1inic=%d K1=%d r1b=%0.2f r1d=%0.2f beta12=%0.6f (red); N2inic=%d K2=%d r2b=%0.2f r2d=%0.2f beta21=%0.8f (black)',N1_0,K1,r1,r1d,beta12,N2_0,K2,r2,r2d,beta21));
+        hold on;
+        subplot(2, 1, 2)
+        %plot(k,t1b-r1d,'-r');
+        %hold on;
+        plot(r1eq,'--r','LineWidth',1);
+        hold on;
+        plot(r2eq,'--k','LineWidth',1);
+        title(sprintf('r1eq (red); r2eq (black)'));
+        

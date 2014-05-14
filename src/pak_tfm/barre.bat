@@ -1,0 +1,10 @@
+bino_probability_slice.py nexper_1x1 877 590 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 935 565 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 993 535 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1051 510 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1110 485 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1168 460 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1226 440 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1284 420 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1342 400 40 300 100 Logistic_abs V
+bino_probability_slice.py nexper_1x1 1400 380 40 300 100 Logistic_abs V

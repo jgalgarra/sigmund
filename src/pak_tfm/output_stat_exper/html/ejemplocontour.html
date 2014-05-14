@@ -1,0 +1,131 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ejemplocontour</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-07-23"><meta name="DC.source" content="ejemplocontour.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput">close <span class="string">all</span>;
+clear <span class="string">all</span>;
+<span class="comment">%Manifold Pressure(kPa) Efficiency RPM</span>
+MPF = [3.386388 0.279787571 2000;
+17.6092176 0.274361388 2000;
+32.170686 0.270139565 2000;
+45.716238 0.229525428 2000;
+58.5845124 0.170549692 2000;
+7.1114148 0.28169432 2500;
+20.318328 0.277163557 2500;
+33.86388 0.258001274 2500;
+47.409432 0.232429153 2500;
+59.26179 0.171101662 2500;
+6.0954984 0.285690263 3000;
+20.318328 0.280410037 3000;
+33.86388 0.251227131 3000;
+47.0707932 0.228591604 3000;
+59.26179 0.159477716 3000;
+6.772776 0.268948084 3500;
+20.318328 0.261926385 3500;
+33.86388 0.247011536 3500;
+44.7003216 0.211605047 3500;
+57.9072348 0.167200772 3500;
+9.8205252 0.258340759 4000;
+21.3342444 0.269368785 4000;
+33.86388 0.242632812 4000;
+47.409432 0.211323506 4000;
+60.954984 0.155282744 4000;]
+plot3(MPF(:,1).',MPF(:,2).',MPF(:,3).');&shy;
+grid <span class="string">on</span>;
+</pre><pre class="codeoutput">Error: File: D:\eclipseworkspace\sigmund\src\pak_tfm\output_stat_exper\ejemplocontour.m Line: 29 Column: 41
+The input character is not valid in MATLAB statements or expressions.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+close all;
+clear all;
+%Manifold Pressure(kPa) Efficiency RPM
+MPF = [3.386388 0.279787571 2000;
+17.6092176 0.274361388 2000;
+32.170686 0.270139565 2000;
+45.716238 0.229525428 2000;
+58.5845124 0.170549692 2000;
+7.1114148 0.28169432 2500;
+20.318328 0.277163557 2500;
+33.86388 0.258001274 2500;
+47.409432 0.232429153 2500;
+59.26179 0.171101662 2500;
+6.0954984 0.285690263 3000;
+20.318328 0.280410037 3000;
+33.86388 0.251227131 3000;
+47.0707932 0.228591604 3000;
+59.26179 0.159477716 3000;
+6.772776 0.268948084 3500;
+20.318328 0.261926385 3500;
+33.86388 0.247011536 3500;
+44.7003216 0.211605047 3500;
+57.9072348 0.167200772 3500;
+9.8205252 0.258340759 4000;
+21.3342444 0.269368785 4000;
+33.86388 0.242632812 4000;
+47.409432 0.211323506 4000;
+60.954984 0.155282744 4000;]
+plot3(MPF(:,1).',MPF(:,2).',MPF(:,3).');­
+grid on;
+##### SOURCE END #####
+--></body></html>

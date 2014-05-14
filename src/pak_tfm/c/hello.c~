@@ -1,0 +1,11 @@
+#include <stdio.h>
+#include <pyhton.h>
+
+void main()
+{
+    int i;
+    for (i=0;i<2;i++)
+	{
+    	printf("\nHello World\n");
+	}
+}

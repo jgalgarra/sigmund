@@ -1,0 +1,1 @@
+"bino_probability_map.py nexper_1x1 bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM3.txt 40 300 100 Logistic_abs" 

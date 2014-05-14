@@ -1,0 +1,50 @@
+b12 = 0.000041850;
+
+c1 = 0.00004;
+alpha1 = 0.000035;
+%r1 =0.02-0.036;
+r1=0.02-0.036;
+
+b21=0.00008750;  % dos raices
+%b21= 0.000063185; % una raiz
+%b21 = 0.00004; % raices complejas
+c2 = 0.0001;
+alpha2 = 0.000035;
+r2 =0.05-0.07;
+
+K1_A = (c2*b21*alpha1+c1*b12*b21);
+K1_B = (alpha1*alpha2 + c1*b12*r2 - c2*b21*r1 -b12*b21);
+K1_C = -1*(r1*alpha2 + b12* r2);
+
+raiz_K1_1 = (-1*K1_B+sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A);
+raiz_K1_2 = (-1*K1_B-sqrt(K1_B^2-4*K1_A*K1_C))/(2*K1_A);
+
+
+K2_A = (c1*b12*alpha2+c2*b21*b12);
+K2_B = (alpha2*alpha1 + c2*b21*r1 - c1*b12*r2 -b21*b12);
+K2_C = -1*(r2*alpha1 + b21* r1);
+
+
+raiz_K2_1 = (-1*K2_B+sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A);
+raiz_K2_2 = (-1*K2_B-sqrt(K2_B^2-4*K2_A*K2_C))/(2*K2_A);
+ 
+% Calculo aproximado del mínimo. Se desprecian los términos multiplicados
+% por c 
+
+% -alpha1*N1 + b12*N2 = -r1
+% b21*N1 - alpha2*N2  = -r2
+M = [-alpha1 b12; b21 -alpha2];
+b = [-r1; -r2]
+x0 = linsolve(M,b)
+f2 =@(x) [r1+b12*x(2)-x(1)*(alpha1+c1*b12*x(2));
+          r2+b21*x(1)-x(2)*(alpha2+c2*b21*x(1))]
+f = @(x)[G*f2(x)];
+xnum_min = fsolve(f,x0);
+
+% Calculo aproximado del maximo. Se usa como pista [1/c1,1/c2]
+x1 = [1/c1;1/c2];
+xnum_max = fsolve(f,x1);
+[raiz_K1_2 raiz_K2_2]
+xnum_min
+[raiz_K1_1 raiz_K2_1]
+xnum_max

@@ -1,0 +1,7 @@
+function [ y ] = rp( ran,per )
+    a = 1+ran
+    %b = a^(1/per)
+    b=power(a, 1/per)
+    y = b-1
+end
+

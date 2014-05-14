@@ -1,0 +1,4 @@
+function [ y ] = irp( ran,per )
+    y = ((1+ran)^(1/per))-1;
+end
+

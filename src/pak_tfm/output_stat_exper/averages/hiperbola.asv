@@ -1,0 +1,7 @@
+x = linspace(330,4500);
+y=  (x + 3))./(x + 1);
+plot(x,y,'.k');
+hold on;
+
+xlimit = ([0 5000]);
+ylimit = ([0 5000]);

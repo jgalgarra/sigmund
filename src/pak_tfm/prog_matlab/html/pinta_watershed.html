@@ -1,0 +1,165 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>pinta_watershed</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-01-29"><meta name="DC.source" content="pinta_watershed.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% Genera y pinta una watershed para dos especies</span>
+<span class="comment">%</span>
+<span class="comment">% N2ini = (N2crit * N1ini^-B/A) / N1crit^-B/A</span>
+
+
+<span class="comment">% Los valores iniciales han sido calculados previamente con el</span>
+<span class="comment">% script calK1K2.m</span>
+
+N1crit = 692;
+N2crit = 989;
+B = 0.0243;
+A = 0.0188;
+limpop = 5000;
+
+N1 = linspace(0,limpop);
+exponente = -B/A;
+N2 = N2crit*N1.^exponente/N1crit^exponente
+polt(N1,N2)
+</pre><pre class="codeoutput">
+N2 =
+
+  1.0e+004 *
+
+  Columns 1 through 8
+
+       Inf    2.9143    1.1897    0.7044    0.4857    0.3640    0.2876    0.2356
+
+  Columns 9 through 16
+
+    0.1983    0.1703    0.1486    0.1314    0.1174    0.1059    0.0962    0.0880
+
+  Columns 17 through 24
+
+    0.0809    0.0748    0.0695    0.0648    0.0607    0.0570    0.0536    0.0506
+
+  Columns 25 through 32
+
+    0.0479    0.0455    0.0432    0.0412    0.0393    0.0375    0.0359    0.0344
+
+  Columns 33 through 40
+
+    0.0330    0.0318    0.0306    0.0294    0.0284    0.0274    0.0265    0.0256
+
+  Columns 41 through 48
+
+    0.0248    0.0240    0.0232    0.0226    0.0219    0.0213    0.0207    0.0201
+
+  Columns 49 through 56
+
+    0.0196    0.0190    0.0186    0.0181    0.0176    0.0172    0.0168    0.0164
+
+  Columns 57 through 64
+
+    0.0160    0.0157    0.0153    0.0150    0.0147    0.0144    0.0141    0.0138
+
+  Columns 65 through 72
+
+    0.0135    0.0132    0.0130    0.0127    0.0125    0.0122    0.0120    0.0118
+
+  Columns 73 through 80
+
+    0.0116    0.0114    0.0112    0.0110    0.0108    0.0106    0.0104    0.0103
+
+  Columns 81 through 88
+
+    0.0101    0.0099    0.0098    0.0096    0.0095    0.0093    0.0092    0.0091
+
+  Columns 89 through 96
+
+    0.0089    0.0088    0.0087    0.0086    0.0084    0.0083    0.0082    0.0081
+
+  Columns 97 through 100
+
+    0.0080    0.0079    0.0078    0.0077
+
+</pre><pre class="codeoutput">Undefined function or method 'polt' for input arguments of type 'double'.
+
+Error in ==&gt; pinta_watershed at 18
+polt(N1,N2)</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+% Genera y pinta una watershed para dos especies 
+%
+% N2ini = (N2crit * N1ini^-B/A) / N1crit^-B/A
+
+
+% Los valores iniciales han sido calculados previamente con el
+% script calK1K2.m
+
+N1crit = 692;
+N2crit = 989;
+B = 0.0243;
+A = 0.0188;
+limpop = 5000;
+
+N1 = linspace(0,limpop);
+exponente = -B/A;
+N2 = N2crit*N1.^exponente/N1crit^exponente
+polt(N1,N2)
+##### SOURCE END #####
+--></body></html>

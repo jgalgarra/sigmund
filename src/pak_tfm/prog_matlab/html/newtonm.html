@@ -1,0 +1,143 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>newtonm</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-09-12"><meta name="DC.source" content="newtonm.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [x,iter] = newtonm(x0,f,J)
+<span class="comment">% Newton-Raphson method applied to a</span>
+<span class="comment">% system of linear equations f(x) = 0,</span>
+<span class="comment">% given the jacobian function J, with</span>
+<span class="comment">% J = del(f1,f2,...,fn)/del(x1,x2,...,xn)</span>
+<span class="comment">% x = [x1;x2;...;xn], f = [f1;f2;...;fn]</span>
+<span class="comment">% x0 is an initial guess of the solution</span>
+N = 100; <span class="comment">% define max. number of iterations</span>
+epsilon = 1e-10; <span class="comment">% define tolerance</span>
+maxval = 10000.0; <span class="comment">% define value for divergence</span>
+xx = x0; <span class="comment">% load initial guess</span>
+<span class="keyword">while</span> (N&gt;0)
+    JJ = feval(J,xx);
+    <span class="keyword">if</span> abs(det(JJ))&lt;epsilon
+        error(<span class="string">'newtonm - Jacobian is singular - try new x0'</span>);
+        abort;
+    <span class="keyword">end</span>;
+    xn = xx - inv(JJ)*feval(f,xx);
+    <span class="keyword">if</span> abs(feval(f,xn))&lt;epsilon
+        x=xn;
+        iter = 100-N;
+        <span class="keyword">return</span>;
+    <span class="keyword">end</span>;
+    <span class="keyword">if</span> abs(feval(f,xx))&gt;maxval
+        iter = 100-N;
+        disp([<span class="string">'iterations = '</span>,num2str(iter)]);
+        error(<span class="string">'Solution diverges'</span>);
+        abort;
+    <span class="keyword">end</span>;
+    N = N - 1;
+    xx = xn;
+<span class="keyword">end</span>;
+error(<span class="string">'No convergence after 100 iterations.'</span>);
+abort;
+<span class="comment">% end function</span>
+</pre><pre class="codeoutput">Input argument "x0" is undefined.
+
+Error in ==&gt; newtonm at 11
+xx = x0; % load initial guess
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+function [x,iter] = newtonm(x0,f,J)
+% Newton-Raphson method applied to a
+% system of linear equations f(x) = 0,
+% given the jacobian function J, with
+% J = del(f1,f2,...,fn)/del(x1,x2,...,xn)
+% x = [x1;x2;...;xn], f = [f1;f2;...;fn]
+% x0 is an initial guess of the solution
+N = 100; % define max. number of iterations
+epsilon = 1e-10; % define tolerance
+maxval = 10000.0; % define value for divergence
+xx = x0; % load initial guess
+while (N>0)
+    JJ = feval(J,xx);
+    if abs(det(JJ))<epsilon
+        error('newtonm - Jacobian is singular - try new x0');
+        abort;
+    end;
+    xn = xx - inv(JJ)*feval(f,xx);
+    if abs(feval(f,xn))<epsilon
+        x=xn;
+        iter = 100-N;
+        return;
+    end;
+    if abs(feval(f,xx))>maxval
+        iter = 100-N;
+        disp(['iterations = ',num2str(iter)]);
+        error('Solution diverges');
+        abort;
+    end;
+    N = N - 1;
+    xx = xn;
+end;
+error('No convergence after 100 iterations.');
+abort;
+% end function
+##### SOURCE END #####
+--></body></html>

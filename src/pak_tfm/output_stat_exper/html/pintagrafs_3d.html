@@ -1,0 +1,306 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>pintagrafs_3d</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2013-07-23"><meta name="DC.source" content="pintagrafs_3d.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput">xinf = 0;
+xmax = 1400;
+yinf = 0;
+ymax = 1300;
+xsup = max(Min1(:,1));
+xinf = min(Min1(:,1));
+
+Min1=dlmread(<span class="string">'probslice_nexper_1x1_Binary_Logistic_abs_xcentral570_ycentral1300_numpoints30_nexper_400.txt'</span>);
+Min1(:,1)=int32(Min1(:,1));
+Min1(:,2)=int32(Min1(:,2));
+
+p = 0.1;
+valmin = min(abs(Min1(:,:,3)-p))
+
+<span class="keyword">return</span>
+Min2=dlmread(<span class="string">'probslice_nexper_1x1_Binary_Logistic_abs_xcentral580_ycentral1232_numpoints30_nexper_400.txt'</span>);
+Min2(:,1)=int32(Min2(:,1));
+Min2(:,2)=int32(Min2(:,2));
+
+Min3=dlmread(<span class="string">'probslice_nexper_1x1_Binary_Logistic_abs_xcentral600_ycentral1165_numpoints30_nexper_400.txt'</span>);
+Min3(:,1)=int32(Min3(:,1));
+Min3(:,2)=int32(Min3(:,2));
+
+Mdata = vertcat(Min1,Min2,Min3);
+
+
+
+rangeX= min(Mdata(:,1)):1:max(Mdata(:,1));
+rangeY = min(Mdata(:,2)):1:max(Mdata(:,2));
+
+rangeZ = 0:0.1:1.01;
+
+x = Mdata(:,1);
+y = Mdata(:,2);
+z = Mdata(:,3);
+
+
+colormap(cool);
+tx = 0:1:1400;
+ty = 0:1:1300;
+[XI,YI] = meshgrid(tx,ty);
+ZI = griddata(x,y,z,XI,YI);
+mesh(XI,YI,ZI);
+ylim([0 1300])
+xlim([0 1400])
+zlim([0 1.0]);
+hold;
+<span class="comment">%plot3(x,y,z,'o');</span>
+hold <span class="string">off</span>;
+
+
+<span class="comment">%[C,h]=contour(rangeX,rangeY,Mdata(1:10,:,:),rangeZ);</span>
+<span class="comment">%{
+</span><span class="comment">plot3(Min1(:,1),Min1(:,2),Min1(:,3));
+</span><span class="comment">xlim([min(Mdata(:,1))-50 1400])
+</span><span class="comment">ylim([0 1300])
+</span><span class="comment">hold on;
+</span><span class="comment">
+</span><span class="comment">plot3(Min2(:,1),Min2(:,2),Min2(:,3));
+</span><span class="comment">grid on;
+</span><span class="comment">hold on;
+</span><span class="comment">
+</span><span class="comment">plot3(Min3(:,1),Min3(:,2),Min3(:,3));
+</span><span class="comment">grid on;
+</span><span class="comment">%[c,h] = contourm(Mdata,'LevelStep',0.1,'ShowText','on');
+</span><span class="comment">%}
+</span>
+
+<span class="comment">%{
+</span><span class="comment">colormap(cool);
+</span><span class="comment">c = linspace(1,10,length(Mdata(:,1)));
+</span><span class="comment">s=6;
+</span><span class="comment">
+</span><span class="comment">h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+</span><span class="comment">xlim([min(Ma(:,1))-50 1400])
+</span><span class="comment">ylim([0 1300])
+</span><span class="comment">zlim([0 1])
+</span><span class="comment">set(h, 'Markersize',12);
+</span><span class="comment">
+</span><span class="comment">Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral580_ycentral1232_numpoints30_nexper_400.txt');
+</span><span class="comment">h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+</span><span class="comment">
+</span><span class="comment">Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral600_ycentral1165_numpoints30_nexper_400.txt');
+</span><span class="comment">h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+</span><span class="comment">
+</span><span class="comment">%}
+</span><span class="comment">%{
+</span><span class="comment">Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral614_ycentral1232_numpoints3_nexper_1000.txt');
+</span><span class="comment">h = scatter(Ma(:,1),Ma(:,2),s,c,'.');
+</span><span class="comment">
+</span><span class="comment">Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral634_ycentral1165_numpoints3_nexper_400.txt');
+</span><span class="comment">h = scatter(Ma(:,1),Ma(:,2),s,c,'.');
+</span><span class="comment">%}
+</span>
+M1=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM1.txt'</span>);
+M2=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM2.txt'</span>);
+M3=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM3.txt'</span>);
+M4=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM4.txt'</span>);
+M5=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM5.txt'</span>);
+M6=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM6.txt'</span>);
+M7=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM7.txt'</span>);
+M8=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM8.txt'</span>);
+M9=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM9.txt'</span>);
+M10=dlmread(<span class="string">'bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM10.txt'</span>);
+
+mediax = round(1/10*(M1(:,1)+M2(:,1)+M3(:,1)+M4(:,1)+M5(:,1)+M6(:,1)+M7(:,1)+M8(:,1)+M9(:,1)+M10(:,1)));
+mediay = round(1/10*(M1(:,2)+M2(:,2)+M3(:,2)+M4(:,2)+M5(:,2)+M6(:,2)+M7(:,2)+M8(:,2)+M9(:,2)+M10(:,2)));
+
+hold <span class="string">on</span>;
+
+prob = 0.75;
+c = zeros(length(mediax))
+<span class="keyword">for</span> j=1:length(mediax)
+   c(j) = prob;
+<span class="keyword">end</span>
+<span class="comment">%h = plot3(mediax,mediay,c,'.k');</span>
+</pre><pre class="codeoutput">Index exceeds matrix dimensions.
+
+Error in ==&gt; pintagrafs_3d at 13
+valmin = min(abs(Min1(:,:,3)-p))
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+xinf = 0;
+xmax = 1400;
+yinf = 0;
+ymax = 1300;
+xsup = max(Min1(:,1));
+xinf = min(Min1(:,1));
+
+Min1=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral570_ycentral1300_numpoints30_nexper_400.txt');
+Min1(:,1)=int32(Min1(:,1));
+Min1(:,2)=int32(Min1(:,2));
+
+p = 0.1;
+valmin = min(abs(Min1(:,:,3)-p))
+
+return
+Min2=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral580_ycentral1232_numpoints30_nexper_400.txt');
+Min2(:,1)=int32(Min2(:,1));
+Min2(:,2)=int32(Min2(:,2));
+
+Min3=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral600_ycentral1165_numpoints30_nexper_400.txt');
+Min3(:,1)=int32(Min3(:,1));
+Min3(:,2)=int32(Min3(:,2));
+
+Mdata = vertcat(Min1,Min2,Min3);
+
+
+
+rangeX= min(Mdata(:,1)):1:max(Mdata(:,1));
+rangeY = min(Mdata(:,2)):1:max(Mdata(:,2));
+
+rangeZ = 0:0.1:1.01;
+
+x = Mdata(:,1);
+y = Mdata(:,2);
+z = Mdata(:,3);
+
+
+colormap(cool);
+tx = 0:1:1400; 
+ty = 0:1:1300;
+[XI,YI] = meshgrid(tx,ty);
+ZI = griddata(x,y,z,XI,YI);
+mesh(XI,YI,ZI);
+ylim([0 1300])
+xlim([0 1400])
+zlim([0 1.0]);
+hold;
+%plot3(x,y,z,'o');
+hold off;
+
+
+%[C,h]=contour(rangeX,rangeY,Mdata(1:10,:,:),rangeZ);
+%{
+plot3(Min1(:,1),Min1(:,2),Min1(:,3));
+xlim([min(Mdata(:,1))-50 1400])
+ylim([0 1300])
+hold on;
+
+plot3(Min2(:,1),Min2(:,2),Min2(:,3));
+grid on;
+hold on;
+
+plot3(Min3(:,1),Min3(:,2),Min3(:,3));
+grid on;
+%[c,h] = contourm(Mdata,'LevelStep',0.1,'ShowText','on');
+%}
+
+
+%{
+colormap(cool);
+c = linspace(1,10,length(Mdata(:,1)));
+s=6;
+
+h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+xlim([min(Ma(:,1))-50 1400])
+ylim([0 1300])
+zlim([0 1])
+set(h, 'Markersize',12);
+
+Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral580_ycentral1232_numpoints30_nexper_400.txt');
+h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+
+Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral600_ycentral1165_numpoints30_nexper_400.txt');
+h = scatter3(Ma(:,1),Ma(:,2),Ma(:,3),c);
+
+%}
+%{
+Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral614_ycentral1232_numpoints3_nexper_1000.txt');
+h = scatter(Ma(:,1),Ma(:,2),s,c,'.');
+
+Ma=dlmread('probslice_nexper_1x1_Binary_Logistic_abs_xcentral634_ycentral1165_numpoints3_nexper_400.txt');
+h = scatter(Ma(:,1),Ma(:,2),s,c,'.');
+%}
+
+M1=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM1.txt');
+M2=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM2.txt');
+M3=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM3.txt');
+M4=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM4.txt');
+M5=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM5.txt');
+M6=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM6.txt');
+M7=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM7.txt');
+M8=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM8.txt');
+M9=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM9.txt');
+M10=dlmread('bd_nexper_1x1_Logistic_abs_Pl_r_b_-0.050000_0.000080_Pol_r_b_-0.090000_0.000110_NUM10.txt');
+
+mediax = round(1/10*(M1(:,1)+M2(:,1)+M3(:,1)+M4(:,1)+M5(:,1)+M6(:,1)+M7(:,1)+M8(:,1)+M9(:,1)+M10(:,1)));
+mediay = round(1/10*(M1(:,2)+M2(:,2)+M3(:,2)+M4(:,2)+M5(:,2)+M6(:,2)+M7(:,2)+M8(:,2)+M9(:,2)+M10(:,2)));
+
+hold on;
+
+prob = 0.75;
+c = zeros(length(mediax))
+for j=1:length(mediax)
+   c(j) = prob;
+end
+%h = plot3(mediax,mediay,c,'.k');
+
+##### SOURCE END #####
+--></body></html>
