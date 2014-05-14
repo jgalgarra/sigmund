@@ -1,4 +1,4 @@
-# SIGMUND 1.5
+# SIGMUND 1.5 
 #
 # Simulator of mutualistic interactions
 #
