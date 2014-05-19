@@ -175,7 +175,7 @@ def main():
         puntospolcalculo = np.round(np.linspace(Kpol0,cornerpoint[1],numpuntos+1))
         print(puntospolcalculo)
         
-        puntosgraf = []
+        puntosgraf = [] 
         repeat_count = 0
         margen = 0
         rango_N_ini = round(cornerpoint[0]/4)
