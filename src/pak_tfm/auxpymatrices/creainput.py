@@ -8,9 +8,16 @@ Created on 31/05/2014
 import numpy as np
 import os
 
-def completamatrix(mat_nopesada,ncols,n0base,bijbase,alfabase,cibase,rdbase):
+def completamatrix(mat_nopesada,ncols,n0base,bijbase,alfabase,cibase,rdbase,nchunks=0):
     newfila=np.empty(ncols-1)
     mat_completa = mat_nopesada * bijbase
+    # Multiplica los bij por un factor inverso a la distancia al core generalista
+    if (nchunks>0):
+        rangecols = np.array(range(0,ncols-1))
+        chunkcols = np.array_split(rangecols,nchunks)
+        for j in range(1,nchunks):
+            for k in chunkcols[j]:
+                mat_completa[:,k] = mat_completa[:,k]*(j+1)
     # newfila=np.empty(ncols-1); newfila.fill(n0base)
     # Poblaciones iniciales
     mat_completa = np.vstack([mat_completa,n0base])
@@ -28,7 +35,7 @@ def completamatrix(mat_nopesada,ncols,n0base,bijbase,alfabase,cibase,rdbase):
     mat_completa = np.vstack([mat_completa,newfila])
     return(mat_completa)
 
-def construyematrices(nomfich,bijbase = 0.00001,cibase = 0.00001,avgbase=0.05,rdbase = 0.04,randomizenest=0,randomizeall=0):
+def construyematrices(nomfich,bijbase = 0.00001,cibase = 0.00001,avgbase=0.05,rdbase = 0.04,randomizenest=0,randomizeall=0,nchunks=0):
     my_data = np.genfromtxt(nomfich, delimiter=',')
     nfilas, ncols = my_data.shape
     # Creamos un array vacio con una linea menos y una columna menos para eliminar
@@ -46,13 +53,13 @@ def construyematrices(nomfich,bijbase = 0.00001,cibase = 0.00001,avgbase=0.05,rd
     alfabase = cibase*10
     sustrato = avgbase/cibase
     n0base = np.round(0.2*sustrato+np.random.normal(sustrato,0.3*sustrato,ncols-1))
-    mat_A = completamatrix(mat_inter,ncols,n0base,bijbase,alfabase,cibase,rdbase)
+    mat_A = completamatrix(mat_inter,ncols,n0base,bijbase,alfabase,cibase,rdbase,nchunks)
     n0base = np.round(0.2*sustrato+np.random.normal(sustrato,0.3*sustrato,nfilas-1)) 
-    mat_B = completamatrix(mat_inter.transpose(),nfilas,n0base,bijbase,alfabase,cibase,rdbase)
+    mat_B = completamatrix(mat_inter.transpose(),nfilas,n0base,bijbase,alfabase,cibase,rdbase,nchunks)
     return(mat_A,mat_B)
 
-nfich='M_PL_042.csv'
-mat_A, mat_B = construyematrices(nfich,bijbase = 0.00003,avgbase=0.02,rdbase = 0.1,randomizenest=0,randomizeall=0)
+nfich='M_PL_010.csv'
+mat_A, mat_B = construyematrices(nfich,bijbase = 0.000003,avgbase=0.02,rdbase = 0.1,randomizenest=0,randomizeall=0,nchunks=8)
 prefix = nfich.split('.')[0]
 #print(prefix)
 np.savetxt(prefix+'_a.txt',mat_A,fmt='%0.08f',delimiter='\t',newline=os.linesep)

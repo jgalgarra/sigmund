@@ -730,7 +730,7 @@ def pintasubplot(na, min_individuos, max_individuos, displayinic, periods, facto
             graf.append(na[k][i])
             x.append(k)
         
-        plt.plot(x, graf, color=cm.Set1(i / (numspecies)), lw=2)
+        plt.plot(x, graf, color=cm.Set1(i / (numspecies)), lw=calc_lw_width(numspecies))
         ax.plot(0,0, color=cm.Set1(i/(numspecies)),label='%i' % i)
     a = plt.gca()
     a.set_ylim([0-factorescala*abs(min_individuos), factorescala * max_individuos])
@@ -758,15 +758,11 @@ def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_indiv
     numspecies_a=len(na[0])
     numspecies_b=len(nb[0])
     plt.figure('Mutualist network simulation. Input file: '+filename,dpi=resolucion,figsize=(ancho,alto))
-    
-    
     ax=plt.subplot(3, 2, 1)
     pintasubplot(na, 0, maxa_individuos, displayinic, periods, factorescala, numspecies_a, 'Plants', 'Individuals')
-    
     ax=plt.subplot(3, 2, 3)
     pintasubplot(ra_eff, min_reff, max_reff, displayinic, periods, factorescala, numspecies_a, '','Efficient growth rate')
     plt.xlabel('Years')
-    
     
     if (len(Bssvar_coefs)):
         ax=plt.subplot(3, 2, 5)
@@ -779,7 +775,7 @@ def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_indiv
             for k in range (0,numanyos):
                 graf.append(Bssvar_coefs[i][k])
                 x.append(1+k)
-            plt.plot(x,graf,color=cm.Set1(i/(numspecies_a)),lw=2)
+            plt.plot(x,graf,color=cm.Set1(i/(numspecies_a)),lw=calc_lw_width(numspecies_a))
             ax.plot(0,0, color=cm.Set1(i/(numspecies_a)),label='%i' % i)
         a = plt.gca()
         a.set_ylim([0,1.1])
@@ -857,6 +853,9 @@ def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_indiv
     #plt.show(2)
     plt.close()
     
+def calc_lw_width(numspecies):
+    return(0.5)
+
 def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,periods,dirsalida,algorithm='',fichreport='',os='',dirtrabajo=''):
     hayreport=len(fichreport)>0
     if hayreport: 
@@ -879,7 +878,7 @@ def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,pe
         for k in range (displayinic,periods):
             graf.append(na[k][i])
             x.append(k)
-        plt.plot(x,graf,color=cm.Set1(i/(numspecies_a)),lw=2)
+        plt.plot(x,graf,color=cm.Set1(i/(numspecies_a)),lw=calc_lw_width(numspecies_a))
     a = plt.gca()
     a.set_ylim([0,factorescala*maxa_individuos])
     if numspecies_b<11:
@@ -896,7 +895,7 @@ def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,pe
         for k in range (displayinic,periods):
             graf.append(nb[k][i])
             x.append(k)
-        plt.plot(x,graf,color=cm.Paired(i/(numspecies_b)),lw=2)
+        plt.plot(x,graf,color=cm.Paired(i/(numspecies_b)),lw=calc_lw_width(numspecies_b))
     a = plt.gca()
     a.set_ylim([0,factorescala*maxb_individuos])
     if numspecies_b<11:
@@ -915,7 +914,7 @@ def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,pe
         for k in range (displayinic,periods):
             graf.append(nc[k][i])
             x.append(k)
-        plt.plot(x,graf,color=cm.Paired(i/(numspecies_c)),lw=2)
+        plt.plot(x,graf,color=cm.Paired(i/(numspecies_c)),lw=calc_lw_width(numspecies_c))
     a = plt.gca()
     a.set_ylim([0,factorescala*maxc_individuos])   
     if numspecies_c<11:
