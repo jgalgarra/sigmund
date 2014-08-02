@@ -1,4 +1,7 @@
-pintaspecies <- function(directory, filea, fileb="", ylegend, titulo, position = "",grays="no",mmaximo="",mminimo="",wlinea="",hr=5,vr=7,horizlegend="no",xtitle="",cexlegend=0.6,caxis=0.75) {
+pintaspecies <- function(directory, filea, fileb="", ylegend, titulo, position = "",
+                         grays="no",mmaximo="",mminimo="",wlinea="",hr=5,vr=7,
+                         horizlegend="no",xtitle="",cexlegend=0.6,caxis=0.75,
+                         leginset = 0.025,legx.intersp=1,legy.intersp=1.0,legpch="no") {
   ficheroa <- paste0(getwd(),"/",directory,"/",filea)
   if (wlinea=="")
     wl=3
@@ -93,7 +96,17 @@ pintaspecies <- function(directory, filea, fileb="", ylegend, titulo, position =
   axis(1, at = posticks_x, labels = labels_x, lwd = 1, cex.axis=caxis, xaxs="r", font=1)
   axis(2, lwd = 1, cex.axis=caxis, xaxs="r", font=1)
   #legend("topleft", c(1,nspecies), cex=0.8, col=colores,lty=1:3, lwd=2, bty="n")
-  if (nchar(position)>0){
-    legend(position,inset = 0.025,x.intersp=1,y.intersp=1.0,bty="o",box.lwd=0,box.col="white",horiz=(horizlegend=="yes"),as.character(seq(1,nspecies)),cex=cexlegend,fill=c(colores),border=c(colores))  }
+  if (nchar(position)>0)
+    if (legpch=="no")
+      legend(position,horiz=(horizlegend=="yes"),inset = leginset,
+             x.intersp=legx.intersp,y.intersp=legy.intersp,bty="n",
+             box.lwd=0,as.character(seq(1,nspecies)),
+             cex=cexlegend,fill=c(colores),border=c(colores))
+      else
+      legend(position,horiz=(horizlegend=="yes"),inset = leginset,
+             x.intersp=legx.intersp,y.intersp=legy.intersp,bty="n",
+             box.lwd=0,as.character(seq(1,nspecies)),
+             cex=0.9*cexlegend,col=c(colores),lwd=rep(c(0),nspecies),seg.len=rep(c(0.05),nspecies),pch=rep(c(19),nspecies))
+  
   return(a)
 }
