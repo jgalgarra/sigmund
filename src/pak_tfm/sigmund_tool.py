@@ -316,15 +316,17 @@ class StartQT4(QtGui.QMainWindow):
                 return
             
         Na,Nb,Nc,Ra,Rb,RequA,RequB,maxa,maxb,maxreff,minreff,\
-        maxequs,minequs,extinction,pBssvar_coefs=b_sim.bino_mutual(input_fname,self.ciclos,self.haypred,haysup,\
-                                                     outputdatasave,dirs,dirent,dirsalida,eliminarenlaces=el,\
-                                                     pl_ext=plants_extinction,pol_ext=pols_extinction,\
-                                                     os=output_suffix,fichreport=fichr,com=comentario,\
-                                                     algorithm=self.algorithm,plants_blossom_prob=pb,\
-                                                     plants_blossom_sd=pb_sd,plants_blossom_type=self.typeofblossom,\
-                                                     blossom_pert_list = blossom_perturbation, release = self.release,\
-                                                     Bssvar_period = self.Bssvar_period,Bssvar_sd=self.Bssvar_sd,\
-                                                     Bssvar_modulationtype_list=self.Bssvar_modulationtype_list,Bssvar_species=self.Bssvar_species) 
+                maxequs,minequs,extinction,pBssvar_coefs= \
+                b_sim.bino_mutual(input_fname,self.ciclos,self.haypred,haysup,\
+                outputdatasave,dirs,dirent,dirsalida,eliminarenlaces=el,\
+                pl_ext=plants_extinction,pol_ext=pols_extinction,\
+                os=output_suffix,fichreport=fichr,com=comentario,\
+                algorithm=self.algorithm,plants_blossom_prob=pb,\
+                plants_blossom_sd=pb_sd,plants_blossom_type=self.typeofblossom,\
+                blossom_pert_list = blossom_perturbation, release = self.release,\
+                Bssvar_period = self.Bssvar_period,Bssvar_sd=self.Bssvar_sd,\
+                Bssvar_modulationtype_list=self.Bssvar_modulationtype_list,\
+                Bssvar_species=self.Bssvar_species) 
         self.ui.label_report.setText("Report file: ")
         self.ui.URL_report.setText(linkname)
         self.ui.Run_Button.setEnabled(1)

@@ -9,20 +9,17 @@ import numpy as np
 from time import time
 import math
 import datetime
-#import sys
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.backends.backend_tkagg
 import os
+import sys
 import cProfile
 
 global ancho
 global alto
 global resolucion
 global pathout
-global hayreport
-global frep
-global output_verbose
 global invperiod
 global cuentaperpl,cuentaperpol
 global Logistic_abs
@@ -34,12 +31,49 @@ global diasdelanio
 global ax
 
 diasdelanio = 365
-
 ancho=16
 alto=10
 resolucion=600
 invperiod = 1/diasdelanio
 tol_extincion = -0.0001
+
+class CanalInfo():
+    """ CanalInfo is a wrapper of status information channels such as stdout and
+    the report file """
+    def __init__(self,device,newlinestr):
+        self.device = device
+        self.newline = newlinestr
+    def write(self,texto):
+        self.device.write(texto+self.newline)
+    def close(self):
+        self.device.close()
+        
+def show_info_to_user(canalesinfo,texto):
+    """ (list of CanalInfo, str) -> NoneType
+
+    Execution status information for human user
+    
+    >>> ldevices = []
+    >>> ldevices.append(CanalInfo(sys.stdout))
+    >>> show_info_to_user(ldevices, 'Info for you')
+    Info for you
+    """
+    [canal.write(texto) for canal in canalesinfo]
+    
+def close_info_channels(canalesinfo):
+    [canal.close() for canal in canalesinfo]
+    
+def open_info_channels(verbose,fichreport,mode):
+    ldev = []
+    lfich = []
+    if verbose:    
+        sout = CanalInfo(sys.stdout,'\n')
+        ldev.append(sout)
+    if len(fichreport)>0:
+        frep = CanalInfo(open(fichreport,mode,encoding='utf-8'),'<br>')
+        ldev.append(frep)
+        lfich.append(frep)
+    return ldev,lfich
 
 '''signfunc = lambda x : (x>0) - (x<0)'''
 
@@ -117,19 +151,6 @@ def dlmwritelike(inputfile,nperiod,Nin,dirsalida,os):
         salida.write(str(linea[-1])+'\n');
     salida.close()
     return(nsal)
-
-def informa(text):
-    global hayreport
-    global frep
-    global output_verbose
-    
-    if output_verbose:
-        '''print(text,file=sys.stdout)'''
-        print(text)
-        pass
-    if hayreport: 
-        frep.write(text+'<br>')
-    return(0)
 
 def val_mutMay(r_species,beta,period,N1,N2,K1):
     rspneq = calc_r_periodo_vh(abs(r_species),invperiod)
@@ -247,7 +268,7 @@ def init_perturbations(pl_ext, pol_ext, yearperiods, inicioextplantas, inicioext
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        informa("Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / diasdelanio, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        show_info_to_user(ldevices_info,"Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / diasdelanio, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
@@ -255,7 +276,7 @@ def init_perturbations(pl_ext, pol_ext, yearperiods, inicioextplantas, inicioext
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        informa("Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / diasdelanio, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        show_info_to_user(ldevices_info,"Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / diasdelanio, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol, inicioextpolin, periodoextpol, spikepol
@@ -340,7 +361,7 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
             retl = ciclo_May(r_p[n] - r_muerte, rMay, days_year, term_May, Nindividuals_p[k,n], Alpha_p[n])           
         pop_p = retl[0] - p_devorados
         if not(pop_p):
-            informa("Day %d (year %d). %s species %d extincted" % (k, k//diasdelanio, strtype, n))
+            show_info_to_user(ldevices_info,"Day %d (year %d). %s species %d extincted" % (k, k//diasdelanio, strtype, n))
     Nindividuals_p[k+1][n] = pop_p
     if (pop_p):
         rp_eff[k+1][n] = retl[1]
@@ -391,9 +412,6 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                 eliminarenlaces=0,pl_ext=[],pol_ext=[],os='',fichreport='',com='', algorithm='MoMutualism', plants_blossom_prob=1.0,\
                 plants_blossom_sd=0.01, plants_blossom_type = 'Binary', blossom_pert_list='', verbose=True,exit_on_extinction=False,\
                 N0plants='',N0pols='',release='',Bssvar_period=0.1,Bssvar_sd=0.0,Bssvar_modulationtype_list=[],Bssvar_species=[]):
-    global hayreport
-    global frep
-    global output_verbose
     global cuentaperpl,cuentaperpol
     global Logistic_abs
     global model_r_alpha
@@ -406,21 +424,20 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     model_r_alpha =  (algorithm=='Verhulst') or (algorithm=='NoMutualism')
     #print("model_ra"+str(model_r_alpha))
     Logistic_abs = (algorithm=='Logistic_abs')   
-    hayreport=len(fichreport)>0
-    output_verbose = verbose
-    if hayreport: 
-        frep=open(fichreport,'w',encoding='utf-8')
-    informa ("Binomial simulated mutualistic interaction. Input file: %s" %(filename))
-    informa ('============================================================================')
-    if len(com)>0: informa("User Comment: %s" % com)
+    ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'w')    
+    
+    show_info_to_user(ldevices_info,\
+      "Binomial simulated mutualistic interaction. Input file: %s" %(filename))
+    show_info_to_user(ldevices_info,'========================================')
+    if len(com)>0: show_info_to_user(ldevices_info,"User Comment: %s" % com)
     tinic=time()
     days_year=diasdelanio
-    informa('Span: %d years' % (year_periods))
-    informa('ALGORITHM: '+algorithm)
-    informa('Release '+ (("%.02f")%(release/100)))
+    show_info_to_user(ldevices_info,'Span: %d years' % (year_periods))
+    show_info_to_user(ldevices_info,'ALGORITHM: '+algorithm)
+    show_info_to_user(ldevices_info,'Release '+ (("%.02f")%(release/100)))
     filename_a=filename+'_a.txt'
     dt = dirtrabajo.replace('\\','/')
-    if hayreport: frep.write("<br>Plants matrix: <a href='file:///"+dt+"/input/"+filename_a+"' target=_BLANK>"+filename_a+"<a><br>")
+    show_info_to_user(lfich_info,"Plants matrix: <a href='file:///"+dt+"/input/"+filename_a+"' target=_BLANK>"+filename_a+"<a>")
     l_minputchar_a=dlmreadlike(filename_a,direntrada)
     ''' If N0plants provided by command line'''
     if len(N0plants)>0:
@@ -445,7 +462,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     else:
         lcompatibplantas = calc_compatib_plantas(numspecies_a,plants_blossom_prob,[g for g in range(0,numspecies_a)])
     filename_b=filename+'_b.txt'
-    if hayreport: frep.write("Pollinators matrix: <a href='file:///"+dt+"/input/"+filename_b+"' target=_BLANK>"+filename_b+"<a><br>")
+    show_info_to_user(lfich_info,"Pollinators matrix: <a href='file:///"+dt+"/input/"+filename_b+"' target=_BLANK>"+filename_b+"<a><br>")
     l_minputchar_b=dlmreadlike(filename_b,direntrada)
     ''' If N0pols provided by command line'''
     if len(N0pols)>0:
@@ -467,14 +484,14 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     if hay_foodweb>0:
         filename_c=filename+'_c.txt'
         filename_d=filename+'_d.txt'
-        if hayreport: frep.write("Predators matrix c:<a href='file:///"+dt+"/input/"+filename_c+"' target=_BLANK>"+filename_c+"<a><br>")
-        frep.write("Predators matrix d:<a href='file:///"+dt+"/input/"+filename_d+"' target=_BLANK>"+filename_d+"<a><br>")
+        how_info_to_user(lfich_info,"Predators matrix c:<a href='file:///"+dt+"/input/"+filename_c+"' target=_BLANK>"+filename_c+"<a><br>")
+        show_info_to_user(lfich_info,"Predators matrix d:<a href='file:///"+dt+"/input/"+filename_d+"' target=_BLANK>"+filename_d+"<a><br>")
         l_minputchar_c=dlmreadlike(filename_c,direntrada)
         minputchar_c = np.array(l_minputchar_c,dtype=float)
         nrows_c=len(minputchar_c)
         ncols_c=len(minputchar_c[0])
         numspecies_c=ncols_c;
-        informa("Predator species : %d" %numspecies_c)
+        show_info_to_user(ldevices_info,"Predator species : %d" %numspecies_c)
         for n in range(numspecies_c):
             rowNindividuals_c.append(int(minputchar_c[nrows_c-3][n]))
             K_c.append(int(minputchar_c[nrows_c-2][n]))
@@ -487,7 +504,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         ncols_d=len(minputchar_d[0])
         numspecies_d = ncols_d
   
-    informa("Plant species: %d" %numspecies_a)
+    show_info_to_user(ldevices_info,"Plant species: %d" %numspecies_a)
     for n in range(numspecies_a):
         rowNindividuals_a.append(int(minputchar_a[-5][n]))
         cAlpha_a.append(float(minputchar_a[-4][n]))
@@ -496,12 +513,12 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         rd_a.append(minputchar_a[-1][n])
     Nindividuals_a[0]=np.array(rowNindividuals_a)
     
-    informa("Plant initial populations %s" % rowNindividuals_a)
+    show_info_to_user(ldevices_info,"Plant initial populations %s" % rowNindividuals_a)
     if (plants_blossom_type=='Binary'):
-        informa("Blossom probability %s, type %s. Plant affected species:%s" % (plants_blossom_prob,plants_blossom_type,str(blossom_pert_list)))
+        show_info_to_user(ldevices_info,"Blossom probability %s, type %s. Plant affected species:%s" % (plants_blossom_prob,plants_blossom_type,str(blossom_pert_list)))
     else:
-        informa("Blossom probability, type %s, mean %s, standard dev. %s. Plant affected species:%s" % (plants_blossom_type,plants_blossom_prob,plants_blossom_sd,str(blossom_pert_list)))
-    informa("Pollinator species: %d" %numspecies_b)
+        show_info_to_user(ldevices_info,"Blossom probability, type %s, mean %s, standard dev. %s. Plant affected species:%s" % (plants_blossom_type,plants_blossom_prob,plants_blossom_sd,str(blossom_pert_list)))
+    show_info_to_user(ldevices_info,"Pollinator species: %d" %numspecies_b)
     for n in range(numspecies_b):
         rowNindividuals_b.append(int(minputchar_b[-5][n]))
         cAlpha_b.append(float(minputchar_b[-4][n]))
@@ -510,11 +527,11 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         rd_b.append(minputchar_b[-1][n])
     Nindividuals_b[0]=np.array(rowNindividuals_b)
    
-    informa("Pollinator initial populations %s" % rowNindividuals_b)
+    show_info_to_user(ldevices_info,"Pollinator initial populations %s" % rowNindividuals_b)
     if eliminarenlaces>0:
         cuenta=cuentaenlaces(minputchar_a)
         hayqueborrar=math.floor(eliminarenlaces*cuenta)
-        informa ("Links %d. Will be deleted %d" % (cuentaenlaces(minputchar_a),hayqueborrar))
+        show_info_to_user(ldevices_info,"Links %d. Will be deleted %d" % (cuentaenlaces(minputchar_a),hayqueborrar))
         if hayqueborrar > 0:
             periodoborr=periods/(hayqueborrar+1)
         else:
@@ -556,7 +573,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
             else:
                 strvalor=''
         straff = (". Affected species:%s" % (Bssvar_species))
-        informa("Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
+        show_info_to_user(ldevices_info,"Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
                 % (Bssvar_period,Bssvar_sd,Bssvar_modulationtype_list[0],strvalor,straff))
         if (str(Bssvar_species[0]).upper()=='ALL'):
             listaspecies = list(range(numspecies_a))
@@ -589,14 +606,14 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                     if (k>diasdelanio) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
                        ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
                         systemextinction = True
-                        informa("ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
+                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
                         if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
                 else:
                     if (k>diasdelanio) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
                        ((ra_eff[k-1]>=tol_extincion).sum()==0) and ((rb_eff[k-1]>=tol_extincion).sum()==0):
                         systemextinction = True
-                        informa("ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
+                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
                         if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas = calc_blossom_effect(numspecies_a,nrows_a,ncols_a,\
@@ -615,7 +632,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                 minputchar_b[col][fil]=0
                 minpeq_a = minputchar_a*minputchar_a_mask
                 minpeq_b = minputchar_b*minputchar_b_mask
-                informa("Day:%d (year %d). Deleted links plant %d <-> pollinator %d" % (k, k//diasdelanio ,fil,col))
+                show_info_to_user(ldevices_info,"Day:%d (year %d). Deleted links plant %d <-> pollinator %d" % (k, k//diasdelanio ,fil,col))
         [populations_evolution(n,"Plant",numspecies_a,algorithm,hay_foodweb, pl_ext, May, haymut,\
                                              days_year, ra_eff, ra_equs, minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, Nindividuals_a,\
                                              numspecies_b, Nindividuals_b, Nindividuals_c, minputchar_c, numspecies_c,\
@@ -652,7 +669,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                     signo=signfunc(r_c[n])
                     pop_c=Nindividuals_c[k][n]+incPredatoria+signo*incNmalth #+ incNlogistic-c_devorados
                     if (pop_c==0):
-                        informa("Predator species %d extinction in day %d" % (n,k))
+                        show_info_to_user(ldevices_info,"Predator species %d extinction in day %d" % (n,k))
                 else:
                     pop_c=0;
                 rowNi.append(pop_c)
@@ -666,29 +683,27 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
 
     tfin=time()
-    informa ("Elapsed time %.02f s" % (tfin-tinic))
+    show_info_to_user(ldevices_info,"Elapsed time %.02f s" % (tfin-tinic))
     speriodos = str(int(periods/diasdelanio))
     if (data_save==1):
         nsal = dlmwritelike(filename+'_'+algorithm+"_a_populations_",speriodos,Nindividuals_a,dirsal,os)
         rsal = dlmwritelike(filename+'_'+algorithm+"_a_rs_",speriodos,ra_eff,dirsal,os)
         requsal = dlmwritelike(filename+'_'+algorithm+"_a_requs_",speriodos,ra_equs,dirsal,os)
-        if hayreport: 
-            frep.write("<br>Plant populations data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
-            frep.write("<br>Plant effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
-            frep.write("<br>Plant equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
+        show_info_to_user(lfich_info,"Plant populations data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
+        show_info_to_user(lfich_info,"Plant effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
+        show_info_to_user(lfich_info,"Plant equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
         nsal=dlmwritelike(filename+'_'+algorithm+"_b_populations_",speriodos,Nindividuals_b,dirsal,os)
         rsal = dlmwritelike(filename+'_'+algorithm+"_b_rs_",speriodos,rb_eff,dirsal,os)
         requsal = dlmwritelike(filename+'_'+algorithm+"_b_requs_",speriodos,rb_equs,dirsal,os)
-        if hayreport: 
-            frep.write("<br>Pollinators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
-            frep.write("<br>Pollinators effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
-            frep.write("<br>Pollinators equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
+        show_info_to_user(lfich_info,"Pollinators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
+        show_info_to_user(lfich_info,"Pollinators effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
+        show_info_to_user(lfich_info,"Pollinators equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
         if hay_foodweb>0:
             nsal=dlmwritelike(filename+'_'+algorithm+"_c",speriodos,Nindividuals_c,dirsal,os)
-            if hayreport: frep.write("Predators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a><br>")
-    informa ('')
-    informa ('Created %s' % datetime.datetime.now())
-    if hayreport: frep.close()
+            show_info_to_user(lfich_info,"Predators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a><br>")
+    show_info_to_user(ldevices_info,'')
+    show_info_to_user(ldevices_info,'Created %s' % datetime.datetime.now())
+    close_info_channels(lfich_info)
     return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_individuos,\
            max_reff,min_reff,max_requs,min_requs,systemextinction,pBssvar_species)
 
@@ -745,15 +760,14 @@ def pintasubplot(na, min_individuos, max_individuos, displayinic, periods, facto
     
 
 def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_individuos,max_reff,min_reff,max_equs,min_equs,\
-                  filename,displayinic,periods,dirsalida,algorithm='',fichreport='',os='',dirtrabajo='',Bssvar_coefs=[]):
+                  filename,displayinic,periods,dirsalida,algorithm='',fichreport='',verbose=True,os='',dirtrabajo='',Bssvar_coefs=[]):
     global ax
     # Si los valores de reff son muy pequenios, se cambia la escala de esas graficas
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
     years = periods/diasdelanio
-    hayreport=len(fichreport)>0
-    if hayreport: 
-        frep=open(fichreport,'a',encoding='utf-8')
+    ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'a')    
+    
     factorescala=1.1
     numspecies_a=len(na[0])
     numspecies_b=len(nb[0])
@@ -786,80 +800,29 @@ def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_indiv
             leg = plt.gca().get_legend()
             ltext  = leg.get_texts()
             plt.setp(ltext, fontsize='small')
-    
-    '''
-    ax=plt.subplot(3, 2, 5)
-    plt.ylabel('Equivalent growth rate')
-    plt.xlabel('Days')
-    plt.grid(True)
-    for i in range(numspecies_a):
-        graf=[]
-        x=[]
-        for k in range (displayinic,periods-1):
-            graf.append(ra_equs[k][i])
-            x.append(k)
-        plt.plot(x,graf,color=cm.Set1(i/(numspecies_a)),lw=2)
-        ax.plot(0,0, color=cm.Set1(i/(numspecies_a)),label='%i' % i)
-    a = plt.gca()
-    a.set_ylim([0-factorescala*abs(min_equs),factorescala*max_equs])
-    if (numspecies_a<11):
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fancybox=True, shadow=True)
-        leg = plt.gca().get_legend()
-        ltext  = leg.get_texts()
-        plt.setp(ltext, fontsize='small')
-    '''
-    
+        
     ax=plt.subplot(3, 2, 2)
     pintasubplot(nb, 0, maxb_individuos, displayinic, periods, factorescala, numspecies_b, 'Polllinators', '')
     ax=plt.subplot(3, 2, 4)
     pintasubplot(rb_eff, min_reff, max_reff, displayinic, periods, factorescala, numspecies_b, '','')
     plt.xlabel('Years')
-    
-    '''
-    ax=plt.subplot(3, 2, 6)
-    #plt.ylabel('Equivalent growth rate')
-    plt.xlabel('Days')
-    plt.grid(True)
-    for i in range(numspecies_b):
-        graf=[]
-        x=[]
-        for k in range (displayinic,periods-1):
-            graf.append(rb_equs[k][i])
-            x.append(k)
-        plt.plot(x,graf,color=cm.Paired(i/(numspecies_b)),lw=2)
-        ax.plot(0,0, color=cm.Paired(i/(numspecies_b)),label='%i' % i)
-    a = plt.gca()
-    a.set_ylim([0-factorescala*abs(min_equs),factorescala*max_equs])
-    if numspecies_b<11:
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), fancybox=True, shadow=True)
-        leg = plt.gca().get_legend()
-        ltext  = leg.get_texts()
-        plt.setp(ltext, fontsize='small')
-     '''
-    
+      
     dt = dirtrabajo.replace('\\','/');    
     nsal= 'output_pict_plantsandpols_'+filename+'_'+algorithm+'_'+os+'_'+str(years)+'.png'
     plt.savefig(str(dt+'/'+dirsalida.replace('\\','/')+nsal),bbox_inches=0)
-    if hayreport:
-        frep.write("<p align=left><br>Populations evolution picture<br>")
-        frep.write("<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" % str(dt+'/'+dirsalida.replace('\\','/')+nsal)) 
-        frep.write('</p>')
-        frep.write('<br>')
-        frep.close()
-    #plt.show(2)
+    show_info_to_user(lfich_info,"<p align=left>Populations evolution picture")
+    show_info_to_user(lfich_info,"<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" % str(dt+'/'+dirsalida.replace('\\','/')+nsal)) 
+    show_info_to_user(lfich_info,'</p><br>')
+    close_info_channels(lfich_info)
     plt.close()
     
 def calc_lw_width(numspecies):
     return(0.5)
 
-def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,periods,dirsalida,algorithm='',fichreport='',os='',dirtrabajo=''):
-    hayreport=len(fichreport)>0
-    if hayreport: 
-        frep=open(fichreport,'a',encoding='utf-8')
+def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,periods,dirsalida,algorithm='',fichreport='',os='',dirtrabajo='',verbose=True):
+#
+    ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'a')    
+    
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
     factorescala=1.2
@@ -924,11 +887,12 @@ def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,pe
     dt = dirtrabajo.replace('\\','/');
     plt.savefig(str(dt+'/'+dirsalida.replace('\\','/')+nsal),bbox_inches=0)
     plt.close()
-    if hayreport:
-        frep.write("<P align=left><br>Foodweb effect picture<br>")
-        dt = dirtrabajo.replace('\\','/');
-        frep.write("<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" % str(dt+'/'+dirsalida.replace('\\','/')+nsal)) 
-        frep.write('<p>')
-        frep.close()
-    #plt.show(2)    
+    show_info_to_user(lfich_info,"<P align=left><br>Foodweb effect picture<br>")
+    dt = dirtrabajo.replace('\\','/');
+    show_info_to_user(lfich_info,"<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" % str(dt+'/'+dirsalida.replace('\\','/')+nsal)) 
+    show_info_to_user(lfich_info,'<p>')
+    close_info_channels(lfich_info)    
             
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
