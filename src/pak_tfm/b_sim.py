@@ -27,14 +27,14 @@ global model_r_alpha
 global tol_extincion
 global hay_bssvar
 global pendiente,sd,periodo
-global diasdelanio
+global DAYS_IN_A_YEAR
 global ax
 
-diasdelanio = 365
-ancho=16
-alto=10
+DAYS_IN_A_YEAR = 365
+ancho = 16
+alto = 10
 resolucion=600
-invperiod = 1/diasdelanio
+invperiod = 1/DAYS_IN_A_YEAR
 tol_extincion = -0.0001
 
 class CanalInfo():
@@ -264,19 +264,19 @@ def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp, spikep, k
 
 def init_perturbations(pl_ext, pol_ext, yearperiods, inicioextplantas, inicioextpolin, hayextplantas, hayextpolin):
     if hayextplantas:
-        inicioextplantas = round(yearperiods * pl_ext['start'] * diasdelanio)
+        inicioextplantas = round(yearperiods * pl_ext['start'] * DAYS_IN_A_YEAR)
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        show_info_to_user(ldevices_info,"Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / diasdelanio, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        show_info_to_user(ldevices_info,"Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / DAYS_IN_A_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
-        inicioextpolin = round(yearperiods * pol_ext['start'] * diasdelanio)
+        inicioextpolin = round(yearperiods * pol_ext['start'] * DAYS_IN_A_YEAR)
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        show_info_to_user(ldevices_info,"Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / diasdelanio, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        show_info_to_user(ldevices_info,"Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / DAYS_IN_A_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol, inicioextpolin, periodoextpol, spikepol
@@ -361,7 +361,7 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
             retl = ciclo_May(r_p[n] - r_muerte, rMay, days_year, term_May, Nindividuals_p[k,n], Alpha_p[n])           
         pop_p = retl[0] - p_devorados
         if not(pop_p):
-            show_info_to_user(ldevices_info,"Day %d (year %d). %s species %d extincted" % (k, k//diasdelanio, strtype, n))
+            show_info_to_user(ldevices_info,"Day %d (year %d). %s species %d extincted" % (k, k//DAYS_IN_A_YEAR, strtype, n))
     Nindividuals_p[k+1][n] = pop_p
     if (pop_p):
         rp_eff[k+1][n] = retl[1]
@@ -408,6 +408,40 @@ def calc_blossom_effect(numspecies_a,nrows_a,ncols_a,nrows_b,ncols_b,numspecies_
             minputchar_b_mask[m,i]=lcompatibplantas[m]
     return minputchar_a_mask,minputchar_b_mask,lcompatibplantas    
 
+def start_report(ldevices_info,filename,com,year_periods,algorithm,release):
+    show_info_to_user(ldevices_info,\
+      "Binomial simulated mutualistic interaction. Input file: %s" %(filename))
+    show_info_to_user(ldevices_info,60*'=')
+    if len(com)>0: show_info_to_user(ldevices_info,"User Comment: %s" % com)
+    show_info_to_user(ldevices_info,'Span: %d years' % (year_periods))
+    show_info_to_user(ldevices_info,'ALGORITHM: '+algorithm)
+    show_info_to_user(ldevices_info,'Release '+ (("%.02f")%(release/100)))
+
+def end_report(ldevices_info,lfich_info,tfin,tinic,periods,data_save,filename,
+               algorithm, dirsal,os,Nindividuals_a,ra_eff,ra_equs, Nindividuals_b, 
+               rb_eff,rb_equs,Nindividuals_c):    
+    show_info_to_user(ldevices_info,"Elapsed time %.02f s" % (tfin-tinic))
+    speriodos = str(int(periods/DAYS_IN_A_YEAR))
+    if (data_save==1):
+        nsal = dlmwritelike(filename+'_'+algorithm+"_a_populations_",speriodos,Nindividuals_a,dirsal,os)
+        rsal = dlmwritelike(filename+'_'+algorithm+"_a_rs_",speriodos,ra_eff,dirsal,os)
+        requsal = dlmwritelike(filename+'_'+algorithm+"_a_requs_",speriodos,ra_equs,dirsal,os)
+        show_info_to_user(lfich_info,"Plant populations data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
+        show_info_to_user(lfich_info,"Plant effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
+        show_info_to_user(lfich_info,"Plant equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
+        nsal=dlmwritelike(filename+'_'+algorithm+"_b_populations_",speriodos,Nindividuals_b,dirsal,os)
+        rsal = dlmwritelike(filename+'_'+algorithm+"_b_rs_",speriodos,rb_eff,dirsal,os)
+        requsal = dlmwritelike(filename+'_'+algorithm+"_b_requs_",speriodos,rb_equs,dirsal,os)
+        show_info_to_user(lfich_info,"Pollinators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
+        show_info_to_user(lfich_info,"Pollinators effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
+        show_info_to_user(lfich_info,"Pollinators equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
+        if hay_foodweb>0:
+            nsal=dlmwritelike(filename+'_'+algorithm+"_c",speriodos,Nindividuals_c,dirsal,os)
+            show_info_to_user(lfich_info,"Predators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a><br>")
+    show_info_to_user(ldevices_info,'')
+    show_info_to_user(ldevices_info,'Created %s' % datetime.datetime.now())
+    close_info_channels(lfich_info)
+
 def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save='',dirtrabajo='',direntrada='',dirsal='',\
                 eliminarenlaces=0,pl_ext=[],pol_ext=[],os='',fichreport='',com='', algorithm='MoMutualism', plants_blossom_prob=1.0,\
                 plants_blossom_sd=0.01, plants_blossom_type = 'Binary', blossom_pert_list='', verbose=True,exit_on_extinction=False,\
@@ -418,23 +452,18 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     global pendiente,blossomperiod,sd,periodo
     
     systemextinction = False
-    periods = year_periods * diasdelanio
+    periods = year_periods * DAYS_IN_A_YEAR
     May = (algorithm=='May')
     haymut = (algorithm!='NoMutualism')    
     model_r_alpha =  (algorithm=='Verhulst') or (algorithm=='NoMutualism')
     #print("model_ra"+str(model_r_alpha))
     Logistic_abs = (algorithm=='Logistic_abs')   
     ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'w')    
-    
-    show_info_to_user(ldevices_info,\
-      "Binomial simulated mutualistic interaction. Input file: %s" %(filename))
-    show_info_to_user(ldevices_info,'========================================')
-    if len(com)>0: show_info_to_user(ldevices_info,"User Comment: %s" % com)
     tinic=time()
-    days_year=diasdelanio
-    show_info_to_user(ldevices_info,'Span: %d years' % (year_periods))
-    show_info_to_user(ldevices_info,'ALGORITHM: '+algorithm)
-    show_info_to_user(ldevices_info,'Release '+ (("%.02f")%(release/100)))
+    days_year=DAYS_IN_A_YEAR
+
+    start_report(ldevices_info,filename,com,year_periods,algorithm,release)    
+    
     filename_a=filename+'_a.txt'
     dt = dirtrabajo.replace('\\','/')
     show_info_to_user(lfich_info,"Plants matrix: <a href='file:///"+dt+"/input/"+filename_a+"' target=_BLANK>"+filename_a+"<a>")
@@ -484,7 +513,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     if hay_foodweb>0:
         filename_c=filename+'_c.txt'
         filename_d=filename+'_d.txt'
-        how_info_to_user(lfich_info,"Predators matrix c:<a href='file:///"+dt+"/input/"+filename_c+"' target=_BLANK>"+filename_c+"<a><br>")
+        show_info_to_user(lfich_info,"Predators matrix c:<a href='file:///"+dt+"/input/"+filename_c+"' target=_BLANK>"+filename_c+"<a><br>")
         show_info_to_user(lfich_info,"Predators matrix d:<a href='file:///"+dt+"/input/"+filename_d+"' target=_BLANK>"+filename_d+"<a><br>")
         l_minputchar_c=dlmreadlike(filename_c,direntrada)
         minputchar_c = np.array(l_minputchar_c,dtype=float)
@@ -599,21 +628,21 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
          
     for k in range (periods-1):
         ''' The compatibilty matrixes masks are created when the year starts ''' 
-        #if ((k%diasdelanio)==0):
-        if not(k%diasdelanio):                      # Much faster than if ((k%diasdelanio)==0)    
+        #if ((k%DAYS_IN_A_YEAR)==0):
+        if not(k%DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)    
             if (not(systemextinction)):
                 if (algorithm!='Verhulst'):
-                    if (k>diasdelanio) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
                        ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
                         systemextinction = True
-                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
+                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
                         if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
                 else:
-                    if (k>diasdelanio) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
                        ((ra_eff[k-1]>=tol_extincion).sum()==0) and ((rb_eff[k-1]>=tol_extincion).sum()==0):
                         systemextinction = True
-                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//diasdelanio))
+                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
                         if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas = calc_blossom_effect(numspecies_a,nrows_a,ncols_a,\
@@ -623,7 +652,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
             if hay_bssvar:
                 for t in range(0,numspecies_b):
                     for l in range (0,numspecies_a):
-                        minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//diasdelanio]
+                        minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//DAYS_IN_A_YEAR]
             minpeq_b = minputchar_b*minputchar_b_mask
         # Eliminacion aleatoria de enlaces
         if (links_deletion):
@@ -632,7 +661,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                 minputchar_b[col][fil]=0
                 minpeq_a = minputchar_a*minputchar_a_mask
                 minpeq_b = minputchar_b*minputchar_b_mask
-                show_info_to_user(ldevices_info,"Day:%d (year %d). Deleted links plant %d <-> pollinator %d" % (k, k//diasdelanio ,fil,col))
+                show_info_to_user(ldevices_info,"Day:%d (year %d). Deleted links plant %d <-> pollinator %d" % (k, k//DAYS_IN_A_YEAR ,fil,col))
         [populations_evolution(n,"Plant",numspecies_a,algorithm,hay_foodweb, pl_ext, May, haymut,\
                                              days_year, ra_eff, ra_equs, minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, Nindividuals_a,\
                                              numspecies_b, Nindividuals_b, Nindividuals_c, minputchar_c, numspecies_c,\
@@ -683,27 +712,11 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
 
     tfin=time()
-    show_info_to_user(ldevices_info,"Elapsed time %.02f s" % (tfin-tinic))
-    speriodos = str(int(periods/diasdelanio))
-    if (data_save==1):
-        nsal = dlmwritelike(filename+'_'+algorithm+"_a_populations_",speriodos,Nindividuals_a,dirsal,os)
-        rsal = dlmwritelike(filename+'_'+algorithm+"_a_rs_",speriodos,ra_eff,dirsal,os)
-        requsal = dlmwritelike(filename+'_'+algorithm+"_a_requs_",speriodos,ra_equs,dirsal,os)
-        show_info_to_user(lfich_info,"Plant populations data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
-        show_info_to_user(lfich_info,"Plant effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
-        show_info_to_user(lfich_info,"Plant equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
-        nsal=dlmwritelike(filename+'_'+algorithm+"_b_populations_",speriodos,Nindividuals_b,dirsal,os)
-        rsal = dlmwritelike(filename+'_'+algorithm+"_b_rs_",speriodos,rb_eff,dirsal,os)
-        requsal = dlmwritelike(filename+'_'+algorithm+"_b_requs_",speriodos,rb_equs,dirsal,os)
-        show_info_to_user(lfich_info,"Pollinators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a>")
-        show_info_to_user(lfich_info,"Pollinators effective rates data: <a href='"+rsal+"' target=_BLANK'>"+rsal+"<a>")
-        show_info_to_user(lfich_info,"Pollinators equivalent rates data: <a href='"+requsal+"' target=_BLANK'>"+requsal+"<a>")
-        if hay_foodweb>0:
-            nsal=dlmwritelike(filename+'_'+algorithm+"_c",speriodos,Nindividuals_c,dirsal,os)
-            show_info_to_user(lfich_info,"Predators evolution data: <a href='"+nsal+"' target=_BLANK'>"+nsal+"<a><br>")
-    show_info_to_user(ldevices_info,'')
-    show_info_to_user(ldevices_info,'Created %s' % datetime.datetime.now())
-    close_info_channels(lfich_info)
+    
+    end_report(ldevices_info,lfich_info,tfin,tinic,periods,data_save,filename,algorithm,
+               dirsal,os,Nindividuals_a,ra_eff,ra_equs, Nindividuals_b, 
+               rb_eff,rb_equs,Nindividuals_c)
+
     return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_individuos,\
            max_reff,min_reff,max_requs,min_requs,systemextinction,pBssvar_species)
 
@@ -726,8 +739,8 @@ def setxtickssubplot(displayinic, periods, a):
         ninter = ((displayinic + periods) //365)
     
     intervalo = (displayinic + periods) / ninter
-    rangodias = np.arange(displayinic, periods + diasdelanio, intervalo)
-    rangoanios = rangodias / diasdelanio
+    rangodias = np.arange(displayinic, periods + DAYS_IN_A_YEAR, intervalo)
+    rangoanios = rangodias / DAYS_IN_A_YEAR
     a.xaxis.set_ticks(rangodias)
     xlabels = list(rangoanios)
     a.set_xticklabels(xlabels)
@@ -765,7 +778,7 @@ def mutual_render(na,nb,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_indiv
     # Si los valores de reff son muy pequenios, se cambia la escala de esas graficas
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
-    years = periods/diasdelanio
+    years = periods/DAYS_IN_A_YEAR
     ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'a')    
     
     factorescala=1.1
