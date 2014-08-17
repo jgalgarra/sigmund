@@ -442,6 +442,15 @@ def end_report(ldevices_info,lfich_info,tfin,tinic,periods,data_save,filename,
     show_info_to_user(ldevices_info,'Created %s' % datetime.datetime.now())
     close_info_channels(lfich_info)
 
+def find_max_values(Nindividuals_a,Nindividuals_b,ra_eff,rb_eff,ra_equs,rb_equs):   
+    maxa_individuos = np.max(Nindividuals_a)
+    maxb_individuos = np.max(Nindividuals_b)
+    max_reff = max(np.max([ra_eff]),np.max([rb_eff]))
+    min_reff = min(np.min([ra_eff]),np.min([rb_eff]))
+    max_requs = max(np.max([ra_equs]),np.max([rb_equs]))
+    min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
+    return maxa_individuos, maxb_individuos, max_reff, min_reff, max_requs, min_requs
+
 def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save='',dirtrabajo='',direntrada='',dirsal='',\
                 eliminarenlaces=0,pl_ext=[],pol_ext=[],os='',fichreport='',com='', algorithm='MoMutualism', plants_blossom_prob=1.0,\
                 plants_blossom_sd=0.01, plants_blossom_type = 'Binary', blossom_pert_list='', verbose=True,exit_on_extinction=False,\
@@ -703,20 +712,13 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                     pop_c=0;
                 rowNi.append(pop_c)
             Nindividuals_c.append(rowNi)
-        
-    maxa_individuos = np.max(Nindividuals_a)
-    maxb_individuos = np.max(Nindividuals_b)
-    max_reff = max(np.max([ra_eff]),np.max([rb_eff]))
-    min_reff = min(np.min([ra_eff]),np.min([rb_eff]))
-    max_requs = max(np.max([ra_equs]),np.max([rb_equs]))
-    min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
-
-    tfin=time()
-    
+    maxa_individuos,maxb_individuos,max_reff,min_reff,max_requs,min_requs = \
+                   find_max_values(Nindividuals_a,Nindividuals_b,ra_eff,rb_eff,
+                                   ra_equs,rb_equs)    
+    tfin=time()    
     end_report(ldevices_info,lfich_info,tfin,tinic,periods,data_save,filename,algorithm,
                dirsal,os,Nindividuals_a,ra_eff,ra_equs, Nindividuals_b, 
                rb_eff,rb_equs,Nindividuals_c)
-
     return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_individuos,\
            max_reff,min_reff,max_requs,min_requs,systemextinction,pBssvar_species)
 
