@@ -54,7 +54,7 @@ def show_info_to_user(canalesinfo,texto):
     Execution status information for human user
     
     >>> ldevices = []
-    >>> ldevices.append(CanalInfo(sys.stdout))
+    >>> ldevices.append(CanalInfo(sys.stdout,'\\n'))
     >>> show_info_to_user(ldevices, 'Info for you')
     Info for you
     """
@@ -238,8 +238,7 @@ def init_lists_pop(periods,numspecies_p,minputchar_p):
     rd_p = []
     Nindividuals_p=np.zeros([periods,numspecies_p])
     rp_eff = np.zeros([periods,numspecies_p],dtype=float)
-    rp_equs = np.zeros([periods,numspecies_p],dtype=float)
-    
+    rp_equs = np.zeros([periods,numspecies_p],dtype=float)  
     for n in range(numspecies_p):
         rowNindividuals_p.append(int(minputchar_p[-5][n]))
         cAlpha_p.append(float(minputchar_p[-4][n]))
@@ -247,9 +246,8 @@ def init_lists_pop(periods,numspecies_p,minputchar_p):
         r_p.append(minputchar_p[-2][n])
         rd_p.append(minputchar_p[-1][n])
     Nindividuals_p[0]=np.array(rowNindividuals_p)      
-    
-    return rowNindividuals_p, Alpha_p, cAlpha_p, r_p, rd_p, Nindividuals_p, rp_eff, rp_equs #, maxima_ind_p, minima_ind_p
-
+    return rowNindividuals_p, Alpha_p, cAlpha_p, r_p, rd_p, Nindividuals_p, \
+                                rp_eff, rp_equs
 
 def init_params_population(r_p, rd_p, n):
     r_eqsum = term_May = rMay = p_devorados = rtot_p = 0
@@ -257,7 +255,6 @@ def init_params_population(r_p, rd_p, n):
     r_muerte = rd_p[n]
     pop_ini = 0
     return r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_ini
-
 
 def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp, spikep, k):
     r_m = rd_p
@@ -271,7 +268,9 @@ def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp, spikep, k
     return r_m, cuentaper
 
 
-def init_perturbations(pl_ext, pol_ext, yearperiods, inicioextplantas, inicioextpolin, hayextplantas, hayextpolin):
+def init_perturbations(pl_ext, pol_ext, yearperiods, inicioextplantas, 
+                       inicioextpolin, hayextplantas, hayextpolin, 
+                       ldevices_info, lfich_info):
     if hayextplantas:
         inicioextplantas = round(yearperiods * pl_ext['start'] * DAYS_IN_A_YEAR)
         nperpl = pl_ext['numperiod']
@@ -327,7 +326,6 @@ def predators_effect(p_devorados, DAYS_IN_A_YEAR, j, Nindividuals_p, Nindividual
             p_devorados = p_devorados + np.random.binomial(Nindividuals_p[k][n], -math.expm1(-1 * rceff))
     return p_devorados, j, rceff
 
-
 def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext, May, haymut,\
                           DAYS_IN_A_YEAR, rp_eff, rp_eq, minputchar_p, j, cAlpha_p, Alpha_p, r_p, rd_p, \
                           Nindividuals_p, numspecies_q, Nindividuals_q, Nindividuals_c, minputchar_c, numspecies_c, \
@@ -355,19 +353,25 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
             r_eqsum = np.dot(minputchar_p[0:numspecies_q,n],Nindividuals_q[k,:])
         elif (May):
             for j in range(numspecies_q):
-                r_eqsum, term_May, rMay = calc_mutualism_params(minputchar_p, Alpha_p, Nindividuals_p, Nindividuals_q, r_eqsum, term_May, rMay, k, j, n, r_p, r_muerte, DAYS_IN_A_YEAR)
+                r_eqsum, term_May, rMay = calc_mutualism_params(minputchar_p, 
+                                    Alpha_p, Nindividuals_p, Nindividuals_q, 
+                                    r_eqsum, term_May, rMay, k, j, n, r_p, 
+                                    r_muerte, DAYS_IN_A_YEAR)
         rtot_p = r_p[n] + r_eqsum - r_muerte
-
+        
         # Efecto de los depredadores
         if hay_foodweb:
             p_devorados, j, rceff = predators_effect(p_devorados, DAYS_IN_A_YEAR, j, Nindividuals_p, Nindividuals_c, minputchar_c, numspecies_c, n, k)
         # New algorithm
         if (model_r_a):
-            retl = ciclo_verhulst(rtot_p, r_eqsum, DAYS_IN_A_YEAR, Nindividuals_p[k,n], cAlpha_p[n], Alpha_p[n])
+            retl = ciclo_verhulst(rtot_p, r_eqsum, DAYS_IN_A_YEAR,
+                                  Nindividuals_p[k,n], cAlpha_p[n], Alpha_p[n])
         elif not (May):
-            retl = ciclo_new_model(rtot_p, DAYS_IN_A_YEAR, Nindividuals_p[k,n], 1/Alpha_p[n], Logistic_abs)
+            retl = ciclo_new_model(rtot_p, DAYS_IN_A_YEAR, Nindividuals_p[k,n],
+                                   1/Alpha_p[n], Logistic_abs)
         else:
-            retl = ciclo_May(r_p[n] - r_muerte, rMay, DAYS_IN_A_YEAR, term_May, Nindividuals_p[k,n], Alpha_p[n])           
+            retl = ciclo_May(r_p[n] - r_muerte, rMay, DAYS_IN_A_YEAR, term_May,
+                             Nindividuals_p[k,n], Alpha_p[n])           
         pop_p = retl[0] - p_devorados
         if not(pop_p):
             show_info_to_user(ldevices_info,"Day %d (year %d). %s species %d extincted" % (k, k//DAYS_IN_A_YEAR, strtype, n))
@@ -378,15 +382,7 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
     else:
         rp_eff[k+1][n] =  rp_eff[k][n]
         rp_eq[k+1][n] = rp_eq[k][n]
-    return 0
-    
-'''def calc_compatib_plantas(numspecies,probcoinc,blossom_pert_list):
-    lcomp = np.ones(numspecies,dtype=float)
-    if (probcoinc == 1.0):
-        return lcomp
-    for i in blossom_pert_list:
-        lcomp[i] = np.random.binomial(n=1, p=probcoinc)
-    return lcomp'''   
+    return 0  
 
 def calc_compatib_plantas(numspecies,probcoinc,blossom_pert_list):
     lcomp = []
@@ -474,7 +470,6 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     May = (algorithm=='May')
     haymut = (algorithm!='NoMutualism')    
     model_r_alpha =  (algorithm=='Verhulst') or (algorithm=='NoMutualism')
-    #print("model_ra"+str(model_r_alpha))
     Logistic_abs = (algorithm=='Logistic_abs')   
     ldevices_info, lfich_info = open_info_channels(verbose,fichreport,'w')    
     tinic=time()
@@ -568,29 +563,28 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         else:
             periodoborr = periods
 
-    # Extinction analysis
-    inicioextplantas=inicioextpolin=cuentaperpl=cuentaperpol=0
+    # Extinction analysis. Forced death rate increases
+    inicioextplantas = inicioextpolin = cuentaperpl = cuentaperpol = 0
     hayextplantas=len(pl_ext)>0
     hayextpolin = len(pol_ext) > 0
     j=0
     if hayextplantas and (pl_ext['species'][0]=='ALL'):
-        pl_ext['species'] = []
-        for m in range(0,numspecies_a+1):
-            pl_ext['species'].append(m)
+        pl_ext['species'] = list(range(0,numspecies_a+1))
     if hayextpolin and (pol_ext['species'][0]=='ALL'):
-        pol_ext['species'] = []
-        for m in range(0,numspecies_a+1):
-            pol_ext['species'].append(m)
+        pol_ext['species'] = list(range(0,numspecies_b+1))
+        
+    # Extinction analysis. Blossom pertubations   
+    
     if (blossom_pert_list[0]=='ALL'):
-        bloss_species = []
-        for m in range(0,numspecies_a+1):
-            bloss_species.append(m)
+        bloss_species = list(range(0,numspecies_a+1))
     else:
         bloss_species = blossom_pert_list[:]
         
     nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
-    inicioextpolin, periodoextpol, spikepol = init_perturbations(pl_ext, pol_ext, year_periods, inicioextplantas,\
-                                                                 inicioextpolin, hayextplantas, hayextpolin)
+    inicioextpolin, periodoextpol, spikepol = init_perturbations(pl_ext, 
+                                    pol_ext, year_periods, inicioextplantas,
+                                    inicioextpolin, hayextplantas, hayextpolin,
+                                    ldevices_info, lfich_info)
     links_deletion = (eliminarenlaces>0)
     
     # Blossom variability analysis
@@ -626,8 +620,6 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                 pBssvar_species.append(np.array(varspecies))
             else:
                 pBssvar_species.append(bssvar_allones)
-          
-        #print(pBssvar_species)
          
     for k in range (periods-1):
         ''' The compatibilty matrixes masks are created when the year starts ''' 
@@ -715,17 +707,6 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                rb_eff,rb_equs,Nindividuals_c)
     return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,rb_equs,maxa_individuos,maxb_individuos,\
            max_reff,min_reff,max_requs,min_requs,systemextinction,pBssvar_species)
-
-def phase_map(na,nb,speciesa,speciesb,ciclosinic,ciclosfin):
-    auxa=[]
-    auxb=[]
-    for k in range (ciclosinic,ciclosfin):
-        auxa.append(na[k][speciesa])
-        auxb.append(nb[k][speciesb])
-    plt.hexbin(auxa,auxb,bins='log',cmap=cm.YlOrRd)
-    plt.show()
-    return
-
 
 def setxtickssubplot(displayinic, periods, a):
     a.set_xlim([displayinic,periods])
