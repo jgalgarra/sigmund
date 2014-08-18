@@ -26,7 +26,7 @@ global Logistic_abs
 global model_r_alpha
 global tol_extincion
 global hay_bssvar
-global pendiente,sd,periodo
+global pendiente,sd,periodo, numanyos
 global DAYS_IN_A_YEAR
 global ax
 
@@ -122,13 +122,23 @@ def borraenlace(mat_in):
     mat_in[rfil][rcol]=0
     return(mat_in,rfil,rcol)
 
+def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
+                          minputchar_a_mask, minputchar_b_mask, ldevices_info):
+    minputchar_a,fil,col=borraenlace(minputchar_a)
+    minputchar_b[col][fil]=0
+    minpeq_a = minputchar_a*minputchar_a_mask
+    minpeq_b = minputchar_b*minputchar_b_mask
+    show_info_to_user(ldevices_info,\
+    "Day:%d (year %d). Deleted links plant %d <-> pollinator %d"\
+    % (k, k//DAYS_IN_A_YEAR ,fil,col))
+    return minpeq_a, minpeq_b, minputchar_a, minputchar_b,
+
 def dlmreadlike(inputfile,direntrada):
     try:
         data = open(direntrada+inputfile)
         mtx_input=[]
         for each_line in data:
             try:
-                #print (each_line.split('\t'))
                 mtx_input.append(each_line.strip().split('\t'))
             except ValueError:
                 pass
@@ -146,7 +156,6 @@ def dlmwritelike(inputfile,nperiod,Nin,dirsalida,os):
     for linea in Nin:
         for i in range(len(linea)-1):
             y="%.012f" % linea[i]
-            #salida.write(str(linea[i])+',')
             salida.write(y+',')
         salida.write(str(linea[-1])+'\n');
     salida.close()
@@ -158,9 +167,7 @@ def val_mutMay(r_species,beta,period,N1,N2,K1):
     termEq = round(betaMay*N1*N2/K1)
     rMay = betaMay*N2/K1
     if (abs(termEq)> 1):
-        #incEq = np.random.binomial(round(abs(termEq)),1-math.exp(-rspneq))
         incEq = np.random.binomial(round(abs(termEq)),-math.expm1(-rspneq)) 
-
     else:
         incEq = 0
     ret = [incEq,rMay]
@@ -172,22 +179,15 @@ def ciclo_May(r_species, rM, period, inctermMay, Nindivs, K):
     termEq = Nindivs * (signosp-(Nindivs/K))
     rcal = r_species*((1-(Nindivs/K)) + rM)
     if (abs(termEq)> 1):
-        #incEq = np.random.binomial(round(abs(termEq)),1-math.exp(-rspneq))
         incEq = np.random.binomial(round(abs(termEq)),-math.expm1(-rspneq))
     else:
         incEq = 0
     ret = [Nindivs + signfunc(termEq)*incEq + abs(inctermMay),signfunc(termEq)*rcal]
     return(ret)
-    #return(Nindivs + signfunc(term3Eq)*inc3Eq)
                
 def ciclo_verhulst(rtot_species, reqsum, period, Nindivs, cAlpha, Alpha):
     roz = (Alpha+cAlpha*reqsum)*Nindivs
     rcal = rtot_species - roz
-    #print(rcal,reqsum,roz,Alpha)
-    '''if (rtot_species>0):
-        rcal -= (rtot_species * Nindivs*invK) 
-    elif L_abs :       # |reff| correction
-        rcal += (rtot_species*Nindivs*invK)'''      
     rspneq = calc_r_periodo_vh(rcal,invperiod) if (rcal>=0) else calc_r_periodo_vh(-rcal,invperiod)
     incNmalth= np.random.binomial(Nindivs,-math.expm1(-rspneq))
     if (rcal>0):
@@ -251,7 +251,6 @@ def init_lists_pop(periods,numspecies_p,minputchar_p):
 
 def init_params_population(r_p, rd_p, n):
     r_eqsum = term_May = rMay = p_devorados = rtot_p = 0
-    #signo = signfunc(r_p[n])
     r_muerte = rd_p[n]
     pop_ini = 0
     return r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_ini
@@ -295,7 +294,6 @@ def sinusoidal(val):
     return np.random.normal(1,sd*modifier)
 
 def lineal(val):
-    global numanyos,pendiente
     modifier = 1+pendiente*(val/numanyos)
     return np.random.normal(1,sd*modifier)
 
@@ -382,6 +380,7 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
     else:
         rp_eff[k+1][n] =  rp_eff[k][n]
         rp_eq[k+1][n] = rp_eq[k][n]
+    rp_eff[0,]=rp_eff[1,]
     return 0  
 
 def calc_compatib_plantas(numspecies,probcoinc,blossom_pert_list):
@@ -392,6 +391,47 @@ def calc_compatib_plantas(numspecies,probcoinc,blossom_pert_list):
         else:
             lcomp.append(1.0)
     return np.array(lcomp)       
+
+def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
+                    Bssvar_species, Bssvar_modulationtype_list, numspecies_a,
+                    year_periods, ldevices_info):
+    # Blossom variability analysis
+    global pendiente, periodo
+    pBssvar_species = []
+    hay_bssvar = (Bssvar_sd>0.0) & (len(Bssvar_species)>0)
+    if (hay_bssvar):
+        if (Bssvar_modulationtype_list[0]=='linear'):
+            strvalor = (", Slope %0.2f " % (Bssvar_modulationtype_list[1]))
+        else:
+            if (Bssvar_modulationtype_list[0]=='sin'):
+                strvalor = (", Period %0.2f " % (Bssvar_modulationtype_list[1]))
+            else:
+                strvalor=''
+        straff = (". Affected species:%s" % (Bssvar_species))
+        show_info_to_user(ldevices_info,"Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
+                % (Bssvar_period,Bssvar_sd,Bssvar_modulationtype_list[0],strvalor,straff))
+        if (str(Bssvar_species[0]).upper()=='ALL'):
+            listaspecies = list(range(numspecies_a))
+        else:
+            listaspecies = Bssvar_species
+        bssvar_allones = np.ones((year_periods,),dtype=float)
+        for i in range(numspecies_a):
+            if i in listaspecies:
+                if (Bssvar_modulationtype_list[0]=='None'):
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinmodulacion,year_periods)
+                elif (Bssvar_modulationtype_list[0]=='linear'):
+                    pendiente = float(Bssvar_modulationtype_list[1])
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,lineal,year_periods)
+                elif (Bssvar_modulationtype_list[0]=='sin'):
+                    periodo = int(Bssvar_modulationtype_list[1])
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinusoidal,year_periods)            
+                pBssvar_species.append(np.array(varspecies))
+            else:
+                pBssvar_species.append(bssvar_allones)
+    else:
+        pendiente = 0
+        periodo = 0    
+    return pBssvar_species, hay_bssvar, pendiente, periodo
 
 def calc_blossom_effect(numspecies_a,nrows_a,ncols_a,nrows_b,ncols_b,numspecies_b,plants_blossom_type,\
                         plants_blossom_prob,plants_blossom_sd,blossom_pert_list):
@@ -455,15 +495,26 @@ def find_max_values(Nindividuals_a,Nindividuals_b,ra_eff,rb_eff,ra_equs,rb_equs)
     max_requs = max(np.max([ra_equs]),np.max([rb_equs]))
     min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
     return maxa_individuos, maxb_individuos, max_reff, min_reff, max_requs, min_requs
+    
+
+def check_system_extinction(k, lcompatibplantas, plants_blossom_prob, ra_xx,\
+                            lim_ra, rb_xx, lim_rb ):
+    hayextinction = False
+    if (k>DAYS_IN_A_YEAR) and \
+       ((ra_xx[k-1] > lim_ra).sum()==0) and ((rb_xx[k-1] > lim_rb).sum()==0)\
+       and ((np.array(lcompatibplantas) < plants_blossom_prob).sum()==0):
+           hayextinction = True
+    return hayextinction
+                    
 
 def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save='',dirtrabajo='',direntrada='',dirsal='',\
                 eliminarenlaces=0,pl_ext=[],pol_ext=[],os='',fichreport='',com='', algorithm='MoMutualism', plants_blossom_prob=1.0,\
                 plants_blossom_sd=0.01, plants_blossom_type = 'Binary', blossom_pert_list='', verbose=True,exit_on_extinction=False,\
                 N0plants='',N0pols='',release='',Bssvar_period=0.1,Bssvar_sd=0.0,Bssvar_modulationtype_list=[],Bssvar_species=[]):
-    global cuentaperpl,cuentaperpol
+    global cuentaperpl, cuentaperpol
     global Logistic_abs
     global model_r_alpha
-    global pendiente,blossomperiod,sd,periodo
+    global pendiente, blossomperiod, sd, periodo
     
     systemextinction = False
     periods = year_periods * DAYS_IN_A_YEAR
@@ -496,7 +547,6 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     numspecies_a = ncols_a
     rowNindividuals_a, Alpha_a, cAlpha_a, r_a, rd_a, Nindividuals_a, ra_eff,\
                     ra_equs = init_lists_pop(periods,numspecies_a,minputchar_a)
-
     if (len(blossom_pert_list)>0):
         lcompatibplantas = calc_compatib_plantas(numspecies_a,plants_blossom_prob,blossom_pert_list)
     else:
@@ -554,14 +604,13 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     show_info_to_user(ldevices_info,"Pollinator species: %d" %numspecies_b)
     show_info_to_user(ldevices_info,"Pollinator initial populations %s" % rowNindividuals_b)
     
+    periodoborr = periods
     if eliminarenlaces>0:
         cuenta=cuentaenlaces(minputchar_a)
         hayqueborrar=math.floor(eliminarenlaces*cuenta)
         show_info_to_user(ldevices_info,"Links %d. Will be deleted %d" % (cuentaenlaces(minputchar_a),hayqueborrar))
         if hayqueborrar > 0:
-            periodoborr=periods/(hayqueborrar+1)
-        else:
-            periodoborr = periods
+            periodoborr = periods//(hayqueborrar+1)            
 
     # Extinction analysis. Forced death rate increases
     inicioextplantas = inicioextpolin = cuentaperpl = cuentaperpol = 0
@@ -571,72 +620,41 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     if hayextplantas and (pl_ext['species'][0]=='ALL'):
         pl_ext['species'] = list(range(0,numspecies_a+1))
     if hayextpolin and (pol_ext['species'][0]=='ALL'):
-        pol_ext['species'] = list(range(0,numspecies_b+1))
-        
-    # Extinction analysis. Blossom pertubations   
-    
-    if (blossom_pert_list[0]=='ALL'):
-        bloss_species = list(range(0,numspecies_a+1))
-    else:
-        bloss_species = blossom_pert_list[:]
-        
+        pol_ext['species'] = list(range(0,numspecies_b+1))     
     nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
     inicioextpolin, periodoextpol, spikepol = init_perturbations(pl_ext, 
                                     pol_ext, year_periods, inicioextplantas,
                                     inicioextpolin, hayextplantas, hayextpolin,
                                     ldevices_info, lfich_info)
-    links_deletion = (eliminarenlaces>0)
-    
-    # Blossom variability analysis
-    pBssvar_species = []
-    hay_bssvar = (Bssvar_sd>0.0) & (len(Bssvar_species)>0)
-    if (hay_bssvar):
-        if (Bssvar_modulationtype_list[0]=='linear'):
-            strvalor = (", Slope %0.2f " % (Bssvar_modulationtype_list[1]))
-        else:
-            if (Bssvar_modulationtype_list[0]=='sin'):
-                strvalor = (", Period %0.2f " % (Bssvar_modulationtype_list[1]))
-            else:
-                strvalor=''
-        straff = (". Affected species:%s" % (Bssvar_species))
-        show_info_to_user(ldevices_info,"Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
-                % (Bssvar_period,Bssvar_sd,Bssvar_modulationtype_list[0],strvalor,straff))
-        if (str(Bssvar_species[0]).upper()=='ALL'):
-            listaspecies = list(range(numspecies_a))
-        else:
-            listaspecies = Bssvar_species
-        #print(listaspecies)
-        bssvar_allones = np.ones((year_periods,),dtype=float)
-        for i in range(numspecies_a):
-            if i in listaspecies:
-                if (Bssvar_modulationtype_list[0]=='None'):
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinmodulacion,year_periods)
-                elif (Bssvar_modulationtype_list[0]=='linear'):
-                    pendiente = float(Bssvar_modulationtype_list[1])
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,lineal,year_periods)
-                elif (Bssvar_modulationtype_list[0]=='sin'):
-                    periodo = int(Bssvar_modulationtype_list[1])
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinusoidal,year_periods)            
-                pBssvar_species.append(np.array(varspecies))
-            else:
-                pBssvar_species.append(bssvar_allones)
+    # Extinction analysis. Blossom pertubations   
+    if (blossom_pert_list[0]=='ALL'):
+        bloss_species = list(range(0,numspecies_a+1))
+    else:
+        bloss_species = blossom_pert_list[:]       
+    pBssvar_species, hay_bssvar , pendiente, periodo = init_blossom_pertubation_params(Bssvar_period, 
+                                  Bssvar_sd, Bssvar_species, 
+                                  Bssvar_modulationtype_list, numspecies_a,
+                                  year_periods, ldevices_info)
          
     for k in range (periods-1):
         ''' The compatibilty matrixes masks are created when the year starts ''' 
         #if ((k%DAYS_IN_A_YEAR)==0):
-        if not(k%DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)    
+        if not(k % DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)    
             if (not(systemextinction)):
                 if (algorithm!='Verhulst'):
-                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-                       ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
-                        systemextinction = True
-                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
-                        if exit_on_extinction:
+#                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+#                        ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
+#                        systemextinction = True
+                       show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
+                       if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
                 else:
                     if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-                       ((ra_eff[k-1]>=tol_extincion).sum()==0) and ((rb_eff[k-1]>=tol_extincion).sum()==0):
+                       ((ra_eff[k-1]>tol_extincion).sum()==0) and ((rb_eff[k-1]>tol_extincion).sum()==0):
                         systemextinction = True
+#                     systemextinction = check_system_extinction(k, \
+#                       lcompatibplantas, plants_blossom_prob, ra_eff, tol_extincion, rb_eff, tol_extincion)
+#                     if systemextinction:
                         show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
                         if exit_on_extinction:
                             return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
@@ -647,28 +665,27 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
             if hay_bssvar:
                 for t in range(0,numspecies_b):
                     for l in range (0,numspecies_a):
-                        minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//DAYS_IN_A_YEAR]
+                         minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//DAYS_IN_A_YEAR]
             minpeq_b = minputchar_b*minputchar_b_mask
         # Eliminacion aleatoria de enlaces
-        if (links_deletion):
-            if (k>0) and (k%periodoborr==0):
-                minputchar_a,fil,col=borraenlace(minputchar_a)
-                minputchar_b[col][fil]=0
-                minpeq_a = minputchar_a*minputchar_a_mask
-                minpeq_b = minputchar_b*minputchar_b_mask
-                show_info_to_user(ldevices_info,"Day:%d (year %d). Deleted links plant %d <-> pollinator %d" % (k, k//DAYS_IN_A_YEAR ,fil,col))
+        if (eliminarenlaces > 0 ) & (k > 0) & (k % periodoborr == 0):
+            minpeq_a, minpeq_b , minputchar_a, minputchar_b = \
+                                          deletion_links_effect(k, periodoborr, 
+                                          minputchar_a, minputchar_b,
+                                          minputchar_a_mask, minputchar_b_mask,
+                                          ldevices_info)
         [populations_evolution(n,"Plant",numspecies_a,algorithm,hay_foodweb, pl_ext, May, haymut,\
                                              DAYS_IN_A_YEAR, ra_eff, ra_equs, minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, Nindividuals_a,\
                                              numspecies_b, Nindividuals_b, Nindividuals_c, minputchar_c, numspecies_c,\
                                              inicioextplantas, hayextplantas, nperpl, periodoextpl, spikepl, k,\
                                              model_r_alpha) for n in range(numspecies_a)]
-        ra_eff[0,]=ra_eff[1,]
+        #ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n,"Pollinator",numspecies_b,algorithm,hay_foodweb, pol_ext, May, haymut,\
                                               DAYS_IN_A_YEAR, rb_eff, rb_equs, minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, Nindividuals_b,\
                                               numspecies_a, Nindividuals_a, Nindividuals_c, minputchar_c, numspecies_c,\
                                               inicioextpolin, hayextpolin, nperpol, periodoextpol, spikepol,k,\
                                               model_r_alpha) for n in range(numspecies_b)]
-        rb_eff[0,]=rb_eff[1,]
+        #rb_eff[0,]=rb_eff[1,]
         if hay_foodweb:
             rowNi=[]
             for n in range (numspecies_c):
