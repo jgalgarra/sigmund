@@ -109,7 +109,7 @@ def cuentaenlaces(mat_in):
                 cuenta+=1
     return(cuenta)
 
-def borraenlace(mat_in):
+def delete_link(mat_in):
     intentos=0
     fil=len(mat_in)-5
     col=len(mat_in[0])
@@ -124,7 +124,7 @@ def borraenlace(mat_in):
 
 def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
                           minputchar_a_mask, minputchar_b_mask, ldevices_info):
-    minputchar_a,fil,col=borraenlace(minputchar_a)
+    minputchar_a,fil,col=delete_link(minputchar_a)
     minputchar_b[col][fil]=0
     minpeq_a = minputchar_a*minputchar_a_mask
     minpeq_b = minputchar_b*minputchar_b_mask
@@ -289,16 +289,16 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods, inicioextpla
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol, inicioextpolin, periodoextpol, spikepol
 
-def sinusoidal(val):
+def bss_pert_sinusoidal(val):
     global periodo,sd
     modifier = 0.5*(1.0001+np.sin((2*np.pi/periodo)*val))
     return np.random.normal(1,sd*modifier)
 
-def lineal(val):
+def bss_pert_lineal(val):
     modifier = 1+pendiente*(val/numanyos)
     return np.random.normal(1,sd*modifier)
 
-def sinmodulacion(val):
+def bss_pert_no_modulation(val):
     global sd
     return(np.random.normal(1,sd))
 
@@ -331,10 +331,8 @@ def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext
                           inicioext, hayext, nper, periodoext, spike, k, model_r_a, ldevices_info):
     ''' for n in range (numspecies_p):'''
     global cuentaperpl,cuentaperpol
-    #rceff = retl = rcalc = 0
     r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_p = init_params_population(r_p, rd_p, n)
     '''try:'''
-    #if (Nindividuals_p[k][n] > 0):
     if (Nindividuals_p[k,n]):           # Much faster than (Nindividuals_p[k][n] > 0)
         # Extinciones de plantas
         if hayext:
@@ -421,13 +419,13 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
         for i in range(numspecies_a):
             if i in listaspecies:
                 if (Bssvar_modulationtype_list[0]=='None'):
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinmodulacion,year_periods)
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,bss_pert_no_modulation,year_periods)
                 elif (Bssvar_modulationtype_list[0]=='linear'):
                     pendiente = float(Bssvar_modulationtype_list[1])
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,lineal,year_periods)
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,bss_pert_lineal,year_periods)
                 elif (Bssvar_modulationtype_list[0]=='sin'):
                     periodo = int(Bssvar_modulationtype_list[1])
-                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,sinusoidal,year_periods)            
+                    indspecies, varspecies = calcbssvarespecie(Bssvar_period,Bssvar_sd,bss_pert_sinusoidal,year_periods)            
                 pBssvar_species.append(np.array(varspecies))
             else:
                 pBssvar_species.append(bssvar_allones)
@@ -507,8 +505,6 @@ def check_system_extinction(k, lcompatibplantas, plants_blossom_prob, ra_xx,\
         hayextinction = True
     return hayextinction
                     
-
-
 def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a, Nindividuals_a, numspecies_b, Nindividuals_b, K_c, Nindividuals_c, r_c, numspecies_c, minputchar_d, j, k):
     if hay_foodweb:
         rowNi = []
@@ -661,7 +657,7 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, numspecies_b
         pol_ext['species'] = list(range(0, numspecies_b + 1))
     return inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j
 
-def check_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff):
+def check_species_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff):
     systemextinction = False
     if (algorithm!='Verhulst'):
         if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas) < plants_blossom_prob).sum()==0) and \
@@ -722,7 +718,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         ''' The compatibilty matrixes masks are created when the year starts '''         
         if not(k % DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)     
             if (not(systemextinction)):
-                systemextinction = check_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff)
+                systemextinction = check_species_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff)
                 if systemextinction:
                     show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
                     if exit_on_extinction:
