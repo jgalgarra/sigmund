@@ -24,18 +24,20 @@ global invperiod
 global cuentaperpl,cuentaperpol
 global Logistic_abs
 global model_r_alpha
-global tol_extincion
 global hay_bssvar
 global pendiente,sd,periodo, numanyos
 global DAYS_IN_A_YEAR
 global ax
+global count_collapse_years
+global LIMIT_COLLAPSE_YEARS
 
 DAYS_IN_A_YEAR = 365
+LIMIT_COLLAPSE_YEARS = 3
 ancho = 16
 alto = 10
 resolucion=600
 invperiod = 1/DAYS_IN_A_YEAR
-tol_extincion = -0.0001
+count_collapse_years = 0
 
 class CanalInfo():
     """ CanalInfo is a wrapper of status information channels such as stdout and
@@ -495,15 +497,6 @@ def find_max_values(Nindividuals_a,Nindividuals_b,ra_eff,rb_eff,ra_equs,rb_equs)
     min_requs = min(np.min([ra_equs]),np.min([rb_equs]))
     return maxa_individuos, maxb_individuos, max_reff, min_reff, max_requs, min_requs
     
-
-def check_system_extinction(k, lcompatibplantas, plants_blossom_prob, ra_xx,\
-                            lim_ra, rb_xx, lim_rb ):
-    hayextinction = False
-    if (k>DAYS_IN_A_YEAR) and \
-       ((ra_xx[k-1] > lim_ra).sum()==0) and ((rb_xx[k-1] > lim_rb).sum()==0)\
-       and ((np.array(lcompatibplantas) < plants_blossom_prob).sum()==0):
-        hayextinction = True
-    return hayextinction
                     
 def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a, Nindividuals_a, numspecies_b, Nindividuals_b, K_c, Nindividuals_c, r_c, numspecies_c, minputchar_d, j, k):
     if hay_foodweb:
@@ -647,6 +640,7 @@ def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd, pla
 
 
 def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, numspecies_b):
+    global cuentaperpl,cuentaperpol
     inicioextplantas = inicioextpolin = cuentaperpl = cuentaperpol = 0
     hayextplantas = len(pl_ext) > 0
     hayextpolin = len(pol_ext) > 0
@@ -657,15 +651,18 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, numspecies_b
         pol_ext['species'] = list(range(0, numspecies_b + 1))
     return inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j
 
-def check_species_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff):
+def check_system_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff):
+    global count_collapse_years
+    tol_extincion = -0.00001
     systemextinction = False
-    if (algorithm!='Verhulst'):
-        if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas) < plants_blossom_prob).sum()==0) and \
-                                  ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
-            systemextinction = True
+    if (algorithm == 'Verhulst'):
+        ra_xx, rb_xx = ra_eff, rb_eff
     else:
-        if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-               ((ra_eff[k-1]>tol_extincion).sum()==0) and ((rb_eff[k-1]>tol_extincion).sum()==0):
+        ra_xx, rb_xx = ra_equs, rb_equs;
+    if (k>3*DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+               ((ra_xx[k-1]>tol_extincion).sum()==0) and ((rb_xx[k-1]>tol_extincion).sum()==0):
+        count_collapse_years += 1
+        if count_collapse_years >= LIMIT_COLLAPSE_YEARS:
                 systemextinction = True
     return systemextinction
 
@@ -718,7 +715,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
         ''' The compatibilty matrixes masks are created when the year starts '''         
         if not(k % DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)     
             if (not(systemextinction)):
-                systemextinction = check_species_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff)
+                systemextinction = check_system_extinction(algorithm,k,lcompatibplantas,plants_blossom_prob,ra_equs,rb_equs,ra_eff,rb_eff)
                 if systemextinction:
                     show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
                     if exit_on_extinction:
