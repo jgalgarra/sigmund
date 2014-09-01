@@ -224,7 +224,8 @@ def ciclo_none(rtot_species, period, Nindivs, invK, L_abs):
 def calc_mutualism_params(minputchar_p,Alpha_p,Nindividuals_p,Nindividuals_q,r_eqsum,term_May,rMay,k,j,n,r_p,r_muerte,DAYS_IN_A_YEAR):
     coef_bij_matrix=float(minputchar_p[j][n]*Nindividuals_q[k][j])
     lr_eqsum = float(r_eqsum + coef_bij_matrix)
-    retMay = val_mutMay(r_p[n]-r_muerte,calc_coef_May(minputchar_p[j][n],r_p[n]-r_muerte,Alpha_p[n]),DAYS_IN_A_YEAR,Nindividuals_p[k][n],Nindividuals_q[k][j],Alpha_p[n])
+    retMay = val_mutMay(r_p[n]-r_muerte,calc_coef_May(minputchar_p[j][n],r_p[n]-r_muerte,Alpha_p[n]),\
+                        DAYS_IN_A_YEAR,Nindividuals_p[k][n],Nindividuals_q[k][j],Alpha_p[n])
     lterm_May = term_May+retMay[0]
     lrMay = rMay + retMay[1]
     return lr_eqsum,lterm_May,lrMay
@@ -327,7 +328,7 @@ def predators_effect(p_devorados, DAYS_IN_A_YEAR, j, Nindividuals_p, Nindividual
 def populations_evolution(n,strtype, numspecies_p, algorithm, hay_foodweb, p_ext, May, haymut,\
                           DAYS_IN_A_YEAR, rp_eff, rp_eq, minputchar_p, j, cAlpha_p, Alpha_p, r_p, rd_p, \
                           Nindividuals_p, numspecies_q, Nindividuals_q, Nindividuals_c, minputchar_c, numspecies_c, \
-                          inicioext, hayext, nper, periodoext, spike, k, model_r_a):
+                          inicioext, hayext, nper, periodoext, spike, k, model_r_a, ldevices_info):
     ''' for n in range (numspecies_p):'''
     global cuentaperpl,cuentaperpol
     #rceff = retl = rcalc = 0
@@ -507,6 +508,75 @@ def check_system_extinction(k, lcompatibplantas, plants_blossom_prob, ra_xx,\
     return hayextinction
                     
 
+
+def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a, Nindividuals_a, numspecies_b, Nindividuals_b, K_c, Nindividuals_c, r_c, numspecies_c, minputchar_d, j, k):
+    if hay_foodweb:
+        rowNi = []
+        for n in range(numspecies_c):
+            coef_bij_matrix = 0
+            c_devorados = 0
+            r_eqsum = 0
+            signo = signfunc(r_c[n])
+            if (Nindividuals_c[k][n] > 0):
+                for j in range(numspecies_a):
+                    coef_bij_matrix = Nindividuals_a[k][j] * minputchar_d[j][n]
+                    r_eqsum += coef_bij_matrix
+                
+                for j in range(numspecies_b):
+                    coef_bij_matrix = Nindividuals_b[k][j] * minputchar_d[j + numspecies_a][n]
+                    r_eqsum += coef_bij_matrix
+                
+                rperiodequivalente = calc_r_periodo_vh(r_eqsum, invperiod)
+                term_c = round(Nindividuals_c[k][n] * (1 - Nindividuals_c[k][n] / K_c[n]))
+                if term_c > 1:
+                    incPredatoria = np.random.binomial(term_c, -math.expm1(-rperiodequivalente))
+                else:
+                    incPredatoria = 0
+                incNmalth = np.random.binomial(Nindividuals_c[k][n], -math.expm1(-calc_r_periodo_vh(abs(r_c[n]), invperiod)))
+                signo = signfunc(r_c[n])
+                pop_c = Nindividuals_c[k][n] + incPredatoria + signo * incNmalth #+ incNlogistic-c_devorados
+                if (pop_c == 0):
+                    show_info_to_user(ldevices_info, "Predator species %d extinction in day %d" % (n, k))
+            else:
+                pop_c = 0
+            rowNi.append(pop_c)
+        
+        Nindividuals_c.append(rowNi)
+
+
+def predators_param_init(filename, hay_foodweb, direntrada, ldevices_info, lfich_info, dt):
+    K_c = []
+    Nindividuals_c = []
+    rowNindividuals_c = []
+    r_c = []
+    r_cperiod = []
+    minputchar_c = []; minputchar_d = []
+    numspecies_c = 0
+    if hay_foodweb > 0:
+        filename_c = filename + '_c.txt'
+        filename_d = filename + '_d.txt'
+        show_info_to_user(lfich_info, "Predators matrix c:<a href='file:///" + dt + "/input/" + filename_c + "' target=_BLANK>" + filename_c + "<a><br>")
+        show_info_to_user(lfich_info, "Predators matrix d:<a href='file:///" + dt + "/input/" + filename_d + "' target=_BLANK>" + filename_d + "<a><br>")
+        l_minputchar_c = dlmreadlike(filename_c, direntrada)
+        minputchar_c = np.array(l_minputchar_c, dtype=float)
+        nrows_c = len(minputchar_c)
+        ncols_c = len(minputchar_c[0])
+        numspecies_c = ncols_c
+        show_info_to_user(ldevices_info, "Predator species : %d" % numspecies_c)
+        for n in range(numspecies_c):
+            rowNindividuals_c.append(int(minputchar_c[nrows_c - 3][n]))
+            K_c.append(int(minputchar_c[nrows_c - 2][n]))
+            r_c.append(minputchar_c[nrows_c - 1][n])
+            r_cperiod.append(calc_r_periodo_vh(minputchar_c[nrows_c - 1][n], invperiod))
+        
+        Nindividuals_c.append(rowNindividuals_c)
+        l_minputchar_d = dlmreadlike(filename_d, direntrada)
+        minputchar_d = np.array(l_minputchar_d, dtype=float)
+        nrows_d = len(minputchar_d)
+        ncols_d = len(minputchar_d[0])
+        numspecies_d = ncols_d
+    return Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d
+
 def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save='',dirtrabajo='',direntrada='',dirsal='',\
                 eliminarenlaces=0,pl_ext=[],pol_ext=[],os='',fichreport='',com='', algorithm='MoMutualism', plants_blossom_prob=1.0,\
                 plants_blossom_sd=0.01, plants_blossom_type = 'Binary', blossom_pert_list='', verbose=True,exit_on_extinction=False,\
@@ -563,38 +633,8 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
     numspecies_b=ncols_b
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b, rd_b, Nindividuals_b, rb_eff, \
                     rb_equs = init_lists_pop(periods,numspecies_b,minputchar_b)
-
-    K_c=[]
-    Nindividuals_c=[]
-    rowNindividuals_c=[]
-    r_c=[]
-    r_cperiod=[]
-    minputchar_c=[]
-    numspecies_c =  0
-    
-    if hay_foodweb>0:
-        filename_c=filename+'_c.txt'
-        filename_d=filename+'_d.txt'
-        show_info_to_user(lfich_info,"Predators matrix c:<a href='file:///"+dt+"/input/"+filename_c+"' target=_BLANK>"+filename_c+"<a><br>")
-        show_info_to_user(lfich_info,"Predators matrix d:<a href='file:///"+dt+"/input/"+filename_d+"' target=_BLANK>"+filename_d+"<a><br>")
-        l_minputchar_c=dlmreadlike(filename_c,direntrada)
-        minputchar_c = np.array(l_minputchar_c,dtype=float)
-        nrows_c=len(minputchar_c)
-        ncols_c=len(minputchar_c[0])
-        numspecies_c=ncols_c;
-        show_info_to_user(ldevices_info,"Predator species : %d" %numspecies_c)
-        for n in range(numspecies_c):
-            rowNindividuals_c.append(int(minputchar_c[nrows_c-3][n]))
-            K_c.append(int(minputchar_c[nrows_c-2][n]))
-            r_c.append(minputchar_c[nrows_c-1][n])
-            r_cperiod.append(calc_r_periodo_vh(minputchar_c[nrows_c-1][n],invperiod))
-        Nindividuals_c.append(rowNindividuals_c)
-        l_minputchar_d=dlmreadlike(filename_d,direntrada)
-        minputchar_d = np.array(l_minputchar_d,dtype=float)
-        nrows_d=len(minputchar_d)
-        ncols_d=len(minputchar_d[0])
-        numspecies_d = ncols_d
-  
+    Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d =  \
+                                       predators_param_init(filename, hay_foodweb, direntrada, ldevices_info, lfich_info, dt)  
     show_info_to_user(ldevices_info,"Plant species: %d" %numspecies_a)
     show_info_to_user(ldevices_info,"Plant initial populations %s" % rowNindividuals_a)
     if (plants_blossom_type=='Binary'):
@@ -638,26 +678,18 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
          
     for k in range (periods-1):
         ''' The compatibilty matrixes masks are created when the year starts ''' 
-        #if ((k%DAYS_IN_A_YEAR)==0):
-        if not(k % DAYS_IN_A_YEAR):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)    
-            if (not(systemextinction)):
-                if (algorithm!='Verhulst'):
-#                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-#                        ((ra_equs[k-1]>0).sum()==0) and ((rb_equs[k-1]>0).sum()==0):
-#                        systemextinction = True
-                       show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
-                       if exit_on_extinction:
-                            return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
-                else:
-                    if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-                       ((ra_eff[k-1]>tol_extincion).sum()==0) and ((rb_eff[k-1]>tol_extincion).sum()==0):
-                        systemextinction = True
-#                     systemextinction = check_system_extinction(k, \
-#                       lcompatibplantas, plants_blossom_prob, ra_eff, tol_extincion, rb_eff, tol_extincion)
-#                     if systemextinction:
-                        show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
-                        if exit_on_extinction:
-                            return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
+        if not(k % DAYS_IN_A_YEAR) and (not(systemextinction)):                      # Much faster than if ((k%DAYS_IN_A_YEAR)==0)    
+            if (algorithm!='Verhulst'):
+                show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
+                if exit_on_extinction:
+                    return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
+            else:
+                if (k>DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+                   ((ra_eff[k-1]>tol_extincion).sum()==0) and ((rb_eff[k-1]>tol_extincion).sum()==0):
+                    systemextinction = True
+                    show_info_to_user(ldevices_info,"ALARM !!!. System will collapse. Day %d (year %d)" % (k, k//DAYS_IN_A_YEAR))
+                    if exit_on_extinction:
+                        return(Nindividuals_a,Nindividuals_b,Nindividuals_c,ra_eff,rb_eff,ra_equs,ra_equs,0,0,0,0,0,0,systemextinction)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas = calc_blossom_effect(numspecies_a,nrows_a,ncols_a,\
                                                                                          nrows_b,ncols_b,numspecies_b,plants_blossom_type,\
                                                                                          plants_blossom_prob,plants_blossom_sd,blossom_pert_list=bloss_species[:])
@@ -665,7 +697,7 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
             if hay_bssvar:
                 for t in range(0,numspecies_b):
                     for l in range (0,numspecies_a):
-                         minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//DAYS_IN_A_YEAR]
+                        minpeq_a[t,l] = minpeq_a[t,l]*pBssvar_species[l][k//DAYS_IN_A_YEAR]
             minpeq_b = minputchar_b*minputchar_b_mask
         # Eliminacion aleatoria de enlaces
         if (eliminarenlaces > 0 ) & (k > 0) & (k % periodoborr == 0):
@@ -678,43 +710,15 @@ def bino_mutual(filename,year_periods,hay_foodweb,hay_superpredadores,data_save=
                                              DAYS_IN_A_YEAR, ra_eff, ra_equs, minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, Nindividuals_a,\
                                              numspecies_b, Nindividuals_b, Nindividuals_c, minputchar_c, numspecies_c,\
                                              inicioextplantas, hayextplantas, nperpl, periodoextpl, spikepl, k,\
-                                             model_r_alpha) for n in range(numspecies_a)]
+                                             model_r_alpha, ldevices_info) for n in range(numspecies_a)]
         #ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n,"Pollinator",numspecies_b,algorithm,hay_foodweb, pol_ext, May, haymut,\
                                               DAYS_IN_A_YEAR, rb_eff, rb_equs, minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, Nindividuals_b,\
                                               numspecies_a, Nindividuals_a, Nindividuals_c, minputchar_c, numspecies_c,\
                                               inicioextpolin, hayextpolin, nperpol, periodoextpol, spikepol,k,\
-                                              model_r_alpha) for n in range(numspecies_b)]
+                                              model_r_alpha, ldevices_info) for n in range(numspecies_b)]
         #rb_eff[0,]=rb_eff[1,]
-        if hay_foodweb:
-            rowNi=[]
-            for n in range (numspecies_c):
-                coef_bij_matrix=0
-                c_devorados=0
-                r_eqsum=0
-                signo=signfunc(r_c[n])   
-                if (Nindividuals_c[k][n]>0):
-                    for j in range(numspecies_a):
-                        coef_bij_matrix=Nindividuals_a[k][j]*minputchar_d[j][n]
-                        r_eqsum+=coef_bij_matrix
-                    for j in range(numspecies_b):
-                        coef_bij_matrix=Nindividuals_b[k][j]*minputchar_d[j+numspecies_a][n]
-                        r_eqsum+=coef_bij_matrix
-                    rperiodequivalente = calc_r_periodo_vh(r_eqsum,invperiod)
-                    term_c=round(Nindividuals_c[k][n]*(1-Nindividuals_c[k][n]/K_c[n]))
-                    if term_c>1:
-                        incPredatoria=np.random.binomial(term_c,-math.expm1(-rperiodequivalente))
-                    else:
-                        incPredatoria=0
-                    incNmalth= np.random.binomial(Nindividuals_c[k][n],-math.expm1(-calc_r_periodo_vh(abs(r_c[n]),invperiod)))
-                    signo=signfunc(r_c[n])
-                    pop_c=Nindividuals_c[k][n]+incPredatoria+signo*incNmalth #+ incNlogistic-c_devorados
-                    if (pop_c==0):
-                        show_info_to_user(ldevices_info,"Predator species %d extinction in day %d" % (n,k))
-                else:
-                    pop_c=0;
-                rowNi.append(pop_c)
-            Nindividuals_c.append(rowNi)
+        predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a, Nindividuals_a, numspecies_b, Nindividuals_b, K_c, Nindividuals_c, r_c, numspecies_c, minputchar_d, j, k)
     maxa_individuos,maxb_individuos,max_reff,min_reff,max_requs,min_requs = \
                    find_max_values(Nindividuals_a,Nindividuals_b,ra_eff,rb_eff,
                                    ra_equs,rb_equs)    
@@ -890,7 +894,7 @@ def food_render(na,nb,nc,maxa_individuos,maxb_individuos,filename,displayinic,pe
     if numspecies_c<11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-    nsal= 'output_pict_foodweb_'+filename+'_'+algorithm+'_'+os+'_'+str(years)+'.png'
+    nsal= 'output_pict_foodweb_'+filename+'_'+algorithm+'_'+os+'_'+str(periods)+'.png'
     dt = dirtrabajo.replace('\\','/');
     plt.savefig(str(dt+'/'+dirsalida.replace('\\','/')+nsal),bbox_inches=0)
     plt.close()
