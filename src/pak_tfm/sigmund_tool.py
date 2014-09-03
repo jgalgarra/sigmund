@@ -6,7 +6,7 @@
 import sys
 import os
 import b_sim
-#from PyQt4 import QtCore, QtGui
+# from PyQt4 import QtCore, QtGui
 from bino_form import *
 import re
 
@@ -15,7 +15,7 @@ class StartQT4(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         
         self.hay_error = False
-        self.lista_err=[]
+        self.lista_err = []
         self.input_dir = './input'
         self.ciclos = 100
         self.release = 200
@@ -32,7 +32,8 @@ class StartQT4(QtGui.QMainWindow):
         self.input_file = ""
         self.ui = Ui_Form()
         self.ui.setupUi(self)
-        self.setWindowTitle('SIGMUND '+"%0.2f " % (self.release/100)+self.daterelease)
+        self.setWindowTitle('SIGMUND ' + "%0.2f " % (self.release / 100) +\
+                             self.daterelease)
         self.setWindowIcon(QtGui.QIcon('upm.gif'))
         self.ui.ciclos.setText(str(self.ciclos))
         self.ui.plants_blossom.setText(str(self.plants_blossom))
@@ -47,13 +48,18 @@ class StartQT4(QtGui.QMainWindow):
         self.May = False
         self.algorithm = 'Verhulst'
         self.typeofmodulation = 'None'
-        self.Bssvar_modulationtype_list=[]
+        self.Bssvar_modulationtype_list = []
 
-        QtCore.QObject.connect(self.ui.inputfile, QtCore.SIGNAL("returnPressed()"), self.add_entry)
-        QtCore.QObject.connect(self.ui.ciclos, QtCore.SIGNAL("returnPressed()"), self.add_entry)
-        QtCore.QObject.connect(self.ui.foodweb_checkbox, QtCore.SIGNAL("stateChanged()"), self.add_entry)
-        QtCore.QObject.connect(self.ui.Run_Button, QtCore.SIGNAL("clicked()"), self.add_entry)
-        QtCore.QObject.connect(self.ui.select_input_file, QtCore.SIGNAL("clicked()"), self.select_file)
+        QtCore.QObject.connect(self.ui.inputfile, 
+                               QtCore.SIGNAL("returnPressed()"), self.add_entry)
+        QtCore.QObject.connect(self.ui.ciclos, 
+                               QtCore.SIGNAL("returnPressed()"), self.add_entry)
+        QtCore.QObject.connect(self.ui.foodweb_checkbox, 
+                               QtCore.SIGNAL("stateChanged()"), self.add_entry)
+        QtCore.QObject.connect(self.ui.Run_Button, QtCore.SIGNAL("clicked()"), 
+                               self.add_entry)
+        QtCore.QObject.connect(self.ui.select_input_file, 
+                               QtCore.SIGNAL("clicked()"), self.select_file)
         self.ui.inputfile.setEnabled(False)
         self.ui.TOM_None_Button.clicked.connect(self.select_No_mutualism)
         self.ui.TOM_LAp_vh_Button.clicked.connect(self.select_LApproach_vh)
@@ -132,20 +138,22 @@ class StartQT4(QtGui.QMainWindow):
     
         
     def error_exit(self):
-        texto_aux=""
+        texto_aux = ""
         for i in self.lista_err:
             print (i)
             texto_aux += i
         self.ui.label_report.setText("")
         self.ui.URL_report.setText("")
-        self.ui.Error_msg.setText("<html><head/><body><p align=center><span style=' font-size:12pt; font-weight:600; color:#ff0000;'>"+texto_aux+"</span></p></body></html>")
+        self.ui.Error_msg.setText("<html><head/><body><p align=center><span style=' font-size:12pt; font-weight:600; color:#ff0000;'>" +\
+                                  texto_aux + "</span></p></body></html>")
         self.lista_err = []     
             
     def select_file(self):
-        self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', self.input_dir)
-        a=self.filename.replace('\\','/ ').split('/');
-        #print(a)
-        self.input_file=a[-1]
+        self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
+                                                          self.input_dir)
+        a = self.filename.replace('\\', '/ ').split('/');
+        # print(a)
+        self.input_file = a[-1]
         self.ui.inputfile.setText(self.input_file)
         self.ui.inputfile.setEnabled(False)
         self.ui.Run_Button.setEnabled(1)
@@ -166,27 +174,28 @@ class StartQT4(QtGui.QMainWindow):
         return listb, auxlspec, numspe
 
     def add_entry(self): 
-        algorithms = ["Verhulst","Logistic_abs","May","Logistic_u","NoMutualism"]
+        algorithms = ["Verhulst", "Logistic_abs", "May", \
+                      "Logistic_u", "NoMutualism"]
         # Checking input file existence
         try:
             fh = open(self.filename, "r")
         except IOError:
-            self.lista_err.append("ERROR: can\'t open file "+self.input_file)
+            self.lista_err.append("ERROR: can\'t open file " + self.input_file)
             self.error_exit()
             return
         else:
             fh.close()
         # Testing that file exists
                 
-        dirsal='output/'
-        dirent='input/'
-        dirs=os.path.dirname(dirsal)
+        dirsal = 'output/'
+        dirent = 'input/'
+        dirs = os.path.dirname(dirsal)
         try:
             os.stat(dirs)
         except:
             os.makedirs(dirs)
         try:
-            self.ciclos=int(self.ui.ciclos.text())
+            self.ciclos = int(self.ui.ciclos.text())
         except:            
             self.lista_err.append("ERROR: bad Days format ")
             self.error_exit()
@@ -198,48 +207,50 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.URL_report.setText("Running")
         self.repaint()
         
-        displayinic=0
-        period_year=365
-        dirsalida='output\\'
+        displayinic = 0
+        period_year = 365
+        dirsalida = 'output\\'
         
-        input_fname=self.input_file.replace('_b.txt','_a.txt').replace('_c.txt','_a.txt')
-        aux=input_fname.split('_a.txt')
-        input_fname=aux[0]
+        input_fname = self.input_file.replace('_b.txt',
+                                           '_a.txt').replace('_c.txt', '_a.txt')
+        aux = input_fname.split('_a.txt')
+        input_fname = aux[0]
         
-        output_suffix=self.ui.output_suffix.text()
-        comentario=self.ui.Comments_text.toPlainText()
-        dirs=os.path.dirname(sys.argv[0])
-        reportpath=os.path.join(dirs,dirsalida.replace('\\','/'))
-        fichr=reportpath+'rep_'+input_fname+'_'+self.algorithm+'_'+output_suffix+'_'+str(int(self.ciclos))+'.html'
-        dispfichsal=fichr.split('\\')
-        linkname='<a href=file:///'+fichr+'>'+dispfichsal[-1]+'</a>'
+        output_suffix = self.ui.output_suffix.text()
+        comentario = self.ui.Comments_text.toPlainText()
+        dirs = os.path.dirname(sys.argv[0])
+        reportpath = os.path.join(dirs, dirsalida.replace('\\', '/'))
+        fichr = reportpath + 'rep_' + input_fname + '_' + self.algorithm +\
+                     '_' + output_suffix + '_' + str(int(self.ciclos)) + '.html'
+        dispfichsal = fichr.split('\\')
+        linkname = '<a href=file:///' + fichr + '>' + dispfichsal[-1] + '</a>'
         print("%s" % comentario)
-        outputdatasave=self.ui.save_output_checkbox.checkState()>0
-        self.haypred=self.ui.foodweb_checkbox.checkState()>0
-        haysup=0
+        outputdatasave = self.ui.save_output_checkbox.checkState() > 0
+        self.haypred = self.ui.foodweb_checkbox.checkState() > 0
+        haysup = 0
         p = re.compile('\d+(\.\d+)?')
-        if p.match(self.ui.random_removal.text())==None:
-            el=0
+        if p.match(self.ui.random_removal.text()) == None:
+            el = 0
         else:
-            el=float(self.ui.random_removal.text())
+            el = float(self.ui.random_removal.text())
         q = re.compile('\d+(\.\d+)?')
-        if q.match(self.ui.plants_blossom.text())==None:
-            pb=0
+        if q.match(self.ui.plants_blossom.text()) == None:
+            pb = 0
         else:
-            pb=float(self.ui.plants_blossom.text())
+            pb = float(self.ui.plants_blossom.text())
         qsd = re.compile('\d+(\.\d+)?')
-        if qsd.match(self.ui.plants_blossom_sd.text())==None:
-            pb_sd=0
+        if qsd.match(self.ui.plants_blossom_sd.text()) == None:
+            pb_sd = 0
         else:
-            pb_sd=float(self.ui.plants_blossom_sd.text())
-        if qsd.match(self.ui.Bssvar_period.text())==None:
-            self.Bssvar_sd=0
+            pb_sd = float(self.ui.plants_blossom_sd.text())
+        if qsd.match(self.ui.Bssvar_period.text()) == None:
+            self.Bssvar_sd = 0
         else:
-            self.Bssvar_period=float(self.ui.Bssvar_period.text())
-        if qsd.match(self.ui.Bssvar_sd.text())==None:
-            self.Bssvar_sd=0
+            self.Bssvar_period = float(self.ui.Bssvar_period.text())
+        if qsd.match(self.ui.Bssvar_sd.text()) == None:
+            self.Bssvar_sd = 0
         else:
-            self.Bssvar_sd=float(self.ui.Bssvar_sd.text())
+            self.Bssvar_sd = float(self.ui.Bssvar_sd.text())
         self.Bssvar_modulationtype_list = []
         self.Bssvar_modulationtype_list.append(self.typeofmodulation)
         if (self.typeofmodulation == 'linear'):
@@ -247,46 +258,47 @@ class StartQT4(QtGui.QMainWindow):
         else: 
             if (self.typeofmodulation == 'sin'):
                 self.Bssvar_modulationtype_list.append(float(self.ui.Bssvar_Type_sin_period.text()))
-        if (self.ui.Bssvar_species.text().upper()=='ALL'):
-            self.Bssvar_species=['ALL']
+        if (self.ui.Bssvar_species.text().upper() == 'ALL'):
+            self.Bssvar_species = ['ALL']
         else:
-            if (len(self.ui.Bssvar_species.text())==0):
+            if (len(self.ui.Bssvar_species.text()) == 0):
                 listb = []
             else:
-                auxspec=self.ui.Bssvar_species.text().split(',')
+                auxspec = self.ui.Bssvar_species.text().split(',')
                 listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
             
             
-        print("Bssvar_species "+str(self.Bssvar_species))
+        print("Bssvar_species " + str(self.Bssvar_species))
             
-        plants_extinction={}
-        pols_extinction={}
+        plants_extinction = {}
+        pols_extinction = {}
         blossom_perturbation = {}
         
-        if (self.ui.blossom_pert_species.text().upper()=='ALL'):
-            blossom_perturbation=['ALL']
+        if (self.ui.blossom_pert_species.text().upper() == 'ALL'):
+            blossom_perturbation = ['ALL']
         else:
-            auxspec=self.ui.blossom_pert_species.text().split(',')
+            auxspec = self.ui.blossom_pert_species.text().split(',')
             listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
-            blossom_perturbation=listb
-        #print(blossom_perturbation)
+            blossom_perturbation = listb
+        # print(blossom_perturbation)
         
         if self.ui.pl_ext_period.text().isdigit():
             try:
-                plants_extinction['period']=int(self.ui.pl_ext_period.text())*period_year
-                plants_extinction['spike']=float(self.ui.pl_ext_spike.text())
-                plants_extinction['start']=float(self.ui.pl_ext_start.text())
-                plants_extinction['rate']=float(self.ui.pl_ext_rate.text())
-                plants_extinction['numperiod']=int(self.ui.pl_ext_numperiod.text())
-                #print(self.ui.pl_ext_species.text().upper())
-                if (self.ui.pl_ext_species.text().upper()=='ALL'):
-                    plants_extinction['species']=['ALL']
+                plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
+                                              * period_year
+                plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
+                plants_extinction['start'] = float(self.ui.pl_ext_start.text())
+                plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
+                plants_extinction['numperiod'] = int(self.ui.pl_ext_numperiod.text())
+                # print(self.ui.pl_ext_species.text().upper())
+                if (self.ui.pl_ext_species.text().upper() == 'ALL'):
+                    plants_extinction['species'] = ['ALL']
                 else:
-                    auxspec=self.ui.pl_ext_species.text().split(',')
+                    auxspec = self.ui.pl_ext_species.text().split(',')
                     listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
-                    plants_extinction['species']=listb
-                #print (plants_extinction)
+                    plants_extinction['species'] = listb
+                # print (plants_extinction)
             except:            
                 self.lista_err.append("ERROR: bad plant extinction format")
                 self.error_exit()
@@ -296,18 +308,19 @@ class StartQT4(QtGui.QMainWindow):
             
         if self.ui.pol_ext_period.text().isdigit():
             try:
-                pols_extinction['period']=int(self.ui.pol_ext_period.text())*period_year
-                pols_extinction['spike']=float(self.ui.pol_ext_spike.text())
-                pols_extinction['start']=float(self.ui.pol_ext_start.text())
-                pols_extinction['rate']=float(self.ui.pol_ext_rate.text())
-                pols_extinction['numperiod']=int(self.ui.pol_ext_numperiod.text())
-                if (self.ui.pol_ext_species.text().upper()=='ALL'):
-                    pols_extinction['species']=['ALL']
+                pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
+                                            period_year
+                pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
+                pols_extinction['start'] = float(self.ui.pol_ext_start.text())
+                pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
+                pols_extinction['numperiod'] = int(self.ui.pol_ext_numperiod.text())
+                if (self.ui.pol_ext_species.text().upper() == 'ALL'):
+                    pols_extinction['species'] = ['ALL']
                 else:
-                    auxspec=self.ui.pol_ext_species.text().split(',')
+                    auxspec = self.ui.pol_ext_species.text().split(',')
                     listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
-                    pols_extinction['species']=listb
-                #print (pols_extinction)
+                    pols_extinction['species'] = listb
+                # print (pols_extinction)
             except:            
                 self.lista_err.append("ERROR: bad pollinator extinction format")
                 self.error_exit()
@@ -315,32 +328,41 @@ class StartQT4(QtGui.QMainWindow):
                 self.ui.Clutualose_Button.setEnabled(1)
                 return
             
-        Na,Nb,Nc,Ra,Rb,RequA,RequB,maxa,maxb,maxreff,minreff,\
-                maxequs,minequs,extinction,pBssvar_coefs= \
-                b_sim.bino_mutual(input_fname,self.ciclos,self.haypred,haysup,\
-                outputdatasave,dirs,dirent,dirsalida,eliminarenlaces=el,\
-                pl_ext=plants_extinction,pol_ext=pols_extinction,\
-                os=output_suffix,fichreport=fichr,com=comentario,\
-                algorithm=self.algorithm,plants_blossom_prob=pb,\
-                plants_blossom_sd=pb_sd,plants_blossom_type=self.typeofblossom,\
-                blossom_pert_list = blossom_perturbation, release = self.release,\
-                Bssvar_period = self.Bssvar_period,Bssvar_sd=self.Bssvar_sd,\
-                Bssvar_modulationtype_list=self.Bssvar_modulationtype_list,\
-                Bssvar_species=self.Bssvar_species) 
+        Na, Nb, Nc, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, minreff, \
+                maxequs, minequs, extinction, pBssvar_coefs = b_sim.bino_mutual(
+                        input_fname, self.ciclos, self.haypred, haysup,
+                        outputdatasave, dirs, dirent, dirsalida, 
+                        eliminarenlaces=el, pl_ext=plants_extinction, 
+                        pol_ext=pols_extinction, os=output_suffix, 
+                        fichreport=fichr, com=comentario, 
+                        algorithm=self.algorithm, plants_blossom_prob=pb, 
+                        plants_blossom_sd=pb_sd, 
+                        plants_blossom_type=self.typeofblossom, 
+                        blossom_pert_list=blossom_perturbation, 
+                        release=self.release, Bssvar_period=self.Bssvar_period,
+                        Bssvar_sd=self.Bssvar_sd, 
+                        Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
+                        Bssvar_species=self.Bssvar_species)
         self.ui.label_report.setText("Report file: ")
         self.ui.URL_report.setText(linkname)
         self.ui.Run_Button.setEnabled(1)
         self.ui.Close_Button.setEnabled(1)
-        self.ui.URL_outputs.setText("<a href='file:///"+reportpath.replace('\\','/')+"'>See all results</a>")       
-        #b_sim.mutual_render(Na,Nb,Ra,Rb,maxa,maxb,maxreff,minreff,input_fname,displayinic,self.ciclos*365,dirsalida,self.algorithm,fichreport=fichr,os=output_suffix,dirtrabajo=dirs)
-        b_sim.mutual_render(Na,Nb,Ra,Rb,RequA,RequB,maxa,maxb,maxreff,minreff,maxequs,minequs,input_fname,\
-                            displayinic,self.ciclos*365,dirsalida,self.algorithm,fichreport=fichr,os=output_suffix,dirtrabajo=dirs,Bssvar_coefs=pBssvar_coefs)
+        self.ui.URL_outputs.setText("<a href='file:///" +\
+                                    reportpath.replace('\\', '/') +\
+                                    "'>See all results</a>")       
+        b_sim.mutual_render(Na, Nb, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, 
+                            minreff, maxequs, minequs, input_fname, displayinic,
+                            self.ciclos * 365, dirsalida, self.algorithm, 
+                            fichreport=fichr, os=output_suffix, dirtrabajo=dirs,
+                            Bssvar_coefs=pBssvar_coefs)
         if self.haypred:
-            b_sim.food_render(Na,Nb,Nc,maxa,maxb,input_fname,displayinic,self.ciclos*365,dirsalida,self.algorithm,fichreport=fichr,os=output_suffix,dirtrabajo=dirs)
+            b_sim.food_render(Na, Nb, Nc, maxa, maxb, input_fname, displayinic,
+                              self.ciclos * 365, dirsalida, self.algorithm, 
+                              fichreport=fichr, os=output_suffix, 
+                              dirtrabajo=dirs)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)
     myapp = StartQT4()
     myapp.show()
     sys.exit(app.exec_())
-        
