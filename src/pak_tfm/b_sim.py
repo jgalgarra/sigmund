@@ -16,6 +16,8 @@ import os
 import sys
 import cProfile
 
+import sigmund_GLOBALS as sgGL
+
 global ancho
 global alto
 global resolucion
@@ -26,19 +28,19 @@ global Logistic_abs
 global model_r_alpha
 global hay_bssvar
 global pendiente, sd, periodo, numanyos
-global DAYS_IN_A_YEAR
+#global sgGL.DAYS_YEAR
 global ax
 global count_collapse_years
 global LIMIT_COLLAPSE_YEARS
 global TOL_EXTINCTION
 
-DAYS_IN_A_YEAR = 365
+#sgGL.DAYS_YEAR = 365
 LIMIT_COLLAPSE_YEARS = 8
 TOL_EXTINCTION = -0.001
 ancho = 16
 alto = 10
 resolucion = 600
-invperiod = 1 / DAYS_IN_A_YEAR
+invperiod = 1 / sgGL.DAYS_YEAR
 count_collapse_years = 0
 
 class CanalInfo():
@@ -128,7 +130,7 @@ def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
     minpeq_b = minputchar_b * minputchar_b_mask
     show_info_to_user(ldevices_info, \
     "Day:%d (year %d). Deleted links plant %d <-> pollinator %d"\
-    % (k, k // DAYS_IN_A_YEAR , fil, col))
+    % (k, k // sgGL.DAYS_YEAR , fil, col))
     return minpeq_a, minpeq_b, minputchar_a, minputchar_b,
 
 def dlmreadlike(inputfile, direntrada):
@@ -171,7 +173,7 @@ def val_mutMay(r_species, beta, period, N1, N2, K1):
     ret = [incEq, rMay]
     return(ret)
 
-def ciclo_May(r_species, rM, period, inctermMay, Nindivs, K):
+def ciclo_May(r_species, rM, inctermMay, Nindivs, K):
     rspneq = calc_r_periodo_vh(abs(r_species), invperiod)
     signosp = signfunc(r_species)
     termEq = Nindivs * (signosp - (Nindivs / K))
@@ -184,7 +186,7 @@ def ciclo_May(r_species, rM, period, inctermMay, Nindivs, K):
            signfunc(termEq) * rcal]
     return(ret)
                
-def ciclo_verhulst(rtot_species, reqsum, period, Nindivs, cAlpha, Alpha):
+def ciclo_verhulst(rtot_species, reqsum, Nindivs, cAlpha, Alpha):
     roz = (Alpha + cAlpha * reqsum) * Nindivs
     rcal = rtot_species - roz
     rspneq = calc_r_periodo_vh(rcal, invperiod) if (rcal >= 0)\
@@ -196,7 +198,7 @@ def ciclo_verhulst(rtot_species, reqsum, period, Nindivs, cAlpha, Alpha):
         inc_pop = Nindivs - incNmalth
     return([inc_pop, rcal])     
 
-def ciclo_new_model(rtot_species, period, Nindivs, invK, L_abs):
+def ciclo_new_model(rtot_species, Nindivs, invK, L_abs):
     rcal = rtot_species
     if (rtot_species > 0):
         rcal -= (rtot_species * Nindivs * invK) 
@@ -211,7 +213,7 @@ def ciclo_new_model(rtot_species, period, Nindivs, invK, L_abs):
         inc_pop = Nindivs - incNmalth
     return([inc_pop, rcal]) 
 
-def ciclo_none(rtot_species, period, Nindivs, invK, L_abs):
+def ciclo_none(rtot_species, Nindivs, invK, L_abs):
     rcal = rtot_species
     rspneq = calc_r_periodo_vh(rcal, invperiod) if (rcal >= 0)\
              else calc_r_periodo_vh(-rcal, invperiod)
@@ -223,13 +225,12 @@ def ciclo_none(rtot_species, period, Nindivs, invK, L_abs):
     return([inc_pop, rcal])    
 
 def calc_mutualism_params(minputchar_p, Alpha_p, Nindividuals_p, Nindividuals_q,
-                          r_eqsum, term_May, rMay, k, j, n, r_p, r_muerte, 
-                          DAYS_IN_A_YEAR):
+                          r_eqsum, term_May, rMay, k, j, n, r_p, r_muerte):
     coef_bij_matrix = float(minputchar_p[j][n] * Nindividuals_q[k][j])
     lr_eqsum = float(r_eqsum + coef_bij_matrix)
     retMay = val_mutMay(r_p[n] - r_muerte, \
             calc_coef_May(minputchar_p[j][n], r_p[n] - r_muerte, Alpha_p[n]),
-                        DAYS_IN_A_YEAR, Nindividuals_p[k][n], 
+                        sgGL.DAYS_YEAR, Nindividuals_p[k][n], 
                         Nindividuals_q[k][j], Alpha_p[n])
     lterm_May = term_May + retMay[0]
     lrMay = rMay + retMay[1]
@@ -277,19 +278,19 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
                                       hayextplantas, hayextpolin,
                        ldevices_info, lfich_info):
     if hayextplantas:
-        inicioextplantas = round(yearperiods * pl_ext['start'] * DAYS_IN_A_YEAR)
+        inicioextplantas = round(yearperiods * pl_ext['start'] * sgGL.DAYS_YEAR)
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        show_info_to_user(ldevices_info, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / DAYS_IN_A_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        show_info_to_user(ldevices_info, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
-        inicioextpolin = round(yearperiods * pol_ext['start'] * DAYS_IN_A_YEAR)
+        inicioextpolin = round(yearperiods * pol_ext['start'] * sgGL.DAYS_YEAR)
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        show_info_to_user(ldevices_info, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / DAYS_IN_A_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        show_info_to_user(ldevices_info, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
@@ -324,7 +325,7 @@ def calcbssvarespecie(valblossomperiod, valsd, funct, nys):
         indiffs.append(m)     
     return indiffs, valdiffs
 
-def predators_effect(p_devorados, DAYS_IN_A_YEAR, j, Nindividuals_p,
+def predators_effect(p_devorados, j, Nindividuals_p,
                      Nindividuals_c, minputchar_c, numspecies_c, n, k):
     for j in range(numspecies_c):
         if (minputchar_c[n][j] > 0):
@@ -335,7 +336,7 @@ def predators_effect(p_devorados, DAYS_IN_A_YEAR, j, Nindividuals_p,
     return p_devorados, j, rceff
 
 def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb, 
-                          p_ext, May, haymut, DAYS_IN_A_YEAR, rp_eff, rp_eq, 
+                          p_ext, May, haymut, rp_eff, rp_eq, 
                           minputchar_p, j, cAlpha_p, Alpha_p, r_p, rd_p, 
                           Nindividuals_p, numspecies_q, Nindividuals_q, 
                           Nindividuals_c, minputchar_c, numspecies_c, inicioext,
@@ -369,32 +370,31 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                 r_eqsum, term_May, rMay = calc_mutualism_params(minputchar_p,
                                     Alpha_p, Nindividuals_p, Nindividuals_q,
                                     r_eqsum, term_May, rMay, k, j, n, r_p,
-                                    r_muerte, DAYS_IN_A_YEAR)
+                                    r_muerte)
         rtot_p = r_p[n] + r_eqsum - r_muerte
         
         # Efecto de los depredadores
         if hay_foodweb:
-            p_devorados, j, rceff = predators_effect(p_devorados, 
-                                                     DAYS_IN_A_YEAR, j, 
+            p_devorados, j, rceff = predators_effect(p_devorados, j, 
                                                      Nindividuals_p, 
                                                      Nindividuals_c, 
                                                      minputchar_c, 
                                                      numspecies_c, n, k)
         # New algorithm
         if (model_r_a):
-            retl = ciclo_verhulst(rtot_p, r_eqsum, DAYS_IN_A_YEAR,
+            retl = ciclo_verhulst(rtot_p, r_eqsum,
                                   Nindividuals_p[k, n], cAlpha_p[n], Alpha_p[n])
         elif not (May):
-            retl = ciclo_new_model(rtot_p, DAYS_IN_A_YEAR, Nindividuals_p[k, n],
+            retl = ciclo_new_model(rtot_p, Nindividuals_p[k, n],
                                    1 / Alpha_p[n], Logistic_abs)
         else:
-            retl = ciclo_May(r_p[n] - r_muerte, rMay, DAYS_IN_A_YEAR, term_May,
+            retl = ciclo_May(r_p[n] - r_muerte, rMay, term_May,
                              Nindividuals_p[k, n], Alpha_p[n])           
         pop_p = retl[0] - p_devorados
         if not(pop_p):
             show_info_to_user(ldevices_info,
                               "Day %d (year %d). %s species %d extincted" %\
-                              (k, k // DAYS_IN_A_YEAR, strtype, n))
+                              (k, k // sgGL.DAYS_YEAR, strtype, n))
     Nindividuals_p[k + 1][n] = pop_p
     if (pop_p):
         rp_eff[k + 1][n] = retl[1]
@@ -503,7 +503,7 @@ def end_report(ldevices_info, lfich_info, tfin, tinic, periods, data_save,
                filename, algorithm, dirsal, os, Nindividuals_a, ra_eff, ra_equs,
                Nindividuals_b, rb_eff, rb_equs, Nindividuals_c, hay_food_web):    
     show_info_to_user(ldevices_info, "Elapsed time %.02f s" % (tfin - tinic))
-    speriodos = str(int(periods / DAYS_IN_A_YEAR))
+    speriodos = str(int(periods / sgGL.DAYS_YEAR))
     if (data_save == 1):
         nsal = dlmwritelike(filename + '_' + algorithm + "_a_populations_", 
                             speriodos, Nindividuals_a, dirsal, os)
@@ -666,7 +666,7 @@ def init_blossom_perturbations_conditions(year_periods, blossom_pert_list,
 def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
     count_collapse_years = 0
     systemextinction = False
-    periods = year_periods * DAYS_IN_A_YEAR
+    periods = year_periods * sgGL.DAYS_YEAR
     May = algorithm == 'May'
     haymut = algorithm != 'NoMutualism'
     model_r_alpha = algorithm == 'Verhulst' or algorithm == 'NoMutualism'
@@ -754,8 +754,8 @@ def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
         ra_xx, rb_xx = ra_eff, rb_eff
     else:
         ra_xx, rb_xx = ra_equs, rb_equs;
-    # if (k>3*DAYS_IN_A_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-    if (k > 3 * DAYS_IN_A_YEAR) and \
+    # if (k>3*sgGL.DAYS_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
+    if (k > 3 * sgGL.DAYS_YEAR) and \
             (ra_xx[k - 1] > TOL_EXTINCTION).sum() == 0 and \
             (rb_xx[k - 1] > TOL_EXTINCTION).sum() == 0:
         count_collapse_years += 1
@@ -775,7 +775,7 @@ def calc_perturbed_coeffs(k, hay_bssvar, pBssvar_species, minputchar_a,
     if hay_bssvar:
         for t in range(0, numspecies_b):
             for l in range (0, numspecies_a):
-                minpeq_a[t, l] = minpeq_a[t, l] * pBssvar_species[l][k // DAYS_IN_A_YEAR]
+                minpeq_a[t, l] = minpeq_a[t, l] * pBssvar_species[l][k // sgGL.DAYS_YEAR]
     minpeq_b = minputchar_b * minputchar_b_mask
     return minpeq_a, minpeq_b
 
@@ -846,7 +846,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
          
     for k in range (periods - 1):
         ''' The compatibilty matrixes masks are created when the year starts '''         
-        if not(k % DAYS_IN_A_YEAR):  # Much faster than if ((k%DAYS_IN_A_YEAR)==0)     
+        if not(k % sgGL.DAYS_YEAR):  # Much faster than if ((k%sgGL.DAYS_YEAR)==0)     
             if (not(systemextinction)):
                 systemextinction = check_system_extinction(algorithm, k, 
                                           lcompatibplantas, plants_blossom_prob,
@@ -854,7 +854,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                 if systemextinction:
                     show_info_to_user(ldevices_info,\
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
-                         (k, k // DAYS_IN_A_YEAR))
+                         (k, k // sgGL.DAYS_YEAR))
                     if exit_on_extinction:
                         return(Nindividuals_a, Nindividuals_b, Nindividuals_c,
                                ra_eff, rb_eff, ra_equs, ra_equs, 
@@ -879,7 +879,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                           ldevices_info)
         [populations_evolution(n, "Plant", 
                                numspecies_a, algorithm, hay_foodweb, pl_ext, 
-                               May, haymut, DAYS_IN_A_YEAR, ra_eff, ra_equs, 
+                               May, haymut, ra_eff, ra_equs, 
                                minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, 
                                Nindividuals_a, numspecies_b, Nindividuals_b, 
                                Nindividuals_c, minputchar_c, numspecies_c, 
@@ -889,7 +889,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
         # ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, algorithm, hay_foodweb, pol_ext, 
-                               May, haymut, DAYS_IN_A_YEAR, rb_eff, rb_equs,
+                               May, haymut, rb_eff, rb_equs,
                                minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, 
                                Nindividuals_b, numspecies_a, Nindividuals_a,
                                Nindividuals_c, minputchar_c, numspecies_c,
@@ -921,8 +921,8 @@ def setxtickssubplot(displayinic, periods, a):
         ninter = ((displayinic + periods) // 365)
     
     intervalo = (displayinic + periods) / ninter
-    rangodias = np.arange(displayinic, periods + DAYS_IN_A_YEAR, intervalo)
-    rangoanios = rangodias / DAYS_IN_A_YEAR
+    rangodias = np.arange(displayinic, periods + sgGL.DAYS_YEAR, intervalo)
+    rangoanios = rangodias / sgGL.DAYS_YEAR
     a.xaxis.set_ticks(rangodias)
     xlabels = list(rangoanios)
     a.set_xticklabels(xlabels)
@@ -967,7 +967,7 @@ def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
     # Si los valores de reff son muy pequenios, se cambia la escala de esas graficas
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
-    years = periods / DAYS_IN_A_YEAR
+    years = periods / sgGL.DAYS_YEAR
     ldevices_info, lfich_info = open_info_channels(verbose, fichreport, 'a')    
     
     factorescala = 1.1
