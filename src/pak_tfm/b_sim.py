@@ -250,6 +250,9 @@ def predators_effect(p_devorados, j, Nindividuals_p,
                                                         -math.expm1(-1 * rceff))
     return p_devorados, j, rceff
 
+def int_to_ext_rep(species):
+    return species + 1
+
 def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb, 
                           p_ext, May, haymut, rp_eff, rp_eq, 
                           minputchar_p, j, cAlpha_p, Alpha_p, r_p, rd_p, 
@@ -302,7 +305,8 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
         if not(pop_p):
             sgcom.inform_user(ldev_inf,
                               "Day %d (year %d). %s species %d extincted" %\
-                              (k, k // sgGL.DAYS_YEAR, strtype, n))
+                              (k, k // sgGL.DAYS_YEAR, strtype, 
+                               int_to_ext_rep(n)))
     Nindividuals_p[k + 1][n] = pop_p
     if (pop_p):
         rp_eff[k + 1][n], rp_eq[k + 1][n] = retl[1], rtot_p
@@ -314,7 +318,7 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
 def calc_compatib_plantas(numspecies, probcoinc, blossom_pert_list):
     lcomp = []
     for i in range(0, numspecies):
-        if i in blossom_pert_list:
+        if i+1 in blossom_pert_list:
             lcomp.append(np.random.binomial(n=1, p=probcoinc))
         else:
             lcomp.append(1.0)
@@ -343,7 +347,8 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
         if (str(Bssvar_species[0]).upper() == 'ALL'):
             listaspecies = list(range(numspecies_a))
         else:
-            listaspecies = Bssvar_species
+            listaspecies = [i-1 for i in Bssvar_species]
+            
         bssvar_allones = np.ones((year_periods,), dtype=float)
         for i in range(numspecies_a):
             if i in listaspecies:
@@ -374,7 +379,7 @@ def calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a, nrows_b, ncols_b,
     else:
         lcompatibplantas = []
         for g in range(0, numspecies_a):
-            if g in blossom_pert_list:
+            if g+1 in blossom_pert_list:
                 lcompatibplantas.append(abs(np.random.normal(plants_blossom_prob, 
                                                          plants_blossom_sd, 1)))
             else:
@@ -566,10 +571,16 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
     hayextplantas = len(pl_ext) > 0
     hayextpolin = len(pol_ext) > 0
     j = 0
-    if hayextplantas and (pl_ext['species'][0] == 'ALL'):
-        pl_ext['species'] = list(range(0, numspecies_a + 1))
-    if hayextpolin and (pol_ext['species'][0] == 'ALL'):
-        pol_ext['species'] = list(range(0, numspecies_b + 1))
+    if hayextplantas:
+        if (pl_ext['species'][0] == 'ALL'):
+            pl_ext['species'] = list(range(0, numspecies_a + 1))
+        else:
+            pl_ext['species'] = [i-1 for i in pl_ext['species']]
+    if hayextpolin: 
+        if (pol_ext['species'][0] == 'ALL'):
+            pol_ext['species'] = list(range(0, numspecies_b + 1))
+        else:
+            pol_ext['species'] = [i-1 for i in pol_ext['species']]
     return inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j
 
 def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
@@ -598,7 +609,8 @@ def calc_perturbed_coeffs(k, hay_bssvar, pBssvar_species, minputchar_a,
     if hay_bssvar:
         for t in range(0, numspecies_b):
             for l in range (0, numspecies_a):
-                minpeq_a[t, l] = minpeq_a[t, l] * pBssvar_species[l][k // sgGL.DAYS_YEAR]
+                minpeq_a[t, l] = minpeq_a[t, l] *\
+                                 pBssvar_species[l][k // sgGL.DAYS_YEAR]
     minpeq_b = minputchar_b * minputchar_b_mask
     return minpeq_a, minpeq_b
 

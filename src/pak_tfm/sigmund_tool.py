@@ -164,7 +164,8 @@ class StartQT4(QtGui.QMainWindow):
                 auxlspec.append([int(numspe)])
             else:
                 rango = numspe.split(':')
-                auxlspec.append([j for j in range(int(rango[0]), 1 + int(rango[-1]))])
+                auxlspec.append([j for j in range(int(rango[0]), 1 +\
+                                                   int(rango[-1]))])
         listb = []
         for subla in auxlspec:
             for j in list(subla):
