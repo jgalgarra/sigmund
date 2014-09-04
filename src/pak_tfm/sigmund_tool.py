@@ -6,6 +6,8 @@
 import sys
 import os
 import b_sim
+import sigmund_GLOBALS as sgGL
+import sigmund_graphs as sggraph
 # from PyQt4 import QtCore, QtGui
 from bino_form import *
 import re
@@ -208,7 +210,6 @@ class StartQT4(QtGui.QMainWindow):
         self.repaint()
         
         displayinic = 0
-        period_year = 365
         dirsalida = 'output\\'
         
         input_fname = self.input_file.replace('_b.txt',
@@ -286,7 +287,7 @@ class StartQT4(QtGui.QMainWindow):
         if self.ui.pl_ext_period.text().isdigit():
             try:
                 plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
-                                              * period_year
+                                              * sgGL.DAYS_YEAR
                 plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
                 plants_extinction['start'] = float(self.ui.pl_ext_start.text())
                 plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
@@ -309,7 +310,7 @@ class StartQT4(QtGui.QMainWindow):
         if self.ui.pol_ext_period.text().isdigit():
             try:
                 pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
-                                            period_year
+                                            sgGL.DAYS_YEAR
                 pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
                 pols_extinction['start'] = float(self.ui.pol_ext_start.text())
                 pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
@@ -350,14 +351,14 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.URL_outputs.setText("<a href='file:///" +\
                                     reportpath.replace('\\', '/') +\
                                     "'>See all results</a>")       
-        b_sim.mutual_render(Na, Nb, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, 
+        sggraph.mutual_render(Na, Nb, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, 
                             minreff, maxequs, minequs, input_fname, displayinic,
-                            self.ciclos * 365, dirsalida, self.algorithm, 
+                            self.ciclos * sgGL.DAYS_YEAR, dirsalida, self.algorithm, 
                             fichreport=fichr, os=output_suffix, dirtrabajo=dirs,
                             Bssvar_coefs=pBssvar_coefs)
         if self.haypred:
-            b_sim.food_render(Na, Nb, Nc, maxa, maxb, input_fname, displayinic,
-                              self.ciclos * 365, dirsalida, self.algorithm, 
+            sggraph.food_render(Na, Nb, Nc, maxa, maxb, input_fname, displayinic,
+                              self.ciclos * sgGL.DAYS_YEAR, dirsalida, self.algorithm, 
                               fichreport=fichr, os=output_suffix, 
                               dirtrabajo=dirs)
 

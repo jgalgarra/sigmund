@@ -17,10 +17,10 @@ import sys
 import cProfile
 
 import sigmund_GLOBALS as sgGL
-
-global ancho
-global alto
-global resolucion
+import sigmund_common as sgcom
+# global ancho
+# global alto
+# global resolucion
 global pathout
 global invperiod
 global cuentaperpl, cuentaperpol
@@ -37,49 +37,11 @@ global TOL_EXTINCTION
 #sgGL.DAYS_YEAR = 365
 LIMIT_COLLAPSE_YEARS = 8
 TOL_EXTINCTION = -0.001
-ancho = 16
-alto = 10
-resolucion = 600
+# ancho = 16
+# alto = 10
+# resolucion = 600
 invperiod = 1 / sgGL.DAYS_YEAR
 count_collapse_years = 0
-
-class CanalInfo():
-    """ CanalInfo is a wrapper of status information channels such as stdout and
-    the report file """
-    def __init__(self, device, newlinestr):
-        self.device = device
-        self.newline = newlinestr
-    def write(self, texto):
-        self.device.write(texto + self.newline)
-    def close(self):
-        self.device.close()
-        
-def show_info_to_user(canalesinfo, texto):
-    """ (list of CanalInfo, str) -> NoneType
-
-    Execution status information for human user
-    
-    >>> ldevices = []
-    >>> ldevices.append(CanalInfo(sys.stdout,'\\n'))
-    >>> show_info_to_user(ldevices, 'Info for you')
-    Info for you
-    """
-    [canal.write(texto) for canal in canalesinfo]
-    
-def close_info_channels(canalesinfo):
-    [canal.close() for canal in canalesinfo]
-    
-def open_info_channels(verbose, fichreport, mode):
-    ldev = []
-    lfich = []
-    if verbose:    
-        sout = CanalInfo(sys.stdout, '\n')
-        ldev.append(sout)
-    if len(fichreport) > 0:
-        frep = CanalInfo(open(fichreport, mode, encoding='utf-8'), '<br>')
-        ldev.append(frep)
-        lfich.append(frep)
-    return ldev, lfich
 
 '''signfunc = lambda x : (x>0) - (x<0)'''
 
@@ -123,43 +85,43 @@ def delete_link(mat_in):
     return(mat_in, rfil, rcol)
 
 def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
-                          minputchar_a_mask, minputchar_b_mask, ldevices_info):
+                          minputchar_a_mask, minputchar_b_mask, ldev_inf):
     minputchar_a, fil, col = delete_link(minputchar_a)
     minputchar_b[col][fil] = 0
     minpeq_a = minputchar_a * minputchar_a_mask
     minpeq_b = minputchar_b * minputchar_b_mask
-    show_info_to_user(ldevices_info, \
+    sgcom.inform_user(ldev_inf, \
     "Day:%d (year %d). Deleted links plant %d <-> pollinator %d"\
     % (k, k // sgGL.DAYS_YEAR , fil, col))
     return minpeq_a, minpeq_b, minputchar_a, minputchar_b,
 
-def dlmreadlike(inputfile, direntrada):
-    try:
-        data = open(direntrada + inputfile)
-        mtx_input = []
-        for each_line in data:
-            try:
-                mtx_input.append(each_line.strip().split('\t'))
-            except ValueError:
-                pass
-        data.close()
-        return(mtx_input)
-    except IOError:
-        print('The datafile %s is missing!' % inputfile)
-        return(0)
-
-def dlmwritelike(inputfile, nperiod, Nin, dirsalida, os):
-    dsal = dirsalida.replace('\\', '/')
-    nsal = 'output_data_' + inputfile + '_' + os + '_' + str(nperiod) + '.txt'
-    print ("Output file %s" % dsal + nsal)
-    salida = open(dsal + nsal, 'w', encoding='utf-8')
-    for linea in Nin:
-        for i in range(len(linea) - 1):
-            y = "%.012f" % linea[i]
-            salida.write(y + ',')
-        salida.write(str(linea[-1]) + '\n');
-    salida.close()
-    return(nsal)
+# def dlmreadlike(inputfile, direntrada):
+#     try:
+#         data = open(direntrada + inputfile)
+#         mtx_input = []
+#         for each_line in data:
+#             try:
+#                 mtx_input.append(each_line.strip().split('\t'))
+#             except ValueError:
+#                 pass
+#         data.close()
+#         return(mtx_input)
+#     except IOError:
+#         print('The datafile %s is missing!' % inputfile)
+#         return(0)
+# 
+# def dlmwritelike(inputfile, nperiod, Nin, dirsalida, os):
+#     dsal = dirsalida.replace('\\', '/')
+#     nsal = 'output_data_' + inputfile + '_' + os + '_' + str(nperiod) + '.txt'
+#     print ("Output file %s" % dsal + nsal)
+#     salida = open(dsal + nsal, 'w', encoding='utf-8')
+#     for linea in Nin:
+#         for i in range(len(linea) - 1):
+#             y = "%.012f" % linea[i]
+#             salida.write(y + ',')
+#         salida.write(str(linea[-1]) + '\n');
+#     salida.close()
+#     return(nsal)
 
 def val_mutMay(r_species, beta, period, N1, N2, K1):
     rspneq = calc_r_periodo_vh(abs(r_species), invperiod)
@@ -275,14 +237,14 @@ def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp,spikep,k):
 
 def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods, 
                                       inicioextplantas, inicioextpolin, 
-                                      hayextplantas, hayextpolin,
-                       ldevices_info, lfich_info):
+                                      hayextplantas, hayextpolin, 
+                                      ldev_inf, lfich_inf):
     if hayextplantas:
         inicioextplantas = round(yearperiods * pl_ext['start'] * sgGL.DAYS_YEAR)
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        show_info_to_user(ldevices_info, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
@@ -290,7 +252,7 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        show_info_to_user(ldevices_info, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
@@ -341,7 +303,7 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                           Nindividuals_p, numspecies_q, Nindividuals_q, 
                           Nindividuals_c, minputchar_c, numspecies_c, inicioext,
                           hayext, nper, periodoext, spike, k, model_r_a, 
-                          ldevices_info):
+                          ldev_inf):
     ''' for n in range (numspecies_p):'''
     global cuentaperpl, cuentaperpol
     r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_p = \
@@ -392,7 +354,7 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                              Nindividuals_p[k, n], Alpha_p[n])           
         pop_p = retl[0] - p_devorados
         if not(pop_p):
-            show_info_to_user(ldevices_info,
+            sgcom.inform_user(ldev_inf,
                               "Day %d (year %d). %s species %d extincted" %\
                               (k, k // sgGL.DAYS_YEAR, strtype, n))
     Nindividuals_p[k + 1][n] = pop_p
@@ -416,7 +378,7 @@ def calc_compatib_plantas(numspecies, probcoinc, blossom_pert_list):
 
 def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
                     Bssvar_species, Bssvar_modulationtype_list, numspecies_a,
-                    year_periods, ldevices_info):
+                    year_periods, ldev_inf):
     # Blossom variability analysis
     global pendiente, periodo
     pBssvar_species = []
@@ -432,7 +394,7 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
             else:
                 strvalor = ''
         straff = (". Affected species:%s" % (Bssvar_species))
-        show_info_to_user(ldevices_info, "Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
+        sgcom.inform_user(ldev_inf, "Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
                 % (Bssvar_period, Bssvar_sd, Bssvar_modulationtype_list[0], 
                    strvalor, straff))
         if (str(Bssvar_species[0]).upper() == 'ALL'):
@@ -490,56 +452,56 @@ def calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a, nrows_b, ncols_b,
             minputchar_b_mask[m, i] = lcompatibplantas[m]
     return minputchar_a_mask, minputchar_b_mask, lcompatibplantas    
 
-def start_report(ldevices_info, filename, com, year_periods, algorithm, release):
-    show_info_to_user(ldevices_info, \
+def start_report(ldev_inf, filename, com, year_periods, algorithm, release):
+    sgcom.inform_user(ldev_inf, \
       "Binomial simulated mutualistic interaction. Input file: %s" % (filename))
-    show_info_to_user(ldevices_info, 60 * '=')
-    if len(com) > 0: show_info_to_user(ldevices_info, "User Comment: %s" % com)
-    show_info_to_user(ldevices_info, 'Span: %d years' % (year_periods))
-    show_info_to_user(ldevices_info, 'ALGORITHM: ' + algorithm)
-    show_info_to_user(ldevices_info, 'Release ' + (("%.02f") % (release / 100)))
+    sgcom.inform_user(ldev_inf, 60 * '=')
+    if len(com) > 0: sgcom.inform_user(sgGL.ldev_inf, "User Comment: %s" % com)
+    sgcom.inform_user(ldev_inf, 'Span: %d years' % (year_periods))
+    sgcom.inform_user(ldev_inf, 'ALGORITHM: ' + algorithm)
+    sgcom.inform_user(ldev_inf, 'Release ' + (("%.02f") % (release / 100)))
 
-def end_report(ldevices_info, lfich_info, tfin, tinic, periods, data_save, 
+def end_report(ldev_inf, lfich_inf, tfin, tinic, periods, data_save, 
                filename, algorithm, dirsal, os, Nindividuals_a, ra_eff, ra_equs,
                Nindividuals_b, rb_eff, rb_equs, Nindividuals_c, hay_food_web):    
-    show_info_to_user(ldevices_info, "Elapsed time %.02f s" % (tfin - tinic))
+    sgcom.inform_user(ldev_inf, "Elapsed time %.02f s" % (tfin - tinic))
     speriodos = str(int(periods / sgGL.DAYS_YEAR))
     if (data_save == 1):
-        nsal = dlmwritelike(filename + '_' + algorithm + "_a_populations_", 
+        nsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_a_populations_", 
                             speriodos, Nindividuals_a, dirsal, os)
-        rsal = dlmwritelike(filename + '_' + algorithm + "_a_rs_", speriodos, 
+        rsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_a_rs_", speriodos, 
                             ra_eff, dirsal, os)
-        requsal = dlmwritelike(filename + '_' + algorithm + "_a_requs_", 
+        requsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_a_requs_", 
                                speriodos, ra_equs, dirsal, os)
-        show_info_to_user(lfich_info, "Plant populations data: <a href='"\
+        sgcom.inform_user(lfich_inf, "Plant populations data: <a href='"\
                           + nsal + "' target=_BLANK'>" + nsal + "<a>")
-        show_info_to_user(lfich_info, "Plant effective rates data: <a href='"\
+        sgcom.inform_user(lfich_inf, "Plant effective rates data: <a href='"\
                           + rsal + "' target=_BLANK'>" + rsal + "<a>")
-        show_info_to_user(lfich_info, "Plant equivalent rates data: <a href='"\
+        sgcom.inform_user(lfich_inf, "Plant equivalent rates data: <a href='"\
                           + requsal + "' target=_BLANK'>" + requsal + "<a>")
-        nsal = dlmwritelike(filename + '_' + algorithm + "_b_populations_", 
+        nsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_b_populations_", 
                             speriodos, Nindividuals_b, dirsal, os)
-        rsal = dlmwritelike(filename + '_' + algorithm + "_b_rs_", 
+        rsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_b_rs_", 
                             speriodos, rb_eff, dirsal, os)
-        requsal = dlmwritelike(filename + '_' + algorithm + "_b_requs_", 
+        requsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_b_requs_", 
                                speriodos, rb_equs, dirsal, os)
-        show_info_to_user(lfich_info, "Pollinators evolution data: <a href='"\
+        sgcom.inform_user(lfich_inf, "Pollinators evolution data: <a href='"\
                           + nsal + "' target=_BLANK'>" + nsal + "<a>")
-        show_info_to_user(lfich_info,
+        sgcom.inform_user(lfich_inf,
                           "Pollinators effective rates data: <a href='" +\
                            rsal + "' target=_BLANK'>" + rsal + "<a>")
-        show_info_to_user(lfich_info, 
+        sgcom.inform_user(lfich_inf, 
                           "Pollinators equivalent rates data: <a href='" +\
                           requsal + "' target=_BLANK'>" + requsal + "<a>")
         if hay_food_web:
-            nsal = dlmwritelike(filename + '_' + algorithm + "_c", speriodos, 
+            nsal = sgcom.dlmwritelike(filename + '_' + algorithm + "_c", speriodos, 
                                 Nindividuals_c, dirsal, os)
-            show_info_to_user(lfich_info, 
+            sgcom.inform_user(lfich_inf, 
                               "Predators evolution data: <a href='" \
                               + nsal + "' target=_BLANK'>" + nsal + "<a><br>")
-    show_info_to_user(ldevices_info, '')
-    show_info_to_user(ldevices_info, 'Created %s' % datetime.datetime.now())
-    close_info_channels(lfich_info)
+    sgcom.inform_user(ldev_inf, '')
+    sgcom.inform_user(ldev_inf, 'Created %s' % datetime.datetime.now())
+    sgcom.close_info_channels(lfich_inf)
 
 def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs, 
                     rb_equs):   
@@ -552,7 +514,7 @@ def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs,
     return maxa_individuos, maxb_individuos, max_reff, min_reff,\
            max_requs, min_requs
                     
-def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a, 
+def predators_population_evolution(hay_foodweb, ldev_inf, numspecies_a, 
                                    Nindividuals_a, numspecies_b, Nindividuals_b,
                                    K_c, Nindividuals_c, r_c, numspecies_c,
                                    minputchar_d, j, k):
@@ -586,7 +548,7 @@ def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a,
                 signo = signfunc(r_c[n])
                 pop_c = Nindividuals_c[k][n] + incPredatoria + signo * incNmalth
                 if (pop_c == 0):
-                    show_info_to_user(ldevices_info, \
+                    sgcom.inform_user(ldev_inf, \
                             "Predator species %d extinction in day %d" % (n, k))
             else:
                 pop_c = 0
@@ -594,8 +556,8 @@ def predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a,
         
         Nindividuals_c.append(rowNi)
 
-def predators_param_init(filename, hay_foodweb, direntrada, ldevices_info, 
-                         lfich_info, dt):
+def predators_param_init(filename, hay_foodweb, direntrada, ldev_inf, lfich_inf,
+                         dt):
     K_c = []
     Nindividuals_c = []
     rowNindividuals_c = []
@@ -606,18 +568,18 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldevices_info,
     if hay_foodweb > 0:
         filename_c = filename + '_c.txt'
         filename_d = filename + '_d.txt'
-        show_info_to_user(lfich_info, "Predators matrix c:<a href='file:///" +\
+        sgcom.inform_user(lfich_inf, "Predators matrix c:<a href='file:///" +\
                           dt + "/input/" + filename_c + "' target=_BLANK>" +\
                           filename_c + "<a><br>")
-        show_info_to_user(lfich_info, "Predators matrix d:<a href='file:///" +\
+        sgcom.inform_user(lfich_inf, "Predators matrix d:<a href='file:///" +\
                           dt + "/input/" + filename_d + "' target=_BLANK>" +\
                           filename_d + "<a><br>")
-        l_minputchar_c = dlmreadlike(filename_c, direntrada)
+        l_minputchar_c = sgcom.dlmreadlike(filename_c, direntrada)
         minputchar_c = np.array(l_minputchar_c, dtype=float)
         nrows_c = len(minputchar_c)
         ncols_c = len(minputchar_c[0])
         numspecies_c = ncols_c
-        show_info_to_user(ldevices_info, "Predator species : %d" % numspecies_c)
+        sgcom.inform_user(ldev_inf, "Predator species : %d" % numspecies_c)
         for n in range(numspecies_c):
             rowNindividuals_c.append(int(minputchar_c[nrows_c - 3][n]))
             K_c.append(int(minputchar_c[nrows_c - 2][n]))
@@ -626,7 +588,7 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldevices_info,
                                                invperiod))
         
         Nindividuals_c.append(rowNindividuals_c)
-        l_minputchar_d = dlmreadlike(filename_d, direntrada)
+        l_minputchar_d = sgcom.dlmreadlike(filename_d, direntrada)
         minputchar_d = np.array(l_minputchar_d, dtype=float)
         nrows_d = len(minputchar_d)
         ncols_d = len(minputchar_d[0])
@@ -634,13 +596,12 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldevices_info,
     return Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d
 
 
-def init_random_links_removal(eliminarenlaces, periods, ldevices_info, 
-                              minputchar_a):
+def init_random_links_removal(eliminarenlaces, periods, ldev_inf, minputchar_a):
     periodoborr = periods
     if eliminarenlaces > 0:
         cuenta = cuentaenlaces(minputchar_a)
         hayqueborrar = math.trunc(eliminarenlaces * cuenta)
-        show_info_to_user(ldevices_info, "Links %d. Will be deleted %d" %\
+        sgcom.inform_user(ldev_inf, "Links %d. Will be deleted %d" %\
                           (cuentaenlaces(minputchar_a), hayqueborrar))
         if hayqueborrar > 0:
             periodoborr = periods // (hayqueborrar)
@@ -650,7 +611,7 @@ def init_random_links_removal(eliminarenlaces, periods, ldevices_info,
 def init_blossom_perturbations_conditions(year_periods, blossom_pert_list, 
                                           Bssvar_period, Bssvar_sd,
                                           Bssvar_modulationtype_list,
-                                          Bssvar_species, ldevices_info,
+                                          Bssvar_species, ldev_inf,
                                           numspecies_a):
     if (blossom_pert_list[0] == 'ALL'):
         bloss_species = list(range(0, numspecies_a + 1))
@@ -659,7 +620,7 @@ def init_blossom_perturbations_conditions(year_periods, blossom_pert_list,
     pBssvar_species, hay_bssvar, pendiente, periodo =\
                     init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
                                    Bssvar_species,Bssvar_modulationtype_list,
-                                   numspecies_a, year_periods, ldevices_info)
+                                   numspecies_a, year_periods, ldev_inf)
     return bloss_species, hay_bssvar, pBssvar_species
 
 
@@ -671,19 +632,19 @@ def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
     haymut = algorithm != 'NoMutualism'
     model_r_alpha = algorithm == 'Verhulst' or algorithm == 'NoMutualism'
     Logistic_abs = algorithm == 'Logistic_abs'
-    ldevices_info, lfich_info = open_info_channels(verbose, fichreport, 'w')
-    return ldevices_info, lfich_info, periods, systemextinction, May, haymut,\
+    ldev_inf, lfich_inf = sgcom.open_info_channels(verbose, fichreport, 'w')
+    return ldev_inf, lfich_inf, periods, systemextinction, May, haymut,\
            model_r_alpha, count_collapse_years
 
 
 def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
-                           N0_guild, lfich_info):
+                           N0_guild, lfich_inf):
     filename_a = filename + str_guild
     dt = dirtrabajo.replace('\\', '/')
-    show_info_to_user(lfich_info, "Plants matrix: <a href='file:///" + dt +\
+    sgcom.inform_user(lfich_inf, "Plants matrix: <a href='file:///" + dt +\
                       "/input/" + filename_a + "' target=_BLANK>" +\
                       filename_a + "<a>")
-    l_minputchar_a = dlmreadlike(filename_a, direntrada)
+    l_minputchar_a = sgcom.dlmreadlike(filename_a, direntrada)
     ''' If N0_guild provided by command line'''
     if len(N0_guild) > 0:
         l_minputchar_a[-5][0] = int(N0_guild)
@@ -713,23 +674,22 @@ def init_blossom_perturbation_lists(plants_blossom_prob, blossom_pert_list,
 
 def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd, 
                                      plants_blossom_type, blossom_pert_list,
-                                     ldevices_info,
-                                     numspecies_a, rowNindividuals_a,
+                                     ldev_inf, numspecies_a, rowNindividuals_a,
                                      numspecies_b, rowNindividuals_b):
-    show_info_to_user(ldevices_info, "Plant species: %d" % numspecies_a)
-    show_info_to_user(ldevices_info, "Plant initial populations %s" %\
+    sgcom.inform_user(ldev_inf, "Plant species: %d" % numspecies_a)
+    sgcom.inform_user(ldev_inf, "Plant initial populations %s" %\
                       rowNindividuals_a)
     if (plants_blossom_type == 'Binary'):
-        show_info_to_user(ldevices_info,
+        sgcom.inform_user(ldev_inf,
                 "Blossom probability %s, type %s. Plant affected species:%s" %\
             (plants_blossom_prob, plants_blossom_type, str(blossom_pert_list)))
     else:
-        show_info_to_user(ldevices_info, 
+        sgcom.inform_user(ldev_inf, 
                 "Blossom probability, type %s, mean %s, standard dev. %s. Plant affected species:%s" %\
                 (plants_blossom_type, plants_blossom_prob, plants_blossom_sd, 
                  str(blossom_pert_list)))
-    show_info_to_user(ldevices_info, "Pollinator species: %d" % numspecies_b)
-    show_info_to_user(ldevices_info, 
+    sgcom.inform_user(ldev_inf, "Pollinator species: %d" % numspecies_b)
+    sgcom.inform_user(ldev_inf, 
                       "Pollinator initial populations %s" % rowNindividuals_b)
 
 
@@ -793,15 +753,15 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
     global pendiente, blossomperiod, sd, periodo
     global count_collapse_years
     
-    ldevices_info, lfich_info, periods, systemextinction,\
+    sgGL.ldev_inf, sgGL.lfich_inf, periods, systemextinction,\
     May, haymut, model_r_alpha, count_collapse_years = \
        init_simulation_environment(year_periods, fichreport, algorithm, verbose)    
     tinic = time()
-    start_report(ldevices_info, filename, com, year_periods, algorithm, release)        
+    start_report(sgGL.ldev_inf, filename, com, year_periods, algorithm, release)        
     numspecies_a, minputchar_a, nrows_a, ncols_a = \
                                     read_simulation_matrix(filename, dirtrabajo,
                                                            direntrada, '_a.txt',
-                                                           N0plants, lfich_info)
+                                                           N0plants, sgGL.lfich_inf)
     rowNindividuals_a, Alpha_a, cAlpha_a, r_a, rd_a, Nindividuals_a,\
     ra_eff, ra_equs = init_lists_pop(periods, numspecies_a, minputchar_a)
     lcompatibplantas = init_blossom_perturbation_lists(plants_blossom_prob,
@@ -809,24 +769,24 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                                        numspecies_a)
     numspecies_b, minputchar_b, nrows_b, ncols_b = \
                         read_simulation_matrix(filename, dirtrabajo, direntrada,
-                                               '_b.txt', N0pols, lfich_info)
+                                               '_b.txt', N0pols, sgGL.lfich_inf)
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
     Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
                                   predators_param_init(filename, hay_foodweb,
-                                                      direntrada, ldevices_info,
-                                                      lfich_info,
+                                                      direntrada, sgGL.ldev_inf,
+                                                      sgGL.lfich_inf,
                                                   dirtrabajo.replace('\\', '/'))  
     add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
                                      plants_blossom_type, blossom_pert_list,
-                                     ldevices_info, numspecies_a,
+                                     sgGL.ldev_inf, numspecies_a,
                                      rowNindividuals_a, numspecies_b,
                                      rowNindividuals_b)
     
     # Random links removal 
     periodoborr = init_random_links_removal(eliminarenlaces, periods, 
-                                            ldevices_info, minputchar_a)            
+                                            sgGL.ldev_inf, minputchar_a)            
     # Extinction analysis. Forced death rate increases
     inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j =\
                                init_external_perturbation_lists(pl_ext, pol_ext,
@@ -835,13 +795,13 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
     periodoextpol, spikepol = init_forced_external_pertubations(pl_ext,
                                     pol_ext, year_periods, inicioextplantas,
                                     inicioextpolin, hayextplantas, hayextpolin,
-                                    ldevices_info, lfich_info)
+                                    sgGL.ldev_inf, sgGL.lfich_inf)
     # Extinction analysis. Blossom pertubations   
     bloss_species, hay_bssvar, pBssvar_species = \
           init_blossom_perturbations_conditions(year_periods, blossom_pert_list,
                                                 Bssvar_period, Bssvar_sd, 
                                                 Bssvar_modulationtype_list,
-                                                Bssvar_species, ldevices_info,
+                                                Bssvar_species, sgGL.ldev_inf,
                                                 numspecies_a)
          
     for k in range (periods - 1):
@@ -852,7 +812,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                           lcompatibplantas, plants_blossom_prob,
                                            ra_equs, rb_equs, ra_eff, rb_eff)
                 if systemextinction:
-                    show_info_to_user(ldevices_info,\
+                    sgcom.inform_user(sgGL.ldev_inf,\
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
                          (k, k // sgGL.DAYS_YEAR))
                     if exit_on_extinction:
@@ -876,7 +836,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                           deletion_links_effect(k, periodoborr,
                                           minputchar_a, minputchar_b,
                                           minputchar_a_mask, minputchar_b_mask,
-                                          ldevices_info)
+                                          sgGL.ldev_inf)
         [populations_evolution(n, "Plant", 
                                numspecies_a, algorithm, hay_foodweb, pl_ext, 
                                May, haymut, ra_eff, ra_equs, 
@@ -885,7 +845,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                Nindividuals_c, minputchar_c, numspecies_c, 
                                inicioextplantas, hayextplantas, nperpl, 
                                periodoextpl, spikepl, k, model_r_alpha, 
-                               ldevices_info) for n in range(numspecies_a)]
+                               sgGL.ldev_inf) for n in range(numspecies_a)]
         # ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, algorithm, hay_foodweb, pol_ext, 
@@ -895,9 +855,9 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                Nindividuals_c, minputchar_c, numspecies_c,
                                inicioextpolin, hayextpolin, nperpol, 
                                periodoextpol, spikepol, k, model_r_alpha, 
-                               ldevices_info) for n in range(numspecies_b)]
+                               sgGL.ldev_inf) for n in range(numspecies_b)]
         # rb_eff[0,]=rb_eff[1,]
-        predators_population_evolution(hay_foodweb, ldevices_info, numspecies_a,
+        predators_population_evolution(hay_foodweb, sgGL.ldev_inf, numspecies_a,
                                        Nindividuals_a, numspecies_b, 
                                        Nindividuals_b, K_c, Nindividuals_c, r_c,
                                        numspecies_c, minputchar_d, j, k)
@@ -905,7 +865,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
     max_requs, min_requs = find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
     tfin = time()    
-    end_report(ldevices_info, lfich_info, tfin, tinic, periods, data_save,
+    end_report(sgGL.ldev_inf, sgGL.lfich_inf, tfin, tinic, periods, data_save,
                filename, algorithm, dirsal, os, Nindividuals_a, ra_eff, ra_equs,
                Nindividuals_b, rb_eff, rb_equs, Nindividuals_c, hay_foodweb)
     return(Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, rb_eff,
@@ -913,207 +873,6 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
            max_reff, min_reff, max_requs, min_requs, systemextinction, 
            pBssvar_species)
 
-def setxtickssubplot(displayinic, periods, a):
-    a.set_xlim([displayinic, periods])
-    if ((displayinic + periods) // 365 >= 10):
-        ninter = 10
-    else:
-        ninter = ((displayinic + periods) // 365)
-    
-    intervalo = (displayinic + periods) / ninter
-    rangodias = np.arange(displayinic, periods + sgGL.DAYS_YEAR, intervalo)
-    rangoanios = rangodias / sgGL.DAYS_YEAR
-    a.xaxis.set_ticks(rangodias)
-    xlabels = list(rangoanios)
-    a.set_xticklabels(xlabels)
-    a.grid(True)
-
-
-def pintasubplot(na, min_individuos, max_individuos, displayinic, periods, 
-                 factorescala, numspecies, titulo, ylabel):
-    global ax
-    plt.title(titulo)
-    plt.ylabel(ylabel)
-    for i in range(numspecies):
-        graf = []
-        x = []
-        for k in range(displayinic, periods):
-            graf.append(na[k][i])
-            x.append(k)
-        
-        plt.plot(x, graf, color=cm.Set1(i / (numspecies)), 
-                 lw=calc_lw_width(numspecies))
-        ax.plot(0, 0, color=cm.Set1(i / (numspecies)), label='%i' % i)
-    a = plt.gca()
-    a.set_ylim([0 - factorescala * abs(min_individuos),\
-                factorescala * max_individuos])
-    setxtickssubplot(displayinic, periods, a)
-    if numspecies < 11:
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 1), 
-                  fancybox=True, shadow=True)
-        leg = plt.gca().get_legend()
-        ltext = leg.get_texts()
-        plt.setp(ltext, fontsize='small')
-    
-
-def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
-                  maxb_individuos, max_reff, min_reff, max_equs, min_equs, 
-                  filename, displayinic, periods, dirsalida, algorithm='',
-                  fichreport='', verbose=True, os='', dirtrabajo='', 
-                  Bssvar_coefs=[]):
-    global ax
-    # Si los valores de reff son muy pequenios, se cambia la escala de esas graficas
-    matplotlib.rc('xtick', labelsize=8) 
-    matplotlib.rc('ytick', labelsize=8) 
-    years = periods / sgGL.DAYS_YEAR
-    ldevices_info, lfich_info = open_info_channels(verbose, fichreport, 'a')    
-    
-    factorescala = 1.1
-    numspecies_a = len(na[0])
-    numspecies_b = len(nb[0])
-    plt.figure('Mutualist network simulation. Input file: ' +\
-               filename, dpi=resolucion, figsize=(ancho, alto))
-    ax = plt.subplot(3, 2, 1)
-    pintasubplot(na, 0, maxa_individuos, displayinic, periods, factorescala, 
-                 numspecies_a, 'Plants', 'Individuals')
-    ax = plt.subplot(3, 2, 3)
-    pintasubplot(ra_eff, min_reff, max_reff, displayinic, periods, factorescala,
-                 numspecies_a, '', 'Efficient growth rate')
-    plt.xlabel('Years')
-    
-    if (len(Bssvar_coefs)):
-        ax = plt.subplot(3, 2, 5)
-        plt.ylabel('Blossom variability coeffs.')
-        plt.xlabel('Years')
-        plt.grid(True)
-        for i in range(numspecies_a):
-            graf = []
-            x = []
-            for k in range (0, numanyos):
-                graf.append(Bssvar_coefs[i][k])
-                x.append(1 + k)
-            plt.plot(x, graf, color=cm.Set1(i / (numspecies_a)),
-                     lw=calc_lw_width(numspecies_a))
-            ax.plot(0, 0, color=cm.Set1(i / (numspecies_a)), label='%i' % i)
-        a = plt.gca()
-        a.set_ylim([0, 1.1])
-        if numspecies_a < 11:
-            box = ax.get_position()
-            ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-            ax.legend(loc='upper left', bbox_to_anchor=(1, 1),
-                      fancybox=True, shadow=True)
-            leg = plt.gca().get_legend()
-            ltext = leg.get_texts()
-            plt.setp(ltext, fontsize='small')
-        
-    ax = plt.subplot(3, 2, 2)
-    pintasubplot(nb, 0, maxb_individuos, displayinic, periods, factorescala,
-                 numspecies_b, 'Polllinators', '')
-    ax = plt.subplot(3, 2, 4)
-    pintasubplot(rb_eff, min_reff, max_reff, displayinic, periods, factorescala,
-                 numspecies_b, '', '')
-    plt.xlabel('Years')
-      
-    dt = dirtrabajo.replace('\\', '/');    
-    nsal = 'output_pict_plantsandpols_' + filename + '_' + algorithm + '_' +\
-            os + '_' + str(years) + '.png'
-    plt.savefig(str(dt + '/' + dirsalida.replace('\\', '/') + nsal), bbox_inches=0)
-    show_info_to_user(lfich_info, "<p align=left>Populations evolution picture")
-    show_info_to_user(lfich_info, \
-                      "<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" %\
-                      str(dt + '/' + dirsalida.replace('\\', '/') + nsal)) 
-    show_info_to_user(lfich_info, '</p><br>')
-    close_info_channels(lfich_info)
-    plt.close()
-    
-def calc_lw_width(numspecies):
-    return(0.5)
-
-def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
-                filename, displayinic, periods, dirsalida, algorithm='', 
-                fichreport='', os='', dirtrabajo='', verbose=True):
-#
-    ldevices_info, lfich_info = open_info_channels(verbose, fichreport, 'a')    
-    
-    matplotlib.rc('xtick', labelsize=8) 
-    matplotlib.rc('ytick', labelsize=8) 
-    factorescala = 1.2
-    numspecies_a = len(na[0])
-    numspecies_b = len(nb[0])
-    numspecies_c = len(nc[0])
-    plt.figure('Mutualist network simulation. Input file: ' + filename, 
-               dpi=resolucion, figsize=(ancho, alto))
-    ax = plt.subplot(3, 1, 1)
-    plt.title('Plants')
-    plt.ylabel('Individuals')
-    # plt.xlabel('Days')
-    plt.grid(True)
-    for i in range(numspecies_a):
-        graf = []
-        x = []
-        for k in range (displayinic, periods):
-            graf.append(na[k][i])
-            x.append(k)
-        plt.plot(x, graf, color=cm.Set1(i / (numspecies_a)),
-                 lw=calc_lw_width(numspecies_a))
-    a = plt.gca()
-    a.set_ylim([0, factorescala * maxa_individuos])
-    if numspecies_b < 11:
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-    ax = plt.subplot(3, 1, 2)
-    plt.title('Pollinators')
-    plt.ylabel('Individuals')
-    # plt.xlabel('Days')
-    plt.grid(True)
-    for i in range(numspecies_b):
-        graf = []
-        x = []
-        for k in range (displayinic, periods):
-            graf.append(nb[k][i])
-            x.append(k)
-        plt.plot(x, graf, color=cm.Paired(i / (numspecies_b)),
-                 lw=calc_lw_width(numspecies_b))
-    a = plt.gca()
-    a.set_ylim([0, factorescala * maxb_individuos])
-    if numspecies_b < 11:
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-    ax = plt.subplot(3, 1, 3)
-    plt.title('Predators')
-    plt.ylabel('Individuals')
-    plt.xlabel('Years')
-    plt.grid(True)
-    lmaxc = max(nc)
-    maxc_individuos = max(lmaxc)
-    for i in range(numspecies_c):
-        graf = []
-        x = []
-        for k in range (displayinic, periods):
-            graf.append(nc[k][i])
-            x.append(k)
-        plt.plot(x, graf, color=cm.Paired(i / (numspecies_c)),
-                 lw=calc_lw_width(numspecies_c))
-    a = plt.gca()
-    a.set_ylim([0, factorescala * maxc_individuos])   
-    if numspecies_c < 11:
-        box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-    nsal = 'output_pict_foodweb_' + filename + '_' + algorithm + '_' + os +\
-           '_' + str(periods) + '.png'
-    dt = dirtrabajo.replace('\\', '/');
-    plt.savefig(str(dt + '/' + dirsalida.replace('\\', '/') + nsal), 
-                bbox_inches=0)
-    plt.close()
-    show_info_to_user(lfich_info, "<P align=left><br>Foodweb effect picture<br>")
-    dt = dirtrabajo.replace('\\', '/');
-    show_info_to_user(lfich_info,\
-                      "<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" %\
-                      str(dt + '/' + dirsalida.replace('\\', '/') + nsal)) 
-    show_info_to_user(lfich_info, '<p>')
-    close_info_channels(lfich_info)    
             
 if __name__ == '__main__':
     import doctest
