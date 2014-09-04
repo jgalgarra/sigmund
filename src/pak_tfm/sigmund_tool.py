@@ -15,7 +15,6 @@ import re
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
-        
         self.hay_error = False
         self.lista_err = []
         self.input_dir = './input'
@@ -51,7 +50,6 @@ class StartQT4(QtGui.QMainWindow):
         self.algorithm = 'Verhulst'
         self.typeofmodulation = 'None'
         self.Bssvar_modulationtype_list = []
-
         QtCore.QObject.connect(self.ui.inputfile, 
                                QtCore.SIGNAL("returnPressed()"), self.add_entry)
         QtCore.QObject.connect(self.ui.ciclos, 
@@ -137,7 +135,6 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Bssvar_Type_linear_slope.setText(str(self.Bssvar_Type_linear_slope))
         self.ui.Bssvar_Type_sin_period.setText(str(self.Bssvar_Type_sin_period))
         self.ui.Bssvar_species.setText('')
-    
         
     def error_exit(self):
         texto_aux = ""
@@ -211,7 +208,6 @@ class StartQT4(QtGui.QMainWindow):
         
         displayinic = 0
         dirsalida = 'output\\'
-        
         input_fname = self.input_file.replace('_b.txt',
                                            '_a.txt').replace('_c.txt', '_a.txt')
         aux = input_fname.split('_a.txt')
@@ -268,7 +264,6 @@ class StartQT4(QtGui.QMainWindow):
                 auxspec = self.ui.Bssvar_species.text().split(',')
                 listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
-            
             
         print("Bssvar_species " + str(self.Bssvar_species))
             
