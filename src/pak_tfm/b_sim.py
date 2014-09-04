@@ -21,6 +21,7 @@ global pendiente, sd, periodo, numanyos
 global count_collapse_years
 global LIMIT_COLLAPSE_YEARS
 global TOL_EXTINCTION
+global forced_extinctions_in_course
 
 LIMIT_COLLAPSE_YEARS = 8
 TOL_EXTINCTION = -0.001
@@ -177,12 +178,14 @@ def init_params_population(r_p, rd_p, n):
     return r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_ini
 
 def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp,spikep,k):
+    global forced_extinctions_in_course
     r_m = rd_p
     cuentaper = cuentaperp
     if (k >= inicioextp) and (n in pl_ext['species']):
         posindextp = (k - inicioextp) % periodoextp
         if (posindextp >= 0) and (posindextp < spikep):
             r_m = rd_p + pl_ext['rate']
+            forced_extinctions_in_course = True
         if (posindextp == spikep - 1) and (n == pl_ext['species'][0]):
             cuentaper = cuentaper + 1
     return r_m, cuentaper
@@ -258,20 +261,15 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
     r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_p = \
                                             init_params_population(r_p, rd_p, n)
     if (Nindividuals_p[k, n]):  # Much faster than (Nindividuals_p[k][n] > 0)
-        # Extinciones de plantas
         if hayext:
-            if (strtype == 'Plant'):
-                cuentaperext = cuentaperpl  
-            else: 
-                cuentaperext = cuentaperpol
-            if (cuentaperext < nper):
-                r_muerte, cuentaperext = perturbation(p_ext, n, rd_p[n], 
-                                                      cuentaperext, inicioext,
-                                                      periodoext, spike, k)
-                if (strtype == 'Plant'):
-                    cuentaperpl = cuentaperext
-                else:
-                    cuentaperpol = cuentaperext
+            if (strtype == 'Plant') & (cuentaperpl < nper):
+                r_muerte, cuentaperpl = perturbation(p_ext, n, rd_p[n],
+                                                   cuentaperpl, inicioext,
+                                                   periodoext, spike, k)
+            elif (strtype == 'Pollinator') & (cuentaperpol < nper):
+                r_muerte, cuentaperpol = perturbation(p_ext, n, rd_p[n],
+                                                   cuentaperpol, inicioext,
+                                                   periodoext, spike, k)
         if haymut:
             r_eqsum = np.dot(minputchar_p[0:numspecies_q, n],\
                              Nindividuals_q[k, :])
@@ -328,8 +326,7 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
     # Blossom variability analysis
     global pendiente, periodo
     pBssvar_species = []
-    pendiente = 0
-    periodo = 0 
+    pendiente = periodo = 0 
     hay_bssvar = (Bssvar_sd > 0.0) & (len(Bssvar_species) > 0)
     if (hay_bssvar):
         if (Bssvar_modulationtype_list[0] == 'linear'):
@@ -363,8 +360,7 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
                                            bss_pert_sinusoidal, year_periods)            
                 pBssvar_species.append(np.array(varspecies))
             else:
-                pBssvar_species.append(bssvar_allones)
-       
+                pBssvar_species.append(bssvar_allones)  
     return pBssvar_species, hay_bssvar, pendiente, periodo
 
 def calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a, nrows_b, ncols_b,
@@ -585,7 +581,7 @@ def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
     else:
         ra_xx, rb_xx = ra_equs, rb_equs;
     # if (k>3*sgGL.DAYS_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
-    if (k > 3 * sgGL.DAYS_YEAR) and \
+    if (k > 3 * sgGL.DAYS_YEAR) and not(forced_extinctions_in_course) and\
             (ra_xx[k - 1] > TOL_EXTINCTION).sum() == 0 and \
             (rb_xx[k - 1] > TOL_EXTINCTION).sum() == 0:
         count_collapse_years += 1
@@ -619,6 +615,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
     global model_r_alpha
     global pendiente, blossomperiod, sd, periodo
     global count_collapse_years
+    global forced_extinctions_in_course
     
     sgGL.ldev_inf, sgGL.lfich_inf, periods, systemextinction,\
     May, haymut, model_r_alpha, count_collapse_years = \
@@ -681,6 +678,7 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                 systemextinction = check_system_extinction(algorithm, k, 
                                           lcompatibplantas, plants_blossom_prob,
                                            ra_equs, rb_equs, ra_eff, rb_eff)
+                forced_extinctions_in_course = False
                 if systemextinction:
                     sgcom.inform_user(sgGL.ldev_inf,\
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
@@ -743,7 +741,6 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
            ra_equs, rb_equs, maxa_individuos, maxb_individuos, 
            max_reff, min_reff, max_requs, min_requs, systemextinction, 
            pBssvar_species)
-
             
 if __name__ == '__main__':
     import doctest

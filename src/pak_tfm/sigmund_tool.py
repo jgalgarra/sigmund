@@ -264,21 +264,16 @@ class StartQT4(QtGui.QMainWindow):
                 auxspec = self.ui.Bssvar_species.text().split(',')
                 listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
-            
         print("Bssvar_species " + str(self.Bssvar_species))
-            
         plants_extinction = {}
         pols_extinction = {}
-        blossom_perturbation = {}
-        
+        blossom_perturbation = {}        
         if (self.ui.blossom_pert_species.text().upper() == 'ALL'):
             blossom_perturbation = ['ALL']
         else:
             auxspec = self.ui.blossom_pert_species.text().split(',')
             listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
-        # print(blossom_perturbation)
-        
         if self.ui.pl_ext_period.text().isdigit():
             try:
                 plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
