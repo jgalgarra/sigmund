@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 00:20:38 2014
+# Created: Sat Sep  6 00:32:24 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,7 +29,7 @@ class Ui_Form(object):
         self.Close_Button.setFont(font)
         self.Close_Button.setObjectName(_fromUtf8("Close_Button"))
         self.inputfile = QtGui.QLineEdit(Form)
-        self.inputfile.setGeometry(QtCore.QRect(159, 20, 161, 20))
+        self.inputfile.setGeometry(QtCore.QRect(159, 20, 241, 20))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.inputfile.setFont(font)
