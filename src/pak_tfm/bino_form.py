@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Fri Sep  5 23:59:37 2014
+# Created: Sat Sep  6 00:04:06 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -642,7 +642,7 @@ class Ui_Form(object):
         self.label_29.setFont(font)
         self.label_29.setObjectName(_fromUtf8("label_29"))
         self.Bssvar_Type_linear = QtGui.QRadioButton(self.Modulation)
-        self.Bssvar_Type_linear.setGeometry(QtCore.QRect(10, 50, 51, 17))
+        self.Bssvar_Type_linear.setGeometry(QtCore.QRect(10, 50, 91, 17))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.Bssvar_Type_linear.setFont(font)
