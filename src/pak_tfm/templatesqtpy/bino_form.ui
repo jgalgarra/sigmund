@@ -746,9 +746,9 @@
   <widget class="QLabel" name="URL_report">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>270</x>
      <y>530</y>
-     <width>641</width>
+     <width>481</width>
      <height>40</height>
     </rect>
    </property>
