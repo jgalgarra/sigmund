@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 00:15:29 2014
+# Created: Sat Sep  6 00:17:40 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -260,7 +260,7 @@ class Ui_Form(object):
         self.label_report.setText(_fromUtf8(""))
         self.label_report.setObjectName(_fromUtf8("label_report"))
         self.URL_report = QtGui.QLabel(Form)
-        self.URL_report.setGeometry(QtCore.QRect(270, 530, 481, 40))
+        self.URL_report.setGeometry(QtCore.QRect(110, 530, 641, 40))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.URL_report.setFont(font)
