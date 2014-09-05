@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Fri Sep  5 14:56:51 2014
+# Created: Fri Sep  5 23:59:37 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -56,7 +56,7 @@ class Ui_Form(object):
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.foodweb_checkbox = QtGui.QCheckBox(Form)
         self.foodweb_checkbox.setEnabled(True)
-        self.foodweb_checkbox.setGeometry(QtCore.QRect(250, 112, 91, 17))
+        self.foodweb_checkbox.setGeometry(QtCore.QRect(250, 112, 161, 17))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.foodweb_checkbox.setFont(font)
@@ -268,7 +268,7 @@ class Ui_Form(object):
         self.URL_report.setOpenExternalLinks(True)
         self.URL_report.setObjectName(_fromUtf8("URL_report"))
         self.save_output_checkbox = QtGui.QCheckBox(Form)
-        self.save_output_checkbox.setGeometry(QtCore.QRect(250, 130, 131, 17))
+        self.save_output_checkbox.setGeometry(QtCore.QRect(250, 130, 151, 17))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.save_output_checkbox.setFont(font)
@@ -589,7 +589,7 @@ class Ui_Form(object):
         self.label_25 = QtGui.QLabel(Form)
         self.label_25.setGeometry(QtCore.QRect(250, 320, 30, 20))
         font = QtGui.QFont()
-        font.setFamily(_fromUtf8("Arial"))
+        font.setFamily(_fromUtf8("Symbol"))
         font.setPointSize(11)
         font.setBold(True)
         font.setWeight(75)
@@ -617,7 +617,7 @@ class Ui_Form(object):
         self.ClearBssvar.setGeometry(QtCore.QRect(690, 320, 61, 21))
         self.ClearBssvar.setObjectName(_fromUtf8("ClearBssvar"))
         self.Modulation = QtGui.QGroupBox(Form)
-        self.Modulation.setGeometry(QtCore.QRect(330, 290, 181, 111))
+        self.Modulation.setGeometry(QtCore.QRect(330, 290, 201, 111))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         self.Modulation.setFont(font)
@@ -631,11 +631,11 @@ class Ui_Form(object):
         self.Bssvar_Type_none.setObjectName(_fromUtf8("Bssvar_Type_none"))
         self.Bssvar_Type_sin_period = QtGui.QLineEdit(self.Modulation)
         self.Bssvar_Type_sin_period.setEnabled(False)
-        self.Bssvar_Type_sin_period.setGeometry(QtCore.QRect(120, 80, 41, 20))
+        self.Bssvar_Type_sin_period.setGeometry(QtCore.QRect(150, 80, 41, 20))
         self.Bssvar_Type_sin_period.setDragEnabled(True)
         self.Bssvar_Type_sin_period.setObjectName(_fromUtf8("Bssvar_Type_sin_period"))
         self.label_29 = QtGui.QLabel(self.Modulation)
-        self.label_29.setGeometry(QtCore.QRect(80, 80, 31, 20))
+        self.label_29.setGeometry(QtCore.QRect(110, 80, 31, 20))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         font.setPointSize(8)
@@ -649,11 +649,11 @@ class Ui_Form(object):
         self.Bssvar_Type_linear.setObjectName(_fromUtf8("Bssvar_Type_linear"))
         self.Bssvar_Type_linear_slope = QtGui.QLineEdit(self.Modulation)
         self.Bssvar_Type_linear_slope.setEnabled(False)
-        self.Bssvar_Type_linear_slope.setGeometry(QtCore.QRect(120, 50, 41, 20))
+        self.Bssvar_Type_linear_slope.setGeometry(QtCore.QRect(150, 50, 41, 20))
         self.Bssvar_Type_linear_slope.setDragEnabled(True)
         self.Bssvar_Type_linear_slope.setObjectName(_fromUtf8("Bssvar_Type_linear_slope"))
         self.label_30 = QtGui.QLabel(self.Modulation)
-        self.label_30.setGeometry(QtCore.QRect(80, 50, 31, 20))
+        self.label_30.setGeometry(QtCore.QRect(110, 50, 31, 20))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         font.setPointSize(8)
