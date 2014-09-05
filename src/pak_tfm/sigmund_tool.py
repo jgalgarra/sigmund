@@ -171,7 +171,7 @@ class StartQT4(QtGui.QMainWindow):
             for j in list(subla):
                 listb.append(j)    
         listb = sorted(set(listb))   
-        return listb, auxlspec, numspe
+        return listb
 
     def add_entry(self): 
         algorithms = ["Verhulst", "Logistic_abs", "May", \
@@ -263,7 +263,7 @@ class StartQT4(QtGui.QMainWindow):
                 listb = []
             else:
                 auxspec = self.ui.Bssvar_species.text().split(',')
-                listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
+                listb = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
         print("Bssvar_species " + str(self.Bssvar_species))
         plants_extinction = {}
@@ -280,18 +280,16 @@ class StartQT4(QtGui.QMainWindow):
                 plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
                                               * sgGL.DAYS_YEAR
                 plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
-                plants_extinction['start'] = float(self.ui.pl_ext_start.text())
+                plants_extinction['start'] = int(self.ui.pl_ext_start.text())
                 plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
                 plants_extinction['numperiod'] = int(self.ui.pl_ext_numperiod.text())
-                # print(self.ui.pl_ext_species.text().upper())
                 if (self.ui.pl_ext_species.text().upper() == 'ALL'):
                     plants_extinction['species'] = ['ALL']
                 else:
                     auxspec = self.ui.pl_ext_species.text().split(',')
-                    listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
+                    listb = self.create_list_species_affected(auxspec)
                     plants_extinction['species'] = listb
-                # print (plants_extinction)
-            except:            
+            except:         
                 self.lista_err.append("ERROR: bad plant extinction format")
                 self.error_exit()
                 self.ui.Run_Button.setEnabled(1)
@@ -303,21 +301,21 @@ class StartQT4(QtGui.QMainWindow):
                 pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
                                             sgGL.DAYS_YEAR
                 pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
-                pols_extinction['start'] = float(self.ui.pol_ext_start.text())
+                pols_extinction['start'] = int(self.ui.pol_ext_start.text())
                 pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
                 pols_extinction['numperiod'] = int(self.ui.pol_ext_numperiod.text())
                 if (self.ui.pol_ext_species.text().upper() == 'ALL'):
                     pols_extinction['species'] = ['ALL']
                 else:
                     auxspec = self.ui.pol_ext_species.text().split(',')
-                    listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
+                    listb = self.create_list_species_affected(auxspec)
                     pols_extinction['species'] = listb
                 # print (pols_extinction)
             except:            
                 self.lista_err.append("ERROR: bad pollinator extinction format")
                 self.error_exit()
                 self.ui.Run_Button.setEnabled(1)
-                self.ui.Clutualose_Button.setEnabled(1)
+                self.ui.Close_Button.setEnabled(1)
                 return
             
         Na, Nb, Nc, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, minreff, \
@@ -348,10 +346,10 @@ class StartQT4(QtGui.QMainWindow):
                             fichreport=fichr, os=output_suffix, dirtrabajo=dirs,
                             Bssvar_coefs=pBssvar_coefs)
         if self.haypred:
-            sggraph.food_render(Na, Nb, Nc, maxa, maxb, input_fname, displayinic,
-                              self.ciclos * sgGL.DAYS_YEAR, dirsalida, self.algorithm, 
-                              fichreport=fichr, os=output_suffix, 
-                              dirtrabajo=dirs)
+            sggraph.food_render(Na, Nb, Nc, maxa, maxb, input_fname, 
+                            displayinic, self.ciclos * sgGL.DAYS_YEAR, dirsalida, 
+                            self.algorithm, fichreport=fichr, os=output_suffix, 
+                            dirtrabajo=dirs)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)

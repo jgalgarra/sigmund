@@ -74,7 +74,7 @@ def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
     minpeq_b = minputchar_b * minputchar_b_mask
     sgcom.inform_user(ldev_inf, \
     "Day:%d (year %d). Deleted links plant %d <-> pollinator %d"\
-    % (k, k // sgGL.DAYS_YEAR , fil, col))
+    % (k, k // sgGL.DAYS_YEAR , int_to_ext_rep(fil), int_to_ext_rep(col)))
     return minpeq_a, minpeq_b, minputchar_a, minputchar_b,
 
 def val_mutMay(r_species, beta, period, N1, N2, K1):
@@ -195,19 +195,21 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
                                       hayextplantas, hayextpolin, 
                                       ldev_inf, lfich_inf):
     if hayextplantas:
-        inicioextplantas = round(yearperiods * pl_ext['start'] * sgGL.DAYS_YEAR)
+        #inicioextplantas = round(yearperiods * pl_ext['start'] * sgGL.DAYS_YEAR)
+        inicioextplantas = pl_ext['start'] * sgGL.DAYS_YEAR
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pl_ext['species'], periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])+1), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
-        inicioextpolin = round(yearperiods * pol_ext['start'] * sgGL.DAYS_YEAR)
+        #inicioextpolin = round(yearperiods * pol_ext['start'] * sgGL.DAYS_YEAR)
+        inicioextpolin = pol_ext['start'] * sgGL.DAYS_YEAR
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %.02f" % (pol_ext['species'], periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pol_ext['species'])+1), periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpolin = nperpol = periodoextpol = spikepol = 0
     return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
@@ -573,12 +575,12 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
     j = 0
     if hayextplantas:
         if (pl_ext['species'][0] == 'ALL'):
-            pl_ext['species'] = list(range(0, numspecies_a + 1))
+            pl_ext['species'] = list(range(0, numspecies_a))
         else:
             pl_ext['species'] = [i-1 for i in pl_ext['species']]
     if hayextpolin: 
         if (pol_ext['species'][0] == 'ALL'):
-            pol_ext['species'] = list(range(0, numspecies_b + 1))
+            pol_ext['species'] = list(range(0, numspecies_b))
         else:
             pol_ext['species'] = [i-1 for i in pol_ext['species']]
     return inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j
