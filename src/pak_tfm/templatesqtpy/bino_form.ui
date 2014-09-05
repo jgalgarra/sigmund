@@ -34,6 +34,11 @@
      <height>23</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="text">
     <string>Close</string>
    </property>
@@ -46,6 +51,11 @@
      <width>161</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
   </widget>
   <widget class="QPushButton" name="Run_Button">
@@ -60,6 +70,11 @@
      <height>23</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="text">
     <string>Run</string>
    </property>
@@ -73,6 +88,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
@@ -85,6 +105,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>10</pointsize>
     </font>
    </property>
@@ -107,6 +128,11 @@
      <height>17</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="text">
     <string>Foodweb</string>
    </property>
@@ -119,6 +145,11 @@
      <width>21</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -135,6 +166,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -154,6 +186,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -169,6 +206,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -190,6 +228,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -208,6 +247,11 @@
      <width>31</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -237,6 +281,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -324,6 +369,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -336,6 +386,11 @@
      <width>31</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -383,6 +438,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -430,6 +486,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -451,6 +508,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -493,6 +551,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -511,6 +570,11 @@
      <width>31</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -597,6 +661,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
@@ -609,6 +678,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>10</pointsize>
     </font>
    </property>
@@ -630,6 +700,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>10</pointsize>
     </font>
    </property>
@@ -661,6 +732,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -680,6 +752,11 @@
      <height>40</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -695,6 +772,11 @@
      <width>131</width>
      <height>17</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="text">
     <string>Save output data</string>
@@ -732,6 +814,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -744,6 +831,11 @@
      <width>91</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="text">
     <string>Input file</string>
@@ -1175,6 +1267,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>18</pointsize>
      <weight>75</weight>
      <bold>true</bold>
@@ -1196,6 +1289,11 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="text">
     <string/>
    </property>
@@ -1212,6 +1310,11 @@
      <height>121</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="title">
     <string>Mutualism Model</string>
    </property>
@@ -1226,6 +1329,11 @@
       <width>161</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>Logistic |req|</string>
@@ -1246,6 +1354,11 @@
       <height>17</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
     <property name="text">
      <string>May</string>
     </property>
@@ -1265,6 +1378,11 @@
       <height>17</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
     <property name="text">
      <string>Logistic u(req)</string>
     </property>
@@ -1283,6 +1401,11 @@
       <width>161</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>Verhulst</string>
@@ -1306,6 +1429,11 @@
       <height>17</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
     <property name="text">
      <string>None</string>
     </property>
@@ -1323,6 +1451,11 @@
      <height>41</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="title">
     <string/>
    </property>
@@ -1334,6 +1467,11 @@
       <width>82</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>Binary</string>
@@ -1353,6 +1491,11 @@
       <width>121</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>Gaussian</string>
@@ -1433,6 +1576,11 @@
      <width>31</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -1517,6 +1665,11 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -1532,6 +1685,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>8</pointsize>
     </font>
    </property>
@@ -1553,7 +1707,7 @@
    </property>
    <property name="font">
     <font>
-     <family>Symbol</family>
+     <family>Arial</family>
      <pointsize>11</pointsize>
      <weight>75</weight>
      <bold>true</bold>
@@ -1577,6 +1731,11 @@
      <width>41</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -1638,6 +1797,11 @@
      <height>111</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
    <property name="title">
     <string>Modulation</string>
    </property>
@@ -1649,6 +1813,11 @@
       <width>82</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>None</string>
@@ -1684,6 +1853,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -1702,6 +1872,11 @@
       <width>51</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>linear</string>
@@ -1734,6 +1909,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -1752,6 +1928,11 @@
       <width>51</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
     <property name="text">
      <string>sin</string>
@@ -1819,7 +2000,6 @@
   <zorder>Bssvar_species</zorder>
   <zorder>label_26</zorder>
   <zorder>ClearBssvar</zorder>
-  <zorder>label_21</zorder>
   <zorder>Modulation</zorder>
  </widget>
  <resources/>
