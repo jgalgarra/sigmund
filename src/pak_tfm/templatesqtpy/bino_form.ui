@@ -34,11 +34,6 @@
      <height>23</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="text">
     <string>Close</string>
    </property>
@@ -51,11 +46,6 @@
      <width>241</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
   </widget>
   <widget class="QPushButton" name="Run_Button">
@@ -70,11 +60,6 @@
      <height>23</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="text">
     <string>Run</string>
    </property>
@@ -88,26 +73,15 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
   </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>50</y>
-     <width>81</width>
+     <width>111</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>10</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Years</string>
@@ -128,11 +102,6 @@
      <height>17</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="text">
     <string>Foodweb</string>
    </property>
@@ -140,16 +109,11 @@
   <widget class="QLineEdit" name="pl_ext_period">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>160</x>
      <y>420</y>
-     <width>21</width>
+     <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -158,17 +122,11 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>110</x>
      <y>420</y>
-     <width>31</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Years</string>
@@ -180,16 +138,11 @@
   <widget class="QLineEdit" name="pl_ext_spike">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>250</x>
      <y>420</y>
      <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -198,17 +151,11 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>210</x>
      <y>420</y>
-     <width>31</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Spike</string>
@@ -220,17 +167,11 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>290</x>
      <y>420</y>
-     <width>41</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Repeat</string>
@@ -247,11 +188,6 @@
      <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -273,17 +209,11 @@
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>380</x>
      <y>420</y>
      <width>41</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Rate</string>
@@ -314,11 +244,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
    <property name="text">
     <string>Start</string>
    </property>
@@ -329,7 +254,7 @@
   <widget class="QLineEdit" name="pl_ext_species">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>420</y>
      <width>61</width>
      <height>20</height>
@@ -344,14 +269,9 @@
     <rect>
      <x>540</x>
      <y>420</y>
-     <width>40</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Species</string>
@@ -363,16 +283,11 @@
   <widget class="QLineEdit" name="pol_ext_period">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>160</x>
      <y>500</y>
-     <width>21</width>
+     <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -386,11 +301,6 @@
      <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -415,11 +325,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
    <property name="text">
     <string>Start</string>
    </property>
@@ -430,17 +335,11 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>290</x>
      <y>500</y>
-     <width>41</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Repeat</string>
@@ -465,7 +364,7 @@
   <widget class="QLineEdit" name="pol_ext_species">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>500</y>
      <width>61</width>
      <height>20</height>
@@ -478,17 +377,11 @@
   <widget class="QLabel" name="label_13">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>210</x>
      <y>500</y>
-     <width>31</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Spike</string>
@@ -500,17 +393,11 @@
   <widget class="QLabel" name="label_14">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>380</x>
      <y>500</y>
      <width>41</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Rate</string>
@@ -524,14 +411,9 @@
     <rect>
      <x>540</x>
      <y>500</y>
-     <width>40</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Species</string>
@@ -543,17 +425,11 @@
   <widget class="QLabel" name="label_16">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>110</x>
      <y>500</y>
-     <width>31</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Years</string>
@@ -565,16 +441,11 @@
   <widget class="QLineEdit" name="pol_ext_spike">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>250</x>
      <y>500</y>
      <width>31</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="dragEnabled">
     <bool>true</bool>
@@ -588,13 +459,6 @@
      <width>111</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <italic>true</italic>
-    </font>
    </property>
    <property name="text">
     <string>Plant perturbations</string>
@@ -611,13 +475,6 @@
      <width>171</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <italic>true</italic>
-    </font>
    </property>
    <property name="text">
     <string>Pollinator perturbations</string>
@@ -661,11 +518,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
@@ -675,12 +527,6 @@
      <width>81</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>10</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Output suffix</string>
@@ -697,12 +543,6 @@
      <width>201</width>
      <height>10</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>10</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Comments for report</string>
@@ -730,12 +570,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
    <property name="text">
     <string/>
    </property>
@@ -751,11 +585,6 @@
      <width>481</width>
      <height>40</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="text">
     <string/>
@@ -773,11 +602,6 @@
      <height>17</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="text">
     <string>Save output data</string>
    </property>
@@ -790,13 +614,6 @@
      <width>161</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <italic>true</italic>
-    </font>
    </property>
    <property name="text">
     <string>Random links removal</string>
@@ -814,11 +631,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -828,14 +640,9 @@
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>91</width>
+     <width>101</width>
      <height>21</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="text">
     <string>Input file</string>
@@ -1265,14 +1072,6 @@
      </disabled>
     </palette>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>18</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
    <property name="text">
     <string/>
    </property>
@@ -1288,11 +1087,6 @@
      <width>131</width>
      <height>21</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
    </property>
    <property name="text">
     <string/>
@@ -1310,11 +1104,6 @@
      <height>121</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="title">
     <string>Mutualism Model</string>
    </property>
@@ -1329,11 +1118,6 @@
       <width>161</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>Logistic |req|</string>
@@ -1354,11 +1138,6 @@
       <height>17</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
     <property name="text">
      <string>May</string>
     </property>
@@ -1378,11 +1157,6 @@
       <height>17</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
     <property name="text">
      <string>Logistic u(req)</string>
     </property>
@@ -1401,11 +1175,6 @@
       <width>161</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>Verhulst</string>
@@ -1429,11 +1198,6 @@
       <height>17</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
     <property name="text">
      <string>None</string>
     </property>
@@ -1451,11 +1215,6 @@
      <height>41</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="title">
     <string/>
    </property>
@@ -1467,11 +1226,6 @@
       <width>82</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>Binary</string>
@@ -1491,11 +1245,6 @@
       <width>121</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>Gaussian</string>
@@ -1529,14 +1278,6 @@
       <height>20</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Symbol</family>
-      <pointsize>11</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
     <property name="text">
      <string>s</string>
     </property>
@@ -1554,13 +1295,6 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <italic>true</italic>
-    </font>
-   </property>
    <property name="text">
     <string>Plants blossom prob.</string>
    </property>
@@ -1577,11 +1311,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -1591,14 +1320,9 @@
     <rect>
      <x>540</x>
      <y>250</y>
-     <width>40</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Species</string>
@@ -1610,7 +1334,7 @@
   <widget class="QLineEdit" name="blossom_pert_species">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>250</y>
      <width>61</width>
      <height>20</height>
@@ -1638,16 +1362,9 @@
     <rect>
      <x>30</x>
      <y>300</y>
-     <width>151</width>
+     <width>211</width>
      <height>16</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>9</pointsize>
-     <italic>true</italic>
-    </font>
    </property>
    <property name="text">
     <string>Plants blossom variability</string>
@@ -1665,11 +1382,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -1677,17 +1389,11 @@
   <widget class="QLabel" name="label_24">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>150</x>
      <y>320</y>
-     <width>31</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Period</string>
@@ -1704,14 +1410,6 @@
      <width>30</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Symbol</family>
-     <pointsize>11</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
    </property>
    <property name="text">
     <string>s</string>
@@ -1732,11 +1430,6 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="dragEnabled">
     <bool>true</bool>
    </property>
@@ -1744,7 +1437,7 @@
   <widget class="QLineEdit" name="Bssvar_species">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>600</x>
      <y>320</y>
      <width>61</width>
      <height>20</height>
@@ -1759,14 +1452,9 @@
     <rect>
      <x>540</x>
      <y>320</y>
-     <width>40</width>
+     <width>51</width>
      <height>20</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-    </font>
    </property>
    <property name="text">
     <string>Species</string>
@@ -1797,11 +1485,6 @@
      <height>111</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-    </font>
-   </property>
    <property name="title">
     <string>Modulation</string>
    </property>
@@ -1813,11 +1496,6 @@
       <width>82</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>None</string>
@@ -1851,12 +1529,6 @@
       <height>20</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
     <property name="text">
      <string>Period</string>
     </property>
@@ -1872,11 +1544,6 @@
       <width>91</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>linear</string>
@@ -1907,12 +1574,6 @@
       <height>20</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
     <property name="text">
      <string>Slope</string>
     </property>
@@ -1928,11 +1589,6 @@
       <width>51</width>
       <height>17</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
     </property>
     <property name="text">
      <string>sin</string>
