@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 12:46:56 2014
+# Created: Sat Sep  6 12:49:40 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -318,34 +318,34 @@ class Ui_Form(object):
         self.URL_outputs.setOpenExternalLinks(True)
         self.URL_outputs.setObjectName(_fromUtf8("URL_outputs"))
         self.TypeofMutualism = QtGui.QGroupBox(Form)
-        self.TypeofMutualism.setGeometry(QtCore.QRect(20, 90, 191, 121))
+        self.TypeofMutualism.setGeometry(QtCore.QRect(20, 80, 191, 131))
         self.TypeofMutualism.setObjectName(_fromUtf8("TypeofMutualism"))
         self.TOM_LAp_abs_Button = QtGui.QRadioButton(self.TypeofMutualism)
         self.TOM_LAp_abs_Button.setEnabled(True)
-        self.TOM_LAp_abs_Button.setGeometry(QtCore.QRect(10, 50, 161, 17))
+        self.TOM_LAp_abs_Button.setGeometry(QtCore.QRect(10, 60, 161, 17))
         self.TOM_LAp_abs_Button.setChecked(False)
         self.TOM_LAp_abs_Button.setObjectName(_fromUtf8("TOM_LAp_abs_Button"))
         self.buttonGroup = QtGui.QButtonGroup(Form)
         self.buttonGroup.setObjectName(_fromUtf8("buttonGroup"))
         self.buttonGroup.addButton(self.TOM_LAp_abs_Button)
         self.TOM_May_Button = QtGui.QRadioButton(self.TypeofMutualism)
-        self.TOM_May_Button.setGeometry(QtCore.QRect(10, 90, 161, 17))
+        self.TOM_May_Button.setGeometry(QtCore.QRect(10, 100, 161, 17))
         self.TOM_May_Button.setObjectName(_fromUtf8("TOM_May_Button"))
         self.buttonGroup.addButton(self.TOM_May_Button)
         self.TOM_LAp_u_Button = QtGui.QRadioButton(self.TypeofMutualism)
         self.TOM_LAp_u_Button.setEnabled(True)
-        self.TOM_LAp_u_Button.setGeometry(QtCore.QRect(10, 70, 161, 17))
+        self.TOM_LAp_u_Button.setGeometry(QtCore.QRect(10, 80, 161, 17))
         self.TOM_LAp_u_Button.setObjectName(_fromUtf8("TOM_LAp_u_Button"))
         self.buttonGroup.addButton(self.TOM_LAp_u_Button)
         self.TOM_LAp_vh_Button = QtGui.QRadioButton(self.TypeofMutualism)
         self.TOM_LAp_vh_Button.setEnabled(True)
-        self.TOM_LAp_vh_Button.setGeometry(QtCore.QRect(10, 30, 161, 17))
+        self.TOM_LAp_vh_Button.setGeometry(QtCore.QRect(10, 40, 161, 17))
         self.TOM_LAp_vh_Button.setCheckable(True)
         self.TOM_LAp_vh_Button.setChecked(True)
         self.TOM_LAp_vh_Button.setObjectName(_fromUtf8("TOM_LAp_vh_Button"))
         self.buttonGroup.addButton(self.TOM_LAp_vh_Button)
         self.TOM_None_Button = QtGui.QRadioButton(self.TypeofMutualism)
-        self.TOM_None_Button.setGeometry(QtCore.QRect(10, 10, 161, 17))
+        self.TOM_None_Button.setGeometry(QtCore.QRect(10, 20, 161, 17))
         self.TOM_None_Button.setObjectName(_fromUtf8("TOM_None_Button"))
         self.buttonGroup.addButton(self.TOM_None_Button)
         self.TypeofBlossom = QtGui.QGroupBox(Form)
