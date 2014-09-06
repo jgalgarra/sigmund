@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 12:58:09 2014
+# Created: Sat Sep  6 13:00:12 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -369,7 +369,7 @@ class Ui_Form(object):
         self.plants_blossom_sd.setDragEnabled(True)
         self.plants_blossom_sd.setObjectName(_fromUtf8("plants_blossom_sd"))
         self.label_21 = QtGui.QLabel(self.TypeofBlossom)
-        self.label_21.setGeometry(QtCore.QRect(210, 0, 30, 20))
+        self.label_21.setGeometry(QtCore.QRect(210, 10, 30, 20))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Symbol"))
         font.setPointSize(11)
