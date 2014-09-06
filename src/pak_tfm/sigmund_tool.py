@@ -19,7 +19,7 @@ class StartQT4(QtGui.QMainWindow):
         self.lista_err = []
         self.input_dir = './input'
         self.ciclos = 100
-        self.release = 200
+        self.release = 201
         self.daterelease = "September 2014"
         self.plants_blossom = 1.00
         self.plants_blossom_sd = 0.01
