@@ -580,7 +580,7 @@
   <widget class="QLabel" name="URL_report">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>220</x>
      <y>510</y>
      <width>551</width>
      <height>40</height>
@@ -625,9 +625,9 @@
   <widget class="QLineEdit" name="random_removal">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>200</x>
      <y>340</y>
-     <width>31</width>
+     <width>41</width>
      <height>20</height>
     </rect>
    </property>
@@ -1384,9 +1384,9 @@
   <widget class="QLineEdit" name="Bssvar_period">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>200</x>
      <y>300</y>
-     <width>31</width>
+     <width>41</width>
      <height>20</height>
     </rect>
    </property>
@@ -1397,7 +1397,7 @@
   <widget class="QLabel" name="label_24">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>140</x>
      <y>300</y>
      <width>51</width>
      <height>20</height>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 12:55:19 2014
+# Created: Sat Sep  6 12:58:09 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -154,7 +154,7 @@ class Ui_Form(object):
         self.label_report.setText(_fromUtf8(""))
         self.label_report.setObjectName(_fromUtf8("label_report"))
         self.URL_report = QtGui.QLabel(Form)
-        self.URL_report.setGeometry(QtCore.QRect(230, 510, 551, 40))
+        self.URL_report.setGeometry(QtCore.QRect(220, 510, 551, 40))
         self.URL_report.setText(_fromUtf8(""))
         self.URL_report.setOpenExternalLinks(True)
         self.URL_report.setObjectName(_fromUtf8("URL_report"))
@@ -165,7 +165,7 @@ class Ui_Form(object):
         self.label_19.setGeometry(QtCore.QRect(20, 340, 161, 20))
         self.label_19.setObjectName(_fromUtf8("label_19"))
         self.random_removal = QtGui.QLineEdit(Form)
-        self.random_removal.setGeometry(QtCore.QRect(210, 340, 31, 20))
+        self.random_removal.setGeometry(QtCore.QRect(200, 340, 41, 20))
         self.random_removal.setDragEnabled(True)
         self.random_removal.setObjectName(_fromUtf8("random_removal"))
         self.select_input_file = QtGui.QPushButton(Form)
@@ -398,11 +398,11 @@ class Ui_Form(object):
         self.label_23.setGeometry(QtCore.QRect(20, 280, 211, 16))
         self.label_23.setObjectName(_fromUtf8("label_23"))
         self.Bssvar_period = QtGui.QLineEdit(Form)
-        self.Bssvar_period.setGeometry(QtCore.QRect(210, 300, 31, 20))
+        self.Bssvar_period.setGeometry(QtCore.QRect(200, 300, 41, 20))
         self.Bssvar_period.setDragEnabled(True)
         self.Bssvar_period.setObjectName(_fromUtf8("Bssvar_period"))
         self.label_24 = QtGui.QLabel(Form)
-        self.label_24.setGeometry(QtCore.QRect(150, 300, 51, 20))
+        self.label_24.setGeometry(QtCore.QRect(140, 300, 51, 20))
         self.label_24.setObjectName(_fromUtf8("label_24"))
         self.label_25 = QtGui.QLabel(Form)
         self.label_25.setGeometry(QtCore.QRect(250, 300, 30, 20))
