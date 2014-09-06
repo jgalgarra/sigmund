@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 13:04:23 2014
+# Created: Sat Sep  6 19:10:13 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -23,14 +23,14 @@ class Ui_Form(object):
         Form.setAcceptDrops(True)
         Form.setAutoFillBackground(False)
         self.Close_Button = QtGui.QPushButton(Form)
-        self.Close_Button.setGeometry(QtCore.QRect(320, 560, 75, 23))
+        self.Close_Button.setGeometry(QtCore.QRect(380, 560, 75, 23))
         self.Close_Button.setObjectName(_fromUtf8("Close_Button"))
         self.inputfile = QtGui.QLineEdit(Form)
         self.inputfile.setGeometry(QtCore.QRect(149, 20, 241, 20))
         self.inputfile.setObjectName(_fromUtf8("inputfile"))
         self.Run_Button = QtGui.QPushButton(Form)
         self.Run_Button.setEnabled(False)
-        self.Run_Button.setGeometry(QtCore.QRect(220, 560, 75, 23))
+        self.Run_Button.setGeometry(QtCore.QRect(280, 560, 75, 23))
         self.Run_Button.setObjectName(_fromUtf8("Run_Button"))
         self.ciclos = QtGui.QLineEdit(Form)
         self.ciclos.setGeometry(QtCore.QRect(150, 50, 61, 20))
@@ -150,11 +150,11 @@ class Ui_Form(object):
         self.Comments_text.setGeometry(QtCore.QRect(480, 90, 301, 101))
         self.Comments_text.setObjectName(_fromUtf8("Comments_text"))
         self.label_report = QtGui.QLabel(Form)
-        self.label_report.setGeometry(QtCore.QRect(110, 520, 111, 20))
+        self.label_report.setGeometry(QtCore.QRect(250, 520, 111, 20))
         self.label_report.setText(_fromUtf8(""))
         self.label_report.setObjectName(_fromUtf8("label_report"))
         self.URL_report = QtGui.QLabel(Form)
-        self.URL_report.setGeometry(QtCore.QRect(200, 510, 581, 40))
+        self.URL_report.setGeometry(QtCore.QRect(390, 510, 291, 40))
         self.URL_report.setText(_fromUtf8(""))
         self.URL_report.setOpenExternalLinks(True)
         self.URL_report.setObjectName(_fromUtf8("URL_report"))
@@ -313,7 +313,7 @@ class Ui_Form(object):
         self.Error_msg.setText(_fromUtf8(""))
         self.Error_msg.setObjectName(_fromUtf8("Error_msg"))
         self.URL_outputs = QtGui.QLabel(Form)
-        self.URL_outputs.setGeometry(QtCore.QRect(420, 560, 131, 21))
+        self.URL_outputs.setGeometry(QtCore.QRect(480, 560, 131, 21))
         self.URL_outputs.setText(_fromUtf8(""))
         self.URL_outputs.setOpenExternalLinks(True)
         self.URL_outputs.setObjectName(_fromUtf8("URL_outputs"))

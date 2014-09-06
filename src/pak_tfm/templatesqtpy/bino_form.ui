@@ -28,7 +28,7 @@
   <widget class="QPushButton" name="Close_Button">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>380</x>
      <y>560</y>
      <width>75</width>
      <height>23</height>
@@ -54,7 +54,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>280</x>
      <y>560</y>
      <width>75</width>
      <height>23</height>
@@ -564,7 +564,7 @@
   <widget class="QLabel" name="label_report">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>250</x>
      <y>520</y>
      <width>111</width>
      <height>20</height>
@@ -580,9 +580,9 @@
   <widget class="QLabel" name="URL_report">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>390</x>
      <y>510</y>
-     <width>581</width>
+     <width>291</width>
      <height>40</height>
     </rect>
    </property>
@@ -1082,7 +1082,7 @@
   <widget class="QLabel" name="URL_outputs">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>480</x>
      <y>560</y>
      <width>131</width>
      <height>21</height>

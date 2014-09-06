@@ -220,7 +220,7 @@ class StartQT4(QtGui.QMainWindow):
         reportpath = os.path.join(dirs, dirsalida.replace('\\', '/'))
         fichr = reportpath + 'rep_' + input_fname + '_' + self.algorithm +\
                      '_' + output_suffix + '_' + str(int(self.ciclos)) + '.html'
-        dispfichsal = fichr.split('\\')
+        dispfichsal = fichr.split('/')
         linkname = '<a href=file:///' + fichr + '>' + dispfichsal[-1] + '</a>'
         print("%s" % comentario)
         outputdatasave = self.ui.save_output_checkbox.checkState() > 0
