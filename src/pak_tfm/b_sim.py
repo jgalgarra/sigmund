@@ -195,7 +195,6 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
                                       hayextplantas, hayextpolin, 
                                       ldev_inf, lfich_inf):
     if hayextplantas:
-        #inicioextplantas = round(yearperiods * pl_ext['start'] * sgGL.DAYS_YEAR)
         inicioextplantas = pl_ext['start'] * sgGL.DAYS_YEAR
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
@@ -204,7 +203,6 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
-        #inicioextpolin = round(yearperiods * pol_ext['start'] * sgGL.DAYS_YEAR)
         inicioextpolin = pol_ext['start'] * sgGL.DAYS_YEAR
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
@@ -616,14 +614,17 @@ def calc_perturbed_coeffs(k, hay_bssvar, pBssvar_species, minputchar_a,
     minpeq_b = minputchar_b * minputchar_b_mask
     return minpeq_a, minpeq_b
 
-def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
-                data_save='', dirtrabajo='', direntrada='', dirsal='',
-                eliminarenlaces=0, pl_ext=[], pol_ext=[], os='', fichreport='',
-                com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
-                plants_blossom_sd=0.01, plants_blossom_type='Binary', 
-                blossom_pert_list='', verbose=True, exit_on_extinction=False,
-                N0plants='', N0pols='', release='', Bssvar_period=0.1, 
-                Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
+# def bino_mutual(filename ='', year_periods = '', hay_foodweb = False, 
+#                 hay_superpredadores = False ,
+#                 data_save='', dirtrabajo ='', direntrada='', dirsal='',
+#                 eliminarenlaces=0, pl_ext=[], pol_ext=[], os='', fichreport='',
+#                 com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
+#                 plants_blossom_sd=0.01, plants_blossom_type='Binary', 
+#                 blossom_pert_list='', verbose=True, exit_on_extinction=False,
+#                 N0plants='', N0pols='', release='', Bssvar_period=0.1, 
+#                 Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
+    
+def bino_mutual(sim_cond = ''):
     global cuentaperpl, cuentaperpol
     global Logistic_abs
     global model_r_alpha
@@ -633,78 +634,99 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
     
     sgGL.ldev_inf, sgGL.lfich_inf, periods, systemextinction,\
     May, haymut, model_r_alpha, count_collapse_years = \
-       init_simulation_environment(year_periods, fichreport, algorithm, verbose)    
+       init_simulation_environment(sim_cond.year_periods, sim_cond.fichreport, 
+                                   sim_cond.algorithm, sim_cond.verbose)    
     tinic = time()
-    sgcom.start_report(sgGL.ldev_inf, filename, com, year_periods, algorithm, 
-                       release)        
+    sgcom.start_report(sgGL.ldev_inf, sim_cond.filename, sim_cond.com, 
+                       sim_cond.year_periods, sim_cond.algorithm, 
+                       sim_cond.release)        
     numspecies_a, minputchar_a, nrows_a, ncols_a = \
-                                    read_simulation_matrix(filename, dirtrabajo,
-                                                           direntrada, '_a.txt',
-                                                           'Plants', N0plants, 
+                                    read_simulation_matrix(sim_cond.filename, 
+                                                           sim_cond.dirtrabajo,
+                                                           sim_cond.direntrada, 
+                                                           '_a.txt',
+                                                           'Plants', 
+                                                           sim_cond.N0plants, 
                                                            sgGL.lfich_inf)
     rowNindividuals_a, Alpha_a, cAlpha_a, r_a, rd_a, Nindividuals_a,\
     ra_eff, ra_equs = init_lists_pop(periods, numspecies_a, minputchar_a)
-    lcompatibplantas = init_blossom_perturbation_lists(plants_blossom_prob,
-                                                       blossom_pert_list,
+    lcompatibplantas = init_blossom_perturbation_lists(sim_cond.plants_blossom_prob,
+                                                       sim_cond.blossom_pert_list,
                                                        numspecies_a)
     numspecies_b, minputchar_b, nrows_b, ncols_b = \
-                        read_simulation_matrix(filename, dirtrabajo, direntrada,
+                        read_simulation_matrix(sim_cond.filename, 
+                                               sim_cond.dirtrabajo, 
+                                               sim_cond.direntrada,
                                                '_b.txt', 'Pollinators ',
-                                               N0pols, sgGL.lfich_inf)
+                                               sim_cond.N0pols, 
+                                               sgGL.lfich_inf)
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
     Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
-                                  predators_param_init(filename, hay_foodweb,
-                                                      direntrada, sgGL.ldev_inf,
-                                                      sgGL.lfich_inf,
-                                                  dirtrabajo.replace('\\', '/'))  
-    add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
-                                     plants_blossom_type, blossom_pert_list,
+                                  predators_param_init(sim_cond.filename, 
+                                                       sim_cond.hay_foodweb,
+                                                       sim_cond.direntrada, 
+                                                       sgGL.ldev_inf,
+                                                       sgGL.lfich_inf,
+                                         sim_cond.dirtrabajo.replace('\\', '/'))  
+    add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
+                                     sim_cond.plants_blossom_sd,
+                                     sim_cond.plants_blossom_type, 
+                                     sim_cond.blossom_pert_list,
                                      sgGL.ldev_inf, numspecies_a,
                                      rowNindividuals_a, numspecies_b,
                                      rowNindividuals_b)
     
     # Random links removal 
-    periodoborr = init_random_links_removal(eliminarenlaces, periods, 
+    periodoborr = init_random_links_removal(sim_cond.eliminarenlaces, periods, 
                                             sgGL.ldev_inf, minputchar_a)            
     # Extinction analysis. Forced death rate increases
     inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j =\
-                               init_external_perturbation_lists(pl_ext, pol_ext,
+                               init_external_perturbation_lists(
+                                                     sim_cond.pl_ext, 
+                                                     sim_cond.pol_ext,
                                                      numspecies_a, numspecies_b)     
     nperpl, inicioextplantas, periodoextpl, spikepl, nperpol, inicioextpolin,\
-    periodoextpol, spikepol = init_forced_external_pertubations(pl_ext,
-                                    pol_ext, year_periods, inicioextplantas,
+    periodoextpol, spikepol = init_forced_external_pertubations(sim_cond.pl_ext,
+                                    sim_cond.pol_ext, sim_cond.year_periods, 
+                                    inicioextplantas,
                                     inicioextpolin, hayextplantas, hayextpolin,
                                     sgGL.ldev_inf, sgGL.lfich_inf)
     # Extinction analysis. Blossom pertubations   
     bloss_species, hay_bssvar, pBssvar_species = \
-          init_blossom_perturbations_conditions(year_periods, blossom_pert_list,
-                                                Bssvar_period, Bssvar_sd, 
-                                                Bssvar_modulationtype_list,
-                                                Bssvar_species, sgGL.ldev_inf,
+          init_blossom_perturbations_conditions(sim_cond.year_periods, 
+                                                sim_cond.blossom_pert_list,
+                                                sim_cond.Bssvar_period, 
+                                                sim_cond.Bssvar_sd, 
+                                                sim_cond.Bssvar_modulationtype_list,
+                                                sim_cond.Bssvar_species, 
+                                                sgGL.ldev_inf,
                                                 numspecies_a)
          
     for k in range (periods - 1):
         ''' The compatibilty matrixes masks are created when the year starts '''         
         if not(k % sgGL.DAYS_YEAR):  # Much faster than if ((k%sgGL.DAYS_YEAR)==0)     
             if (not(systemextinction)):
-                systemextinction = check_system_extinction(algorithm, k, 
-                                          lcompatibplantas, plants_blossom_prob,
+                systemextinction = check_system_extinction(sim_cond.algorithm, k, 
+                                          lcompatibplantas, 
+                                          sim_cond.plants_blossom_prob,
                                            ra_equs, rb_equs, ra_eff, rb_eff)
                 forced_extinctions_in_course = False
                 if systemextinction:
                     sgcom.inform_user(sgGL.ldev_inf,\
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
                          (k, k // sgGL.DAYS_YEAR))
-                    if exit_on_extinction:
+                    if sim_cond.exit_on_extinction:
                         return(Nindividuals_a, Nindividuals_b, Nindividuals_c,
                                ra_eff, rb_eff, ra_equs, ra_equs, 
                                0, 0, 0, 0, 0, 0, systemextinction)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas =\
                       calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a,
-                            nrows_b, ncols_b, numspecies_b, plants_blossom_type,
-                            plants_blossom_prob, plants_blossom_sd, 
+                            nrows_b, ncols_b, numspecies_b, 
+                            sim_cond.plants_blossom_type,
+                            sim_cond.plants_blossom_prob, 
+                            sim_cond.plants_blossom_sd, 
                             blossom_pert_list=bloss_species[:])
             minpeq_a, minpeq_b = calc_perturbed_coeffs(k, hay_bssvar, 
                                                   pBssvar_species, minputchar_a,
@@ -713,14 +735,15 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                                   minputchar_b_mask, 
                                                   numspecies_b)
         # Eliminacion aleatoria de enlaces
-        if (eliminarenlaces > 0) & (k > 0) & (k % periodoborr == 0):
+        if (sim_cond.eliminarenlaces > 0) & (k > 0) & (k % periodoborr == 0):
             minpeq_a, minpeq_b , minputchar_a, minputchar_b = \
                                           deletion_links_effect(k, periodoborr,
                                           minputchar_a, minputchar_b,
                                           minputchar_a_mask, minputchar_b_mask,
                                           sgGL.ldev_inf)
         [populations_evolution(n, "Plant", 
-                               numspecies_a, algorithm, hay_foodweb, pl_ext, 
+                               numspecies_a, sim_cond.algorithm, 
+                               sim_cond.hay_foodweb, sim_cond.pl_ext, 
                                May, haymut, ra_eff, ra_equs, 
                                minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, 
                                Nindividuals_a, numspecies_b, Nindividuals_b, 
@@ -730,7 +753,8 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                sgGL.ldev_inf) for n in range(numspecies_a)]
         # ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n, "Pollinator", 
-                               numspecies_b, algorithm, hay_foodweb, pol_ext, 
+                               numspecies_b, sim_cond.algorithm, 
+                               sim_cond.hay_foodweb, sim_cond.pol_ext, 
                                May, haymut, rb_eff, rb_equs,
                                minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, 
                                Nindividuals_b, numspecies_a, Nindividuals_a,
@@ -739,7 +763,8 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                periodoextpol, spikepol, k, model_r_alpha, 
                                sgGL.ldev_inf) for n in range(numspecies_b)]
         # rb_eff[0,]=rb_eff[1,]
-        predators_population_evolution(hay_foodweb, sgGL.ldev_inf, numspecies_a,
+        predators_population_evolution(sim_cond.hay_foodweb, 
+                                       sgGL.ldev_inf, numspecies_a,
                                        Nindividuals_a, numspecies_b, 
                                        Nindividuals_b, K_c, Nindividuals_c, r_c,
                                        numspecies_c, minputchar_d, j, k)
@@ -748,9 +773,10 @@ def bino_mutual(filename, year_periods, hay_foodweb, hay_superpredadores,
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
     tfin = time()    
     sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, tfin, tinic, periods, 
-                     data_save, filename, algorithm, dirsal, os, Nindividuals_a,
+                     sim_cond.data_save, sim_cond.filename, sim_cond.algorithm, 
+                     sim_cond.dirsal, sim_cond.os, Nindividuals_a,
                      ra_eff, ra_equs, Nindividuals_b, rb_eff, rb_equs, 
-                     Nindividuals_c, hay_foodweb)
+                     Nindividuals_c, sim_cond.hay_foodweb)
     return(Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, rb_eff,
            ra_equs, rb_equs, maxa_individuos, maxb_individuos, 
            max_reff, min_reff, max_requs, min_requs, systemextinction, 

@@ -9,6 +9,7 @@ import b_sim
 import sigmund_GLOBALS as sgGL
 import sigmund_release as sgRL
 import sigmund_graphs as sggraph
+import sigmund_common as sgcom
 # from PyQt4 import QtCore, QtGui
 from bino_form import *
 import re
@@ -274,7 +275,7 @@ class StartQT4(QtGui.QMainWindow):
             blossom_perturbation = ['ALL']
         else:
             auxspec = self.ui.blossom_pert_species.text().split(',')
-            listb, auxlspec, numspe = self.create_list_species_affected(auxspec)
+            listb = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
         if self.ui.pl_ext_period.text().isdigit():
             try:
@@ -319,10 +320,11 @@ class StartQT4(QtGui.QMainWindow):
                 self.ui.Close_Button.setEnabled(1)
                 return
             
-        Na, Nb, Nc, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, minreff, \
-                maxequs, minequs, extinction, pBssvar_coefs = b_sim.bino_mutual(
-                        input_fname, self.ciclos, self.haypred, haysup,
-                        outputdatasave, dirs, dirent, dirsalida, 
+        simulation_params = sgcom.SimulationConditions(filename = input_fname, 
+                        year_periods =self.ciclos, 
+                        hay_foodweb = self.haypred, hay_superpredadores = haysup,
+                        data_save = outputdatasave, dirtrabajo = dirs, 
+                        direntrada = dirent, dirsal = dirsalida,
                         eliminarenlaces=el, pl_ext=plants_extinction, 
                         pol_ext=pols_extinction, os=output_suffix, 
                         fichreport=fichr, com=comentario, 
@@ -333,7 +335,29 @@ class StartQT4(QtGui.QMainWindow):
                         release=self.release, Bssvar_period=self.Bssvar_period,
                         Bssvar_sd=self.Bssvar_sd, 
                         Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
-                        Bssvar_species=self.Bssvar_species)
+                        Bssvar_species=self.Bssvar_species) 
+#         Na, Nb, Nc, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, minreff, \
+#                 maxequs, minequs, extinction, pBssvar_coefs = b_sim.bino_mutual(
+#                         filename = input_fname, year_periods =self.ciclos, 
+#                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
+#                         data_save = outputdatasave, dirtrabajo = dirs, 
+#                         direntrada = dirent, dirsal = dirsalida,
+#                         eliminarenlaces=el, pl_ext=plants_extinction, 
+#                         pol_ext=pols_extinction, os=output_suffix, 
+#                         fichreport=fichr, com=comentario, 
+#                         algorithm=self.algorithm, plants_blossom_prob=pb, 
+#                         plants_blossom_sd=pb_sd, 
+#                         plants_blossom_type=self.typeofblossom, 
+#                         blossom_pert_list=blossom_perturbation, 
+#                         release=self.release, Bssvar_period=self.Bssvar_period,
+#                         Bssvar_sd=self.Bssvar_sd, 
+#                         Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
+#                         Bssvar_species=self.Bssvar_species)
+
+        Na, Nb, Nc, Ra, Rb, RequA, RequB,\
+        maxa, maxb, maxreff, minreff, maxequs, minequs, extinction,\
+        pBssvar_coefs =  b_sim.bino_mutual (sim_cond = simulation_params)         
+
         self.ui.label_report.setText("Report file: ")
         self.ui.URL_report.setText(linkname)
         self.ui.Run_Button.setEnabled(1)

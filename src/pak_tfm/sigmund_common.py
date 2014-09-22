@@ -7,7 +7,48 @@ Created on 04/09/2014
 import sys
 import numpy as np
 import datetime
+import copy
 import sigmund_GLOBALS as sgGL
+
+
+class SimulationConditions():
+    def __init__(self, filename ='', year_periods = '', hay_foodweb = False, 
+                hay_superpredadores = False ,
+                data_save='', dirtrabajo ='', direntrada='', dirsal='',
+                eliminarenlaces=0, pl_ext=[], pol_ext=[], os='', fichreport='',
+                com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
+                plants_blossom_sd=0.01, plants_blossom_type='Binary', 
+                blossom_pert_list='', verbose=True, exit_on_extinction=False,
+                N0plants='', N0pols='', release='', Bssvar_period=0.1, 
+                Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
+        self.filename = filename
+        self.year_periods = year_periods 
+        self.hay_foodweb = hay_foodweb
+        self.hay_superpredadores = hay_superpredadores
+        self.data_save = data_save
+        self.dirtrabajo = dirtrabajo
+        self.direntrada = direntrada
+        self.dirsal = dirsal
+        self.eliminarenlaces = eliminarenlaces
+        self.pl_ext = copy.deepcopy(pl_ext)
+        self.pol_ext = copy.deepcopy(pol_ext)
+        self.os = os
+        self.fichreport = fichreport
+        self.com = com
+        self.algorithm = algorithm
+        self.plants_blossom_prob = plants_blossom_prob
+        self.plants_blossom_sd = plants_blossom_sd
+        self.plants_blossom_type = plants_blossom_type
+        self.blossom_pert_list = blossom_pert_list
+        self.verbose = verbose
+        self.exit_on_extinction = exit_on_extinction
+        self.N0plants = N0plants
+        self.N0pols = N0pols
+        self.release = release
+        self.Bssvar_period = Bssvar_period
+        self.Bssvar_sd = Bssvar_sd
+        self.Bssvar_modulationtype_list = copy.deepcopy(Bssvar_modulationtype_list)
+        self.Bssvar_species = copy.deepcopy(Bssvar_species)
 
 class CanalInfo():
     """ CanalInfo is a wrapper of status information channels such as stdout and
