@@ -7,6 +7,7 @@ import sys
 import os
 import b_sim
 import sigmund_GLOBALS as sgGL
+import sigmund_release as sgRL
 import sigmund_graphs as sggraph
 # from PyQt4 import QtCore, QtGui
 from bino_form import *
@@ -19,8 +20,8 @@ class StartQT4(QtGui.QMainWindow):
         self.lista_err = []
         self.input_dir = './input'
         self.ciclos = 100
-        self.release = 201
-        self.daterelease = "September 2014"
+        self.release = sgRL.RELEASE_NUMBER
+        self.daterelease = sgRL.RELEASE_STRING
         self.plants_blossom = 1.00
         self.plants_blossom_sd = 0.01
         self.typeofblossom = 'Binary'
