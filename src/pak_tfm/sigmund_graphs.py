@@ -92,13 +92,16 @@ def pintasubplot(na, min_value, max_value, displayinic, periods,
         display_legend()
  
 
-def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
-                  maxb_individuos, max_reff, min_reff, max_equs, min_equs, 
-                  filename, displayinic, periods, dirsalida, algorithm='',
-                  fichreport='', verbose=True, os='', dirtrabajo='', 
-                  Bssvar_coefs=[]):
+# def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
+#                   maxb_individuos, max_reff, min_reff, max_equs, min_equs, 
+#                   filename, displayinic, periods, dirsalida, algorithm='',
+#                   fichreport='', verbose=True, os='', dirtrabajo='', 
+#                   Bssvar_coefs=[]):
+def mutual_render(sig_ret_val, filename, displayinic, periods, dirsalida, 
+                  algorithm='', fichreport='', verbose=True, os='', 
+                  dirtrabajo=''):
     global ax
-    if (len(Bssvar_coefs)):
+    if (len(sig_ret_val.pBssvar_species)):
         nrows = 3
     else:
         nrows = 2
@@ -108,26 +111,28 @@ def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
     sgGL.ldev_inf, sgGL.lfich_inf = sgcom.open_info_channels(verbose, 
                                                              fichreport, 'a')    
     factorescala = 1.1
-    numspecies_a = len(na[0])
-    numspecies_b = len(nb[0])
+    numspecies_a = len(sig_ret_val.Nindividuals_a[0])
+    numspecies_b = len(sig_ret_val.Nindividuals_b[0])
     plt.figure('Mutualist network simulation. Input file: ' +\
                filename, dpi=resolucion, figsize=(ancho, alto))
     ax = plt.subplot(nrows, 2, 1)
-    pintasubplot(na, 0, maxa_individuos, displayinic, periods, factorescala, 
+    pintasubplot(sig_ret_val.Nindividuals_a, 0, sig_ret_val.maxa_individuos, displayinic, 
+                 periods, factorescala, 
                  numspecies_a, 'Plants', 'Individuals')
     ax = plt.subplot(nrows, 2, 3)
-    pintasubplot(ra_eff, min_reff, max_reff, displayinic, periods, factorescala,
-                 numspecies_a, '', 'Efficient growth rate')
+    pintasubplot(sig_ret_val.ra_eff, sig_ret_val.min_reff, sig_ret_val.max_reff,
+                 displayinic, periods, factorescala, numspecies_a, '', 
+                 'Efficient growth rate')
     plt.xlabel('Years')
-    if (len(Bssvar_coefs)):
+    if (len(sig_ret_val.pBssvar_species)):
         for i in range(numspecies_a):
-            graf = [Bssvar_coefs[i][0]]
+            graf = [sig_ret_val.pBssvar_species[i][0]]
             x = [0]
             for k in range (0, years):
-                graf.append(Bssvar_coefs[i][k])
+                graf.append(sig_ret_val.pBssvar_species[i][k])
                 x.append(1 + k)
         ax = plt.subplot(nrows, 2, 5)
-        listacoefs = np.array(Bssvar_coefs)
+        listacoefs = np.array(sig_ret_val.pBssvar_species)
         listacoefs = np.c_[listacoefs[:,0],listacoefs]
         listacoefs = list(listacoefs.transpose())
         pintasubplot(listacoefs, 0, 1, displayinic, years, factorescala,
@@ -135,10 +140,12 @@ def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
                      periodsinyears = True) 
         plt.xlabel('Years')    
     ax = plt.subplot(nrows, 2, 2)
-    pintasubplot(nb, 0, maxb_individuos, displayinic, periods, factorescala,
+    pintasubplot(sig_ret_val.Nindividuals_b, 0, sig_ret_val.maxb_individuos, 
+                 displayinic, periods, factorescala,
                  numspecies_b, 'Polllinators', '')
     ax = plt.subplot(nrows, 2, 4)
-    pintasubplot(rb_eff, min_reff, max_reff, displayinic, periods, factorescala,
+    pintasubplot(sig_ret_val.rb_eff, sig_ret_val.min_reff, sig_ret_val.max_reff,
+                 displayinic, periods, factorescala,
                  numspecies_b, '', '')
     plt.xlabel('Years')
     dt = dirtrabajo.replace('\\', '/');    
@@ -157,7 +164,7 @@ def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
 def calc_lw_width(numspecies):
     return(0.5)
 
-def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
+def food_render(sig_ret_val,
                 filename, displayinic, periods, dirsalida, algorithm='', 
                 fichreport='', os='', dirtrabajo='', verbose=True):
     global ax
@@ -167,9 +174,9 @@ def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
     factorescala = 1.2
-    numspecies_a = len(na[0])
-    numspecies_b = len(nb[0])
-    numspecies_c = len(nc[0])
+    numspecies_a = len(sig_ret_val.Nindividuals_a[0])
+    numspecies_b = len(sig_ret_val.Nindividuals_b[0])
+    numspecies_c = len(sig_ret_val.Nindividuals_c[0])
     plt.figure('Mutualist network simulation. Input file: ' + filename, 
                dpi=resolucion, figsize=(ancho, alto))
     ax = plt.subplot(3, 1, 1)
@@ -181,12 +188,12 @@ def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
         graf = []
         x = []
         for k in range (displayinic, periods):
-            graf.append(na[k][i])
+            graf.append(sig_ret_val.Nindividuals_a[k][i])
             x.append(k)
         plt.plot(x, graf, color=cm.Set1(i / (numspecies_a)),
                  lw=calc_lw_width(numspecies_a))
     a = plt.gca()
-    a.set_ylim([0, factorescala * maxa_individuos])
+    a.set_ylim([0, factorescala * sig_ret_val.maxa_individuos])
     if numspecies_b < 11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
@@ -199,12 +206,12 @@ def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
         graf = []
         x = []
         for k in range (displayinic, periods):
-            graf.append(nb[k][i])
+            graf.append(sig_ret_val.Nindividuals_b[k][i])
             x.append(k)
         plt.plot(x, graf, color=cm.Paired(i / (numspecies_b)),
                  lw=calc_lw_width(numspecies_b))
     a = plt.gca()
-    a.set_ylim([0, factorescala * maxb_individuos])
+    a.set_ylim([0, factorescala * sig_ret_val.maxb_individuos])
     if numspecies_b < 11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
@@ -213,13 +220,13 @@ def food_render(na, nb, nc, maxa_individuos, maxb_individuos,
     plt.ylabel('Individuals')
     plt.xlabel('Years')
     plt.grid(True)
-    lmaxc = max(nc)
+    lmaxc = max(sig_ret_val.Nindividuals_c)
     maxc_individuos = max(lmaxc)
     for i in range(numspecies_c):
         graf = []
         x = []
         for k in range (displayinic, periods):
-            graf.append(nc[k][i])
+            graf.append(sig_ret_val.Nindividuals_c[k][i])
             x.append(k)
         plt.plot(x, graf, color=cm.Paired(i / (numspecies_c)),
                  lw=calc_lw_width(numspecies_c))

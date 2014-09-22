@@ -49,6 +49,26 @@ class SimulationConditions():
         self.Bssvar_sd = Bssvar_sd
         self.Bssvar_modulationtype_list = copy.deepcopy(Bssvar_modulationtype_list)
         self.Bssvar_species = copy.deepcopy(Bssvar_species)
+        
+class SimulationReturnValues():
+    def __init__(self, Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, 
+                 rb_eff, ra_equs, rb_equs, maxa_individuos, maxb_individuos, 
+                 max_reff, min_reff, max_requs, min_requs, systemextinction, 
+                 pBssvar_species):
+        self.Nindividuals_a = Nindividuals_a
+        self.Nindividuals_b = Nindividuals_b
+        self.Nindividuals_c = Nindividuals_c
+        self.ra_eff = copy.deepcopy(ra_eff)
+        self.rb_eff = copy.deepcopy(rb_eff)
+        self.ra_equs = copy.deepcopy(ra_equs)
+        self.rb_equs = copy.deepcopy(ra_equs)
+        self.maxa_individuos = maxa_individuos
+        self.maxb_individuos = maxb_individuos
+        self.max_reff = max_reff
+        self.min_reff = min_reff
+        self.max_requs = max_requs
+        self.min_requs = min_requs
+        self.pBssvar_species = copy.deepcopy(pBssvar_species)
 
 class CanalInfo():
     """ CanalInfo is a wrapper of status information channels such as stdout and
@@ -103,9 +123,11 @@ def dlmreadlike(inputfile, direntrada):
         print('The datafile %s is missing!' % inputfile)
         return(0)
  
-def dlmwritelike(inputfile, nperiod, Nin, dirsalida, os):
-    dsal = dirsalida.replace('\\', '/')
-    nsal = 'output_data_' + inputfile + '_' + os + '_' + str(nperiod) + '.txt'
+#def dlmwritelike(inputfile, nperiod, Nin, dirsalida, os):
+def dlmwritelike(input_file,sim_cond, nperiod, Nin):
+    dsal = sim_cond.dirsal.replace('\\', '/')
+    nsal = 'output_data_' + input_file + '_' + sim_cond.os +\
+           str(nperiod) + '.txt'
     print ("Output file %s" % dsal + nsal)
     salida = open(dsal + nsal, 'w', encoding='utf-8')
     for linea in Nin:
@@ -136,41 +158,43 @@ def start_report(ldev_inf, filename, com, year_periods, algorithm, release):
     inform_user(ldev_inf, 'ALGORITHM: ' + algorithm)
     inform_user(ldev_inf, 'Release ' + (("%.02f") % (release / 100)))
 
-def end_report(ldev_inf, lfich_inf, tfin, tinic, periods, data_save, 
-               filename, algorithm, dirsal, os, Nindividuals_a, ra_eff, ra_equs,
-               Nindividuals_b, rb_eff, rb_equs, Nindividuals_c, hay_food_web):    
+
+def create_results_filename(sim_cond,string_file):
+    return sim_cond.filename + '_' + sim_cond.algorithm + string_file
+
+def end_report(ldev_inf, lfich_inf, sim_cond, tfin, tinic, periods, 
+               Nindividuals_a, ra_eff, ra_equs,
+               Nindividuals_b, rb_eff, rb_equs, Nindividuals_c):    
     inform_user(ldev_inf, "Elapsed time %.02f s" % (tfin - tinic))
     speriodos = str(int(periods / sgGL.DAYS_YEAR))
-    if (data_save == 1):
-        nsal = dlmwritelike(filename + '_' + algorithm + "_a_populations_", 
-                            speriodos, Nindividuals_a, dirsal, os)
-        rsal = dlmwritelike(filename + '_' + algorithm + "_a_rs_", speriodos, 
-                            ra_eff, dirsal, os)
-        requsal = dlmwritelike(filename + '_' + algorithm + "_a_requs_", 
-                               speriodos, ra_equs, dirsal, os)
+    if (sim_cond.data_save == 1):
+        nsal = dlmwritelike(create_results_filename(sim_cond,"_a_populations"), 
+                            sim_cond,speriodos, Nindividuals_a)
+        rsal = dlmwritelike(create_results_filename(sim_cond,"_a_rs"),
+                            sim_cond,speriodos, ra_eff)
+        requsal = dlmwritelike(create_results_filename(sim_cond,"_a_requs"), 
+                               sim_cond,speriodos, ra_equs)
         inform_user(lfich_inf, "Plant populations data: <a href='"\
                           + nsal + "' target=_BLANK'>" + nsal + "<a>")
         inform_user(lfich_inf, "Plant effective rates data: <a href='"\
                           + rsal + "' target=_BLANK'>" + rsal + "<a>")
         inform_user(lfich_inf, "Plant equivalent rates data: <a href='"\
                           + requsal + "' target=_BLANK'>" + requsal + "<a>")
-        nsal = dlmwritelike(filename + '_' + algorithm + "_b_populations_", 
-                            speriodos, Nindividuals_b, dirsal, os)
-        rsal = dlmwritelike(filename + '_' + algorithm + "_b_rs_", 
-                            speriodos, rb_eff, dirsal, os)
-        requsal = dlmwritelike(filename + '_' + algorithm + "_b_requs_", 
-                               speriodos, rb_equs, dirsal, os)
+        nsal = dlmwritelike(create_results_filename(sim_cond,"_b_populations"), 
+                            sim_cond,speriodos, Nindividuals_b)
+        rsal = dlmwritelike(create_results_filename(sim_cond,"_b_rs"), 
+                            sim_cond,speriodos, rb_eff)
+        requsal = dlmwritelike(create_results_filename(sim_cond,"_b_requs"), 
+                               sim_cond,speriodos, rb_equs)
         inform_user(lfich_inf, "Pollinators evolution data: <a href='"\
                           + nsal + "' target=_BLANK'>" + nsal + "<a>")
-        inform_user(lfich_inf,
-                          "Pollinators effective rates data: <a href='" +\
+        inform_user(lfich_inf, "Pollinators effective rates data: <a href='" +\
                            rsal + "' target=_BLANK'>" + rsal + "<a>")
-        inform_user(lfich_inf, 
-                          "Pollinators equivalent rates data: <a href='" +\
+        inform_user(lfich_inf, "Pollinators equivalent rates data: <a href='" +\
                           requsal + "' target=_BLANK'>" + requsal + "<a>")
-        if hay_food_web:
-            nsal = dlmwritelike(filename + '_' + algorithm + "_c", speriodos, 
-                                Nindividuals_c, dirsal, os)
+        if sim_cond.hay_foodweb:
+            nsal = dlmwritelike(create_results_filename(sim_cond,"_c"), 
+                                sim_cond,speriodos, Nindividuals_c)
             inform_user(lfich_inf, 
                               "Predators evolution data: <a href='" \
                               + nsal + "' target=_BLANK'>" + nsal + "<a><br>")

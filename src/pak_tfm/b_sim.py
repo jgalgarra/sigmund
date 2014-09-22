@@ -447,10 +447,10 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldev_inf, lfich_inf,
     if hay_foodweb > 0:
         filename_c = filename + '_c.txt'
         filename_d = filename + '_d.txt'
-        sgcom.inform_user(lfich_inf, "Predators matrix c:<a href='file:///" +\
+        sgcom.inform_user(lfich_inf, "Predators matrix c: <a href='file:///" +\
                           dt + "/input/" + filename_c + "' target=_BLANK>" +\
                           filename_c + "<a><br>")
-        sgcom.inform_user(lfich_inf, "Predators matrix d:<a href='file:///" +\
+        sgcom.inform_user(lfich_inf, "Predators matrix d: <a href='file:///" +\
                           dt + "/input/" + filename_d + "' target=_BLANK>" +\
                           filename_d + "<a><br>")
         l_minputchar_c = sgcom.dlmreadlike(filename_c, direntrada)
@@ -613,16 +613,6 @@ def calc_perturbed_coeffs(k, hay_bssvar, pBssvar_species, minputchar_a,
                                  pBssvar_species[l][k // sgGL.DAYS_YEAR]
     minpeq_b = minputchar_b * minputchar_b_mask
     return minpeq_a, minpeq_b
-
-# def bino_mutual(filename ='', year_periods = '', hay_foodweb = False, 
-#                 hay_superpredadores = False ,
-#                 data_save='', dirtrabajo ='', direntrada='', dirsal='',
-#                 eliminarenlaces=0, pl_ext=[], pol_ext=[], os='', fichreport='',
-#                 com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
-#                 plants_blossom_sd=0.01, plants_blossom_type='Binary', 
-#                 blossom_pert_list='', verbose=True, exit_on_extinction=False,
-#                 N0plants='', N0pols='', release='', Bssvar_period=0.1, 
-#                 Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
     
 def bino_mutual(sim_cond = ''):
     global cuentaperpl, cuentaperpol
@@ -751,7 +741,6 @@ def bino_mutual(sim_cond = ''):
                                inicioextplantas, hayextplantas, nperpl, 
                                periodoextpl, spikepl, k, model_r_alpha, 
                                sgGL.ldev_inf) for n in range(numspecies_a)]
-        # ra_eff[0,]=ra_eff[1,]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, sim_cond.algorithm, 
                                sim_cond.hay_foodweb, sim_cond.pol_ext, 
@@ -762,7 +751,6 @@ def bino_mutual(sim_cond = ''):
                                inicioextpolin, hayextpolin, nperpol, 
                                periodoextpol, spikepol, k, model_r_alpha, 
                                sgGL.ldev_inf) for n in range(numspecies_b)]
-        # rb_eff[0,]=rb_eff[1,]
         predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,
                                        Nindividuals_a, numspecies_b, 
@@ -772,15 +760,17 @@ def bino_mutual(sim_cond = ''):
     max_requs, min_requs = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
     tfin = time()    
-    sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, tfin, tinic, periods, 
-                     sim_cond.data_save, sim_cond.filename, sim_cond.algorithm, 
-                     sim_cond.dirsal, sim_cond.os, Nindividuals_a,
-                     ra_eff, ra_equs, Nindividuals_b, rb_eff, rb_equs, 
-                     Nindividuals_c, sim_cond.hay_foodweb)
-    return(Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, rb_eff,
-           ra_equs, rb_equs, maxa_individuos, maxb_individuos, 
-           max_reff, min_reff, max_requs, min_requs, systemextinction, 
-           pBssvar_species)
+    sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, sim_cond, tfin, tinic, 
+                     periods, Nindividuals_a, ra_eff, ra_equs, Nindividuals_b, 
+                     rb_eff, rb_equs, Nindividuals_c)
+    sim_ret_val = sgcom.SimulationReturnValues(Nindividuals_a, Nindividuals_b, 
+                                               Nindividuals_c, ra_eff, rb_eff, 
+                                               ra_equs, rb_equs, 
+                                               maxa_individuos, maxb_individuos,
+                                               max_reff, min_reff, max_requs, 
+                                               min_requs, systemextinction, 
+                                               pBssvar_species)
+    return(sim_ret_val)
             
 if __name__ == '__main__':
     import doctest

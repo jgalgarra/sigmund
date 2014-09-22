@@ -319,7 +319,6 @@ class StartQT4(QtGui.QMainWindow):
                 self.ui.Run_Button.setEnabled(1)
                 self.ui.Close_Button.setEnabled(1)
                 return
-            
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
                         year_periods =self.ciclos, 
                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
@@ -335,29 +334,8 @@ class StartQT4(QtGui.QMainWindow):
                         release=self.release, Bssvar_period=self.Bssvar_period,
                         Bssvar_sd=self.Bssvar_sd, 
                         Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
-                        Bssvar_species=self.Bssvar_species) 
-#         Na, Nb, Nc, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, minreff, \
-#                 maxequs, minequs, extinction, pBssvar_coefs = b_sim.bino_mutual(
-#                         filename = input_fname, year_periods =self.ciclos, 
-#                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
-#                         data_save = outputdatasave, dirtrabajo = dirs, 
-#                         direntrada = dirent, dirsal = dirsalida,
-#                         eliminarenlaces=el, pl_ext=plants_extinction, 
-#                         pol_ext=pols_extinction, os=output_suffix, 
-#                         fichreport=fichr, com=comentario, 
-#                         algorithm=self.algorithm, plants_blossom_prob=pb, 
-#                         plants_blossom_sd=pb_sd, 
-#                         plants_blossom_type=self.typeofblossom, 
-#                         blossom_pert_list=blossom_perturbation, 
-#                         release=self.release, Bssvar_period=self.Bssvar_period,
-#                         Bssvar_sd=self.Bssvar_sd, 
-#                         Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
-#                         Bssvar_species=self.Bssvar_species)
-
-        Na, Nb, Nc, Ra, Rb, RequA, RequB,\
-        maxa, maxb, maxreff, minreff, maxequs, minequs, extinction,\
-        pBssvar_coefs =  b_sim.bino_mutual (sim_cond = simulation_params)         
-
+                        Bssvar_species=self.Bssvar_species)  
+        sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)      
         self.ui.label_report.setText("Report file: ")
         self.ui.URL_report.setText(linkname)
         self.ui.Run_Button.setEnabled(1)
@@ -365,13 +343,11 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.URL_outputs.setText("<a href='file:///" +\
                                     reportpath.replace('\\', '/') +\
                                     "'>See all results</a>")       
-        sggraph.mutual_render(Na, Nb, Ra, Rb, RequA, RequB, maxa, maxb, maxreff, 
-                            minreff, maxequs, minequs, input_fname, displayinic,
+        sggraph.mutual_render(sim_ret_val, input_fname, displayinic,
                             self.ciclos * sgGL.DAYS_YEAR, dirsalida, self.algorithm, 
-                            fichreport=fichr, os=output_suffix, dirtrabajo=dirs,
-                            Bssvar_coefs=pBssvar_coefs)
+                            fichreport=fichr, os=output_suffix, dirtrabajo=dirs)
         if self.haypred:
-            sggraph.food_render(Na, Nb, Nc, maxa, maxb, input_fname, 
+            sggraph.food_render(sim_ret_val, input_fname, 
                             displayinic, self.ciclos * sgGL.DAYS_YEAR, dirsalida, 
                             self.algorithm, fichreport=fichr, os=output_suffix, 
                             dirtrabajo=dirs)
