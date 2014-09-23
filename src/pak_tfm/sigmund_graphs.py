@@ -97,9 +97,8 @@ def pintasubplot(na, min_value, max_value, displayinic, periods,
 #                   filename, displayinic, periods, dirsalida, algorithm='',
 #                   fichreport='', verbose=True, os='', dirtrabajo='', 
 #                   Bssvar_coefs=[]):
-def mutual_render(sig_ret_val, filename, displayinic, periods, dirsalida, 
-                  algorithm='', fichreport='', verbose=True, os='', 
-                  dirtrabajo=''):
+def mutual_render(simulation_params, sig_ret_val, displayinic, periods,  
+                  verbose=True):
     global ax
     if (len(sig_ret_val.pBssvar_species)):
         nrows = 3
@@ -109,15 +108,16 @@ def mutual_render(sig_ret_val, filename, displayinic, periods, dirsalida,
     matplotlib.rc('ytick', labelsize=8) 
     years = periods // sgGL.DAYS_YEAR
     sgGL.ldev_inf, sgGL.lfich_inf = sgcom.open_info_channels(verbose, 
-                                                             fichreport, 'a')    
+                                              simulation_params.fichreport, 'a')    
     factorescala = 1.1
     numspecies_a = len(sig_ret_val.Nindividuals_a[0])
     numspecies_b = len(sig_ret_val.Nindividuals_b[0])
     plt.figure('Mutualist network simulation. Input file: ' +\
-               filename, dpi=resolucion, figsize=(ancho, alto))
+               simulation_params.filename, dpi=resolucion, 
+               figsize=(ancho, alto))
     ax = plt.subplot(nrows, 2, 1)
-    pintasubplot(sig_ret_val.Nindividuals_a, 0, sig_ret_val.maxa_individuos, displayinic, 
-                 periods, factorescala, 
+    pintasubplot(sig_ret_val.Nindividuals_a, 0, sig_ret_val.maxa_individuos, 
+                 displayinic, periods, factorescala, 
                  numspecies_a, 'Plants', 'Individuals')
     ax = plt.subplot(nrows, 2, 3)
     pintasubplot(sig_ret_val.ra_eff, sig_ret_val.min_reff, sig_ret_val.max_reff,
@@ -148,15 +148,16 @@ def mutual_render(sig_ret_val, filename, displayinic, periods, dirsalida,
                  displayinic, periods, factorescala,
                  numspecies_b, '', '')
     plt.xlabel('Years')
-    dt = dirtrabajo.replace('\\', '/');    
-    nsal = 'output_pict_plantsandpols_' + filename + '_' + algorithm + '_' +\
-            os + '_' + str(years) + '.png'
-    plt.savefig(str(dt + '/' + dirsalida.replace('\\', '/') + nsal), 
+    dt = simulation_params.dirtrabajo.replace('\\', '/');    
+    nsal = 'output_pict_plantsandpols_' + simulation_params.filename +\
+           '_' + simulation_params.algorithm + '_' + simulation_params.os +\
+           '_' + str(years) + '.png'
+    plt.savefig(str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal), 
                 bbox_inches=0)
     sgcom.inform_user(sgGL.lfich_inf, "<p align=left>Populations evolution picture")
     sgcom.inform_user(sgGL.lfich_inf, \
                       "<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" %\
-                      str(dt + '/' + dirsalida.replace('\\', '/') + nsal)) 
+                      str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal)) 
     sgcom.inform_user(sgGL.lfich_inf, '</p><br>')
     sgcom.close_info_channels(sgGL.lfich_inf)
     plt.close()
@@ -164,12 +165,14 @@ def mutual_render(sig_ret_val, filename, displayinic, periods, dirsalida,
 def calc_lw_width(numspecies):
     return(0.5)
 
-def food_render(sig_ret_val,
-                filename, displayinic, periods, dirsalida, algorithm='', 
-                fichreport='', os='', dirtrabajo='', verbose=True):
+# def food_render(sig_ret_val,
+#                 filename, displayinic, periods, dirsalida, algorithm='', 
+#                 fichreport='', os='', dirtrabajo='', verbose=True):
+def food_render(simulation_params, sig_ret_val, displayinic, periods, 
+                verbose=True):
     global ax
     sgGL.ldev_inf, sgGL.lfich_inf = sgcom.open_info_channels(verbose, 
-                                                             fichreport, 'a')    
+                                            simulation_params.fichreport, 'a')    
     
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
@@ -177,7 +180,8 @@ def food_render(sig_ret_val,
     numspecies_a = len(sig_ret_val.Nindividuals_a[0])
     numspecies_b = len(sig_ret_val.Nindividuals_b[0])
     numspecies_c = len(sig_ret_val.Nindividuals_c[0])
-    plt.figure('Mutualist network simulation. Input file: ' + filename, 
+    plt.figure('Mutualist network simulation. Input file: ' +\
+               simulation_params.filename,
                dpi=resolucion, figsize=(ancho, alto))
     ax = plt.subplot(3, 1, 1)
     plt.title('Plants')
@@ -235,17 +239,18 @@ def food_render(sig_ret_val,
     if numspecies_c < 11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
-    nsal = 'output_pict_foodweb_' + filename + '_' + algorithm + '_' + os +\
+    nsal = 'output_pict_foodweb_' + simulation_params.filename + '_' +\
+            simulation_params.algorithm + '_' + simulation_params.os +\
            '_' + str(periods) + '.png'
-    dt = dirtrabajo.replace('\\', '/');
-    plt.savefig(str(dt + '/' + dirsalida.replace('\\', '/') + nsal), 
+    dt = simulation_params.dirtrabajo.replace('\\', '/');
+    plt.savefig(str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal), 
                 bbox_inches=0)
     plt.close()
     sgcom.inform_user(sgGL.lfich_inf, "<P align=left><br>Foodweb effect picture<br>")
-    dt = dirtrabajo.replace('\\', '/');
+#    dt = simulation_params.dirtrabajo.replace('\\', '/');
     sgcom.inform_user(sgGL.lfich_inf,\
                       "<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" %\
-                      str(dt + '/' + dirsalida.replace('\\', '/') + nsal)) 
+                      str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal)) 
     sgcom.inform_user(sgGL.lfich_inf, '<p>')
     sgcom.close_info_channels(sgGL.lfich_inf)   
      

@@ -282,8 +282,7 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                                     Alpha_p, Nindividuals_p, Nindividuals_q,
                                     r_eqsum, term_May, rMay, k, j, n, r_p,
                                     r_muerte)
-        rtot_p = r_p[n] + r_eqsum - r_muerte
-        
+        rtot_p = r_p[n] + r_eqsum - r_muerte        
         # Efecto de los depredadores
         if hay_foodweb:
             p_devorados, j, rceff = predators_effect(p_devorados, j, 
@@ -400,9 +399,7 @@ def predators_population_evolution(hay_foodweb, ldev_inf, numspecies_a,
     if hay_foodweb:
         rowNi = []
         for n in range(numspecies_c):
-            coef_bij_matrix = 0
-            c_devorados = 0
-            r_eqsum = 0
+            coef_bij_matrix = c_devorados = r_eqsum = 0
             signo = signfunc(r_c[n])
             if (Nindividuals_c[k][n] > 0):
                 for j in range(numspecies_a):
@@ -708,9 +705,16 @@ def bino_mutual(sim_cond = ''):
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
                          (k, k // sgGL.DAYS_YEAR))
                     if sim_cond.exit_on_extinction:
-                        return(Nindividuals_a, Nindividuals_b, Nindividuals_c,
-                               ra_eff, rb_eff, ra_equs, ra_equs, 
-                               0, 0, 0, 0, 0, 0, systemextinction)
+#                         return(Nindividuals_a, Nindividuals_b, Nindividuals_c,
+#                                ra_eff, rb_eff, ra_equs, ra_equs, 
+#                                0, 0, 0, 0, 0, 0, systemextinction)
+                        sim_ret_val = sgcom.SimulationReturnValues(
+                                              Nindividuals_a, Nindividuals_b, 
+                                              Nindividuals_c, ra_eff, rb_eff, 
+                                              ra_equs, rb_equs, 
+                                              0, 0, 0, 0, 0, 0, 
+                                              systemextinction, pBssvar_species)
+                        return(sim_ret_val)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas =\
                       calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a,
                             nrows_b, ncols_b, numspecies_b, 

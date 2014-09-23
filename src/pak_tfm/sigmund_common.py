@@ -10,7 +10,6 @@ import datetime
 import copy
 import sigmund_GLOBALS as sgGL
 
-
 class SimulationConditions():
     def __init__(self, filename ='', year_periods = '', hay_foodweb = False, 
                 hay_superpredadores = False ,

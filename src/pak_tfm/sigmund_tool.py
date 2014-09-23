@@ -153,7 +153,6 @@ class StartQT4(QtGui.QMainWindow):
         self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
                                                           self.input_dir)
         a = self.filename.replace('\\', '/ ').split('/');
-        # print(a)
         self.input_file = a[-1]
         self.ui.inputfile.setText(self.input_file)
         self.ui.inputfile.setEnabled(False)
@@ -202,13 +201,11 @@ class StartQT4(QtGui.QMainWindow):
                 self.ui.Run_Button.setEnabled(1)
                 self.ui.Close_Button.setEnabled(1)
                 return
-        print (''.join([str(item) for item in ret_extinction]))
         return(ret_extinction)
 
     def trim_input_field_re(self):
         return(re.compile('\d+(\.\d+)?'))
     
-
     def txtfld2float(self,textfield):
         p = self.trim_input_field_re()
         if p.match(textfield) == None:
@@ -331,14 +328,11 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.URL_outputs.setText("<a href='file:///" +\
                                     reportpath.replace('\\', '/') +\
                                     "'>See all results</a>")       
-        sggraph.mutual_render(sim_ret_val, input_fname, displayinic,
-                            self.ciclos * sgGL.DAYS_YEAR, dirsalida, self.algorithm, 
-                            fichreport=fichr, os=output_suffix, dirtrabajo=dirs)
+        sggraph.mutual_render(simulation_params, sim_ret_val, displayinic,
+                            self.ciclos * sgGL.DAYS_YEAR)
         if self.haypred:
-            sggraph.food_render(sim_ret_val, input_fname, 
-                            displayinic, self.ciclos * sgGL.DAYS_YEAR, dirsalida, 
-                            self.algorithm, fichreport=fichr, os=output_suffix, 
-                            dirtrabajo=dirs)
+            sggraph.food_render(simulation_params, sim_ret_val, displayinic, 
+                                self.ciclos * sgGL.DAYS_YEAR)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)
