@@ -174,6 +174,37 @@ class StartQT4(QtGui.QMainWindow):
                 listb.append(j)    
         listb = sorted(set(listb))   
         return listb
+    
+    def fetch_pert_data(self, xx_ext_period, xx_ext_spike, xx_ext_start, 
+                        xx_ext_rate, xx_ext_numperiod, xx_ext_species):
+        ret_extinction = {}
+        print(xx_ext_period.text())
+        if len(xx_ext_period.text())>0:
+            try:
+                ret_extinction['period'] = int( float(xx_ext_period.text())\
+                                              * sgGL.DAYS_YEAR)
+                ret_extinction['spike'] = float(xx_ext_spike.text())
+                ret_extinction['start'] = int(xx_ext_start.text())
+                ret_extinction['rate'] = float(xx_ext_rate.text())
+                ret_extinction['numperiod'] = int(xx_ext_numperiod.text())
+                
+                print(ret_extinction['period'])
+                print (''.join([str(item) for item in ret_extinction]))
+                if (xx_ext_species.text().upper() == 'ALL'):
+                    ret_extinction['species'] = ['ALL']
+                else:
+                    auxspec = xx_ext_species.text().split(',')
+                    listb = self.create_list_species_affected(auxspec)
+                    ret_extinction['species'] = listb
+            except:         
+                self.lista_err.append("ERROR: bad plant extinction format")
+                self.error_exit()
+                self.ui.Run_Button.setEnabled(1)
+                self.ui.Close_Button.setEnabled(1)
+                return
+        print (''.join([str(item) for item in ret_extinction]))
+        return(ret_extinction)
+
 
     def add_entry(self): 
         algorithms = ["Verhulst", "Logistic_abs", "May", \
@@ -187,8 +218,7 @@ class StartQT4(QtGui.QMainWindow):
             return
         else:
             fh.close()
-        # Testing that file exists
-                
+        # Testing that file exists       
         dirsal = 'output/'
         dirent = 'input/'
         dirs = os.path.dirname(dirsal)
@@ -208,7 +238,6 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Error_msg.setText("")
         self.ui.URL_report.setText("Running")
         self.repaint()
-        
         displayinic = 0
         dirsalida = 'output\\'
         input_fname = self.input_file.replace('_b.txt',
@@ -267,9 +296,20 @@ class StartQT4(QtGui.QMainWindow):
                 auxspec = self.ui.Bssvar_species.text().split(',')
                 listb = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
-        print("Bssvar_species " + str(self.Bssvar_species))
-        plants_extinction = {}
-        pols_extinction = {}
+        # External perturbation data
+        plants_extinction = self.fetch_pert_data(self.ui.pl_ext_period,
+                                            self.ui.pl_ext_spike,
+                                            self.ui.pl_ext_start,
+                                            self.ui.pl_ext_rate,
+                                            self.ui.pl_ext_numperiod,
+                                            self.ui.pl_ext_species)
+        
+        pols_extinction = self.fetch_pert_data(self.ui.pol_ext_period,
+                                            self.ui.pol_ext_spike,
+                                            self.ui.pol_ext_start,
+                                            self.ui.pol_ext_rate,
+                                            self.ui.pol_ext_numperiod,
+                                            self.ui.pol_ext_species)
         blossom_perturbation = {}        
         if (self.ui.blossom_pert_species.text().upper() == 'ALL'):
             blossom_perturbation = ['ALL']
@@ -277,48 +317,49 @@ class StartQT4(QtGui.QMainWindow):
             auxspec = self.ui.blossom_pert_species.text().split(',')
             listb = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
-        if self.ui.pl_ext_period.text().isdigit():
-            try:
-                plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
-                                              * sgGL.DAYS_YEAR
-                plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
-                plants_extinction['start'] = int(self.ui.pl_ext_start.text())
-                plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
-                plants_extinction['numperiod'] = int(self.ui.pl_ext_numperiod.text())
-                if (self.ui.pl_ext_species.text().upper() == 'ALL'):
-                    plants_extinction['species'] = ['ALL']
-                else:
-                    auxspec = self.ui.pl_ext_species.text().split(',')
-                    listb = self.create_list_species_affected(auxspec)
-                    plants_extinction['species'] = listb
-            except:         
-                self.lista_err.append("ERROR: bad plant extinction format")
-                self.error_exit()
-                self.ui.Run_Button.setEnabled(1)
-                self.ui.Close_Button.setEnabled(1)
-                return
-            
-        if self.ui.pol_ext_period.text().isdigit():
-            try:
-                pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
-                                            sgGL.DAYS_YEAR
-                pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
-                pols_extinction['start'] = int(self.ui.pol_ext_start.text())
-                pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
-                pols_extinction['numperiod'] = int(self.ui.pol_ext_numperiod.text())
-                if (self.ui.pol_ext_species.text().upper() == 'ALL'):
-                    pols_extinction['species'] = ['ALL']
-                else:
-                    auxspec = self.ui.pol_ext_species.text().split(',')
-                    listb = self.create_list_species_affected(auxspec)
-                    pols_extinction['species'] = listb
-                # print (pols_extinction)
-            except:            
-                self.lista_err.append("ERROR: bad pollinator extinction format")
-                self.error_exit()
-                self.ui.Run_Button.setEnabled(1)
-                self.ui.Close_Button.setEnabled(1)
-                return
+        
+#         if self.ui.pl_ext_period.text().isdigit():
+#             try:
+#                 plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
+#                                               * sgGL.DAYS_YEAR
+#                 plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
+#                 plants_extinction['start'] = int(self.ui.pl_ext_start.text())
+#                 plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
+#                 plants_extinction['numperiod'] = int(self.ui.pl_ext_numperiod.text())
+#                 if (self.ui.pl_ext_species.text().upper() == 'ALL'):
+#                     plants_extinction['species'] = ['ALL']
+#                 else:
+#                     auxspec = self.ui.pl_ext_species.text().split(',')
+#                     listb = self.create_list_species_affected(auxspec)
+#                     plants_extinction['species'] = listb
+#             except:         
+#                 self.lista_err.append("ERROR: bad plant extinction format")
+#                 self.error_exit()
+#                 self.ui.Run_Button.setEnabled(1)
+#                 self.ui.Close_Button.setEnabled(1)
+#                 return
+#             
+#         if self.ui.pol_ext_period.text().isdigit():
+#             try:
+#                 pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
+#                                             sgGL.DAYS_YEAR
+#                 pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
+#                 pols_extinction['start'] = int(self.ui.pol_ext_start.text())
+#                 pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
+#                 pols_extinction['numperiod'] = int(self.ui.pol_ext_numperiod.text())
+#                 if (self.ui.pol_ext_species.text().upper() == 'ALL'):
+#                     pols_extinction['species'] = ['ALL']
+#                 else:
+#                     auxspec = self.ui.pol_ext_species.text().split(',')
+#                     listb = self.create_list_species_affected(auxspec)
+#                     pols_extinction['species'] = listb
+#                 # print (pols_extinction)
+#             except:            
+#                 self.lista_err.append("ERROR: bad pollinator extinction format")
+#                 self.error_exit()
+#                 self.ui.Run_Button.setEnabled(1)
+#                 self.ui.Close_Button.setEnabled(1)
+#                 return
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
                         year_periods =self.ciclos, 
                         hay_foodweb = self.haypred, hay_superpredadores = haysup,

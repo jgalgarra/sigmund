@@ -199,7 +199,7 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])+1), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %0.2f, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])+1), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
