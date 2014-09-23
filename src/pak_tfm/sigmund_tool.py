@@ -289,8 +289,7 @@ class StartQT4(QtGui.QMainWindow):
                                             self.ui.pl_ext_start,
                                             self.ui.pl_ext_rate,
                                             self.ui.pl_ext_numperiod,
-                                            self.ui.pl_ext_species)
-        
+                                            self.ui.pl_ext_species)      
         pols_extinction = self.fetch_pert_data(self.ui.pol_ext_period,
                                             self.ui.pol_ext_spike,
                                             self.ui.pol_ext_start,

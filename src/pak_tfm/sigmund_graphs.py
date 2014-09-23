@@ -91,12 +91,6 @@ def pintasubplot(na, min_value, max_value, displayinic, periods,
     if numspecies < 11:
         display_legend()
  
-
-# def mutual_render(na, nb, ra_eff, rb_eff, ra_equs, rb_equs, maxa_individuos,
-#                   maxb_individuos, max_reff, min_reff, max_equs, min_equs, 
-#                   filename, displayinic, periods, dirsalida, algorithm='',
-#                   fichreport='', verbose=True, os='', dirtrabajo='', 
-#                   Bssvar_coefs=[]):
 def mutual_render(simulation_params, sig_ret_val, displayinic, periods,  
                   verbose=True):
     global ax
@@ -165,9 +159,6 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
 def calc_lw_width(numspecies):
     return(0.5)
 
-# def food_render(sig_ret_val,
-#                 filename, displayinic, periods, dirsalida, algorithm='', 
-#                 fichreport='', os='', dirtrabajo='', verbose=True):
 def food_render(simulation_params, sig_ret_val, displayinic, periods, 
                 verbose=True):
     global ax
