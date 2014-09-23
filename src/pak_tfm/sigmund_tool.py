@@ -205,10 +205,19 @@ class StartQT4(QtGui.QMainWindow):
         print (''.join([str(item) for item in ret_extinction]))
         return(ret_extinction)
 
+    def trim_input_field_re(self):
+        return(re.compile('\d+(\.\d+)?'))
+    
+
+    def txtfld2float(self,textfield):
+        p = self.trim_input_field_re()
+        if p.match(textfield) == None:
+            el = 0
+        else:
+            el = float(textfield)
+        return el
 
     def add_entry(self): 
-        algorithms = ["Verhulst", "Logistic_abs", "May", \
-                      "Logistic_u", "NoMutualism"]
         # Checking input file existence
         try:
             fh = open(self.filename, "r")
@@ -244,7 +253,6 @@ class StartQT4(QtGui.QMainWindow):
                                            '_a.txt').replace('_c.txt', '_a.txt')
         aux = input_fname.split('_a.txt')
         input_fname = aux[0]
-        
         output_suffix = self.ui.output_suffix.text()
         comentario = self.ui.Comments_text.toPlainText()
         dirs = os.path.dirname(sys.argv[0])
@@ -257,29 +265,11 @@ class StartQT4(QtGui.QMainWindow):
         outputdatasave = self.ui.save_output_checkbox.checkState() > 0
         self.haypred = self.ui.foodweb_checkbox.checkState() > 0
         haysup = 0
-        p = re.compile('\d+(\.\d+)?')
-        if p.match(self.ui.random_removal.text()) == None:
-            el = 0
-        else:
-            el = float(self.ui.random_removal.text())
-        q = re.compile('\d+(\.\d+)?')
-        if q.match(self.ui.plants_blossom.text()) == None:
-            pb = 0
-        else:
-            pb = float(self.ui.plants_blossom.text())
-        qsd = re.compile('\d+(\.\d+)?')
-        if qsd.match(self.ui.plants_blossom_sd.text()) == None:
-            pb_sd = 0
-        else:
-            pb_sd = float(self.ui.plants_blossom_sd.text())
-        if qsd.match(self.ui.Bssvar_period.text()) == None:
-            self.Bssvar_sd = 0
-        else:
-            self.Bssvar_period = float(self.ui.Bssvar_period.text())
-        if qsd.match(self.ui.Bssvar_sd.text()) == None:
-            self.Bssvar_sd = 0
-        else:
-            self.Bssvar_sd = float(self.ui.Bssvar_sd.text())
+        el = self.txtfld2float(self.ui.random_removal.text())
+        pb = self.txtfld2float(self.ui.plants_blossom.text())
+        pb_sd = self.txtfld2float(self.ui.plants_blossom_sd.text())
+        self.Bssvar_period = self.txtfld2float(self.ui.Bssvar_period.text())
+        self.Bssvar_sd = self.txtfld2float(self.ui.Bssvar_sd.text())            
         self.Bssvar_modulationtype_list = []
         self.Bssvar_modulationtype_list.append(self.typeofmodulation)
         if (self.typeofmodulation == 'linear'):
@@ -317,49 +307,6 @@ class StartQT4(QtGui.QMainWindow):
             auxspec = self.ui.blossom_pert_species.text().split(',')
             listb = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
-        
-#         if self.ui.pl_ext_period.text().isdigit():
-#             try:
-#                 plants_extinction['period'] = int(self.ui.pl_ext_period.text())\
-#                                               * sgGL.DAYS_YEAR
-#                 plants_extinction['spike'] = float(self.ui.pl_ext_spike.text())
-#                 plants_extinction['start'] = int(self.ui.pl_ext_start.text())
-#                 plants_extinction['rate'] = float(self.ui.pl_ext_rate.text())
-#                 plants_extinction['numperiod'] = int(self.ui.pl_ext_numperiod.text())
-#                 if (self.ui.pl_ext_species.text().upper() == 'ALL'):
-#                     plants_extinction['species'] = ['ALL']
-#                 else:
-#                     auxspec = self.ui.pl_ext_species.text().split(',')
-#                     listb = self.create_list_species_affected(auxspec)
-#                     plants_extinction['species'] = listb
-#             except:         
-#                 self.lista_err.append("ERROR: bad plant extinction format")
-#                 self.error_exit()
-#                 self.ui.Run_Button.setEnabled(1)
-#                 self.ui.Close_Button.setEnabled(1)
-#                 return
-#             
-#         if self.ui.pol_ext_period.text().isdigit():
-#             try:
-#                 pols_extinction['period'] = int(self.ui.pol_ext_period.text()) *\
-#                                             sgGL.DAYS_YEAR
-#                 pols_extinction['spike'] = float(self.ui.pol_ext_spike.text())
-#                 pols_extinction['start'] = int(self.ui.pol_ext_start.text())
-#                 pols_extinction['rate'] = float(self.ui.pol_ext_rate.text())
-#                 pols_extinction['numperiod'] = int(self.ui.pol_ext_numperiod.text())
-#                 if (self.ui.pol_ext_species.text().upper() == 'ALL'):
-#                     pols_extinction['species'] = ['ALL']
-#                 else:
-#                     auxspec = self.ui.pol_ext_species.text().split(',')
-#                     listb = self.create_list_species_affected(auxspec)
-#                     pols_extinction['species'] = listb
-#                 # print (pols_extinction)
-#             except:            
-#                 self.lista_err.append("ERROR: bad pollinator extinction format")
-#                 self.error_exit()
-#                 self.ui.Run_Button.setEnabled(1)
-#                 self.ui.Close_Button.setEnabled(1)
-#                 return
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
                         year_periods =self.ciclos, 
                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
