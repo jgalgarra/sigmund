@@ -304,19 +304,19 @@ class StartQT4(QtGui.QMainWindow):
             listb = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
-                        year_periods =self.ciclos, 
+                        year_periods = self.ciclos, 
                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
                         data_save = outputdatasave, dirtrabajo = dirs, 
                         direntrada = dirent, dirsal = dirsalida,
-                        eliminarenlaces=el, pl_ext=plants_extinction, 
-                        pol_ext=pols_extinction, os=output_suffix, 
-                        fichreport=fichr, com=comentario, 
-                        algorithm=self.algorithm, plants_blossom_prob=pb, 
-                        plants_blossom_sd=pb_sd, 
-                        plants_blossom_type=self.typeofblossom, 
-                        blossom_pert_list=blossom_perturbation, 
+                        eliminarenlaces = el, pl_ext = plants_extinction, 
+                        pol_ext = pols_extinction, os = output_suffix, 
+                        fichreport = fichr, com = comentario, 
+                        algorithm = self.algorithm, plants_blossom_prob = pb, 
+                        plants_blossom_sd = pb_sd, 
+                        plants_blossom_type = self.typeofblossom, 
+                        blossom_pert_list=blossom_perturbation,
                         release=self.release, Bssvar_period=self.Bssvar_period,
-                        Bssvar_sd=self.Bssvar_sd, 
+                        Bssvar_sd=self.Bssvar_sd,
                         Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
                         Bssvar_species=self.Bssvar_species)  
         sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)      
