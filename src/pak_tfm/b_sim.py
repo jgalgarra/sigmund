@@ -55,7 +55,7 @@ def cuentaenlaces(mat_in):
 
 def delete_link(mat_in):
     intentos = 0
-    fil = len(mat_in) - 5
+    fil = len(mat_in) - sgGL.LINES_INFO_MATRIX
     col = len(mat_in[0])
     rfil = (np.random.random_integers(0, fil - 1))
     rcol = (np.random.random_integers(0, col - 1))
@@ -162,11 +162,11 @@ def init_lists_pop(periods, numspecies_p, minputchar_p):
     rp_eff = np.zeros([periods, numspecies_p], dtype=float)
     rp_equs = np.zeros([periods, numspecies_p], dtype=float)  
     for n in range(numspecies_p):
-        rowNindividuals_p.append(int(minputchar_p[-5][n]))
-        cAlpha_p.append(float(minputchar_p[-4][n]))
-        Alpha_p.append(float(minputchar_p[-3][n]))
-        r_p.append(minputchar_p[-2][n])
-        rd_p.append(minputchar_p[-1][n])
+        rowNindividuals_p.append(int(minputchar_p[-sgGL.LINES_INFO_MATRIX][n]))
+        cAlpha_p.append(float(minputchar_p[-(sgGL.LINES_INFO_MATRIX-1)][n]))
+        Alpha_p.append(float(minputchar_p[-(sgGL.LINES_INFO_MATRIX-2)][n]))
+        r_p.append(minputchar_p[-(sgGL.LINES_INFO_MATRIX-3)][n])
+        rd_p.append(minputchar_p[-(sgGL.LINES_INFO_MATRIX-4)][n])
     Nindividuals_p[0] = np.array(rowNindividuals_p)      
     return rowNindividuals_p, Alpha_p, cAlpha_p, r_p, rd_p, Nindividuals_p, \
                                 rp_eff, rp_equs
@@ -508,25 +508,25 @@ def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
     return ldev_inf, lfich_inf, periods, systemextinction, May, haymut,\
            model_r_alpha, count_collapse_years
 
-def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
-                           name_guild, N0_guild, lfich_inf):
-    filename_x = filename + str_guild
-    dt = dirtrabajo.replace('\\', '/')
-    sgcom.inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
-                      "/input/" + filename_x + "' target=_BLANK>" +\
-                      filename_x + "<a>")
-    l_minputchar_x = sgcom.dlmreadlike(filename_x, direntrada)
-    ''' If N0_guild provided by command line'''
-    if len(N0_guild) > 0:
-        l_minputchar_x[-5][0] = int(N0_guild)
-    minputchar_x = np.array(l_minputchar_x, dtype=float)
-    try:
-        nrows_x = len(minputchar_x)
-    except:
-        print("INPUT FILE BAD FORMAT")
-    ncols_x = len(minputchar_x[0])
-    numspecies_x = ncols_x
-    return numspecies_x, minputchar_x, nrows_x, ncols_x
+# def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
+#                            name_guild, N0_guild, lfich_inf):
+#     filename_x = filename + str_guild
+#     dt = dirtrabajo.replace('\\', '/')
+#     sgcom.inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
+#                       "/input/" + filename_x + "' target=_BLANK>" +\
+#                       filename_x + "<a>")
+#     l_minputchar_x = sgcom.dlmreadlike(filename_x, direntrada)
+#     ''' If N0_guild provided by command line'''
+#     if len(N0_guild) > 0:
+#         l_minputchar_x[-sgGL.LINES_INFO_MATRIX][0] = int(N0_guild)
+#     minputchar_x = np.array(l_minputchar_x, dtype=float)
+#     try:
+#         nrows_x = len(minputchar_x)
+#     except:
+#         print("INPUT FILE BAD FORMAT")
+#     ncols_x = len(minputchar_x[0])
+#     numspecies_x = ncols_x
+#     return numspecies_x, minputchar_x, nrows_x, ncols_x
 
 
 def init_blossom_perturbation_lists(plants_blossom_prob, blossom_pert_list, 
@@ -628,25 +628,25 @@ def bino_mutual(sim_cond = ''):
                        sim_cond.year_periods, sim_cond.algorithm, 
                        sim_cond.release)        
     numspecies_a, minputchar_a, nrows_a, ncols_a = \
-                                    read_simulation_matrix(sim_cond.filename, 
+                                sgcom.read_simulation_matrix(sim_cond.filename, 
                                                            sim_cond.dirtrabajo,
                                                            sim_cond.direntrada, 
                                                            '_a.txt',
                                                            'Plants', 
                                                            sim_cond.N0plants, 
-                                                           sgGL.lfich_inf)
+                                                           lfich_inf = sgGL.lfich_inf)
     rowNindividuals_a, Alpha_a, cAlpha_a, r_a, rd_a, Nindividuals_a,\
     ra_eff, ra_equs = init_lists_pop(periods, numspecies_a, minputchar_a)
     lcompatibplantas = init_blossom_perturbation_lists(sim_cond.plants_blossom_prob,
                                                        sim_cond.blossom_pert_list,
                                                        numspecies_a)
     numspecies_b, minputchar_b, nrows_b, ncols_b = \
-                        read_simulation_matrix(sim_cond.filename, 
+                        sgcom.read_simulation_matrix(sim_cond.filename, 
                                                sim_cond.dirtrabajo, 
                                                sim_cond.direntrada,
                                                '_b.txt', 'Pollinators ',
                                                sim_cond.N0pols, 
-                                               sgGL.lfich_inf)
+                                               lfich_inf = sgGL.lfich_inf)
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)

@@ -52,6 +52,9 @@ class StartQT4(QtGui.QMainWindow):
         self.algorithm = 'Verhulst'
         self.typeofmodulation = 'None'
         self.Bssvar_modulationtype_list = []
+        self.dirsal = 'output/'
+        self.dirent = 'input/'
+        self.dirs = os.path.dirname(self.dirsal)
         QtCore.QObject.connect(self.ui.inputfile, 
                                QtCore.SIGNAL("returnPressed()"), self.add_entry)
         QtCore.QObject.connect(self.ui.ciclos, 
@@ -157,6 +160,23 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.inputfile.setText(self.input_file)
         self.ui.inputfile.setEnabled(False)
         self.ui.Run_Button.setEnabled(1)
+        # Checking input file existence
+        try:
+            fh = open(self.filename, "r")
+        except IOError:
+            self.lista_err.append("ERROR: can\'t open file " + self.input_file)
+            self.error_exit()
+            return
+        else:
+            fh.close()
+            input_fname_raw = self.input_file.replace('_b.txt', '_a.txt').\
+                                                replace('_c.txt', '_a.txt')
+            l_minputchar_x = sgcom.dlmreadlike(input_fname_raw, self.dirent)
+            numspecies_a = len(l_minputchar_x) - sgGL.LINES_INFO_MATRIX
+            numspecies_b = len(l_minputchar_x[0])
+            self.ui.species_number.setText("Plant species: %d  Pollinator species: %d" %\
+                             (numspecies_a, numspecies_b))
+            self.repaint()
 
     def create_list_species_affected(self, auxspec):
         auxlspec = []
@@ -215,23 +235,10 @@ class StartQT4(QtGui.QMainWindow):
         return el
 
     def add_entry(self): 
-        # Checking input file existence
         try:
-            fh = open(self.filename, "r")
-        except IOError:
-            self.lista_err.append("ERROR: can\'t open file " + self.input_file)
-            self.error_exit()
-            return
-        else:
-            fh.close()
-        # Testing that file exists       
-        dirsal = 'output/'
-        dirent = 'input/'
-        dirs = os.path.dirname(dirsal)
-        try:
-            os.stat(dirs)
+            os.stat(self.dirs)
         except:
-            os.makedirs(dirs)
+            os.makedirs(self.dirs)
         try:
             self.ciclos = int(self.ui.ciclos.text())
         except:            
@@ -243,17 +250,19 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Close_Button.setEnabled(0)
         self.ui.Error_msg.setText("")
         self.ui.URL_report.setText("Running")
-        self.repaint()
+        
         displayinic = 0
-        dirsalida = 'output\\'
-        input_fname = self.input_file.replace('_b.txt',
+        #dirsalida = 'output\\'
+        input_fname_raw = self.input_file.replace('_b.txt',
                                            '_a.txt').replace('_c.txt', '_a.txt')
-        aux = input_fname.split('_a.txt')
+        aux = input_fname_raw.split('_a.txt')
+        print(input_fname_raw,' ',self.dirent)
         input_fname = aux[0]
+        self.repaint()
         output_suffix = self.ui.output_suffix.text()
         comentario = self.ui.Comments_text.toPlainText()
         dirs = os.path.dirname(sys.argv[0])
-        reportpath = os.path.join(dirs, dirsalida.replace('\\', '/'))
+        reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))
         fichr = reportpath + 'rep_' + input_fname + '_' + self.algorithm +\
                      '_' + output_suffix + '_' + str(int(self.ciclos)) + '.html'
         dispfichsal = fichr.split('/')
@@ -307,7 +316,7 @@ class StartQT4(QtGui.QMainWindow):
                         year_periods = self.ciclos, 
                         hay_foodweb = self.haypred, hay_superpredadores = haysup,
                         data_save = outputdatasave, dirtrabajo = dirs, 
-                        direntrada = dirent, dirsal = dirsalida,
+                        direntrada = self.dirent, dirsal = self.dirsal,
                         eliminarenlaces = el, pl_ext = plants_extinction, 
                         pol_ext = pols_extinction, os = output_suffix, 
                         fichreport = fichr, com = comentario, 
@@ -317,7 +326,7 @@ class StartQT4(QtGui.QMainWindow):
                         blossom_pert_list=blossom_perturbation,
                         release=self.release, Bssvar_period=self.Bssvar_period,
                         Bssvar_sd=self.Bssvar_sd,
-                        Bssvar_modulationtype_list=self.Bssvar_modulationtype_list, \
+                        Bssvar_modulationtype_list = self.Bssvar_modulationtype_list,
                         Bssvar_species=self.Bssvar_species)  
         sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)      
         self.ui.label_report.setText("Report file: ")

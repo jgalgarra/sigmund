@@ -1611,6 +1611,22 @@
     </property>
    </widget>
   </widget>
+  <widget class="QLabel" name="species_number">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>50</y>
+     <width>301</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="buddy">
+    <cstring>label_2</cstring>
+   </property>
+  </widget>
   <zorder>inputfile</zorder>
   <zorder>Close_Button</zorder>
   <zorder>Run_Button</zorder>
@@ -1673,6 +1689,7 @@
   <zorder>label_26</zorder>
   <zorder>ClearBssvar</zorder>
   <zorder>Modulation</zorder>
+  <zorder>species_number</zorder>
  </widget>
  <resources/>
  <connections>

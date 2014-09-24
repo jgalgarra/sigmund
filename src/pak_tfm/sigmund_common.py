@@ -137,6 +137,26 @@ def dlmwritelike(input_file,sim_cond, nperiod, Nin):
     salida.close()
     return(nsal)
 
+def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
+                           name_guild, N0_guild, lfich_inf = ''):
+    filename_x = filename + str_guild
+    dt = dirtrabajo.replace('\\', '/')
+    inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
+                      "/input/" + filename_x + "' target=_BLANK>" +\
+                      filename_x + "<a>")
+    l_minputchar_x = dlmreadlike(filename_x, direntrada)
+    ''' If N0_guild provided by command line'''
+    if len(N0_guild) > 0:
+        l_minputchar_x[-sgGL.LINES_INFO_MATRIX][0] = int(N0_guild)
+    minputchar_x = np.array(l_minputchar_x, dtype=float)
+    try:
+        nrows_x = len(minputchar_x)
+    except:
+        print("INPUT FILE BAD FORMAT")
+    ncols_x = len(minputchar_x[0])
+    numspecies_x = ncols_x
+    return numspecies_x, minputchar_x, nrows_x, ncols_x
+
 def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs, 
                     rb_equs):   
     maxa_individuos = np.max(Nindividuals_a)

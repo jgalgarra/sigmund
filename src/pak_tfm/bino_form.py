@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Sat Sep  6 19:16:27 2014
+# Created: Wed Sep 24 11:18:37 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -457,6 +457,10 @@ class Ui_Form(object):
         self.Bssvar_Type_sin = QtGui.QRadioButton(self.Modulation)
         self.Bssvar_Type_sin.setGeometry(QtCore.QRect(10, 80, 51, 17))
         self.Bssvar_Type_sin.setObjectName(_fromUtf8("Bssvar_Type_sin"))
+        self.species_number = QtGui.QLabel(Form)
+        self.species_number.setGeometry(QtCore.QRect(230, 50, 301, 20))
+        self.species_number.setText(_fromUtf8(""))
+        self.species_number.setObjectName(_fromUtf8("species_number"))
         self.label_2.setBuddy(self.label_2)
         self.label_4.setBuddy(self.inputfile)
         self.label_5.setBuddy(self.inputfile)
@@ -486,6 +490,7 @@ class Ui_Form(object):
         self.label_26.setBuddy(self.inputfile)
         self.label_29.setBuddy(self.inputfile)
         self.label_30.setBuddy(self.inputfile)
+        self.species_number.setBuddy(self.label_2)
 
         self.retranslateUi(Form)
         QtCore.QObject.connect(self.Close_Button, QtCore.SIGNAL(_fromUtf8("clicked()")), Form.close)
