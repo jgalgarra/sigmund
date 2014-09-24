@@ -18,8 +18,9 @@ class SimulationConditions():
                 com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
                 plants_blossom_sd=0.01, plants_blossom_type='Binary', 
                 blossom_pert_list='', verbose=True, exit_on_extinction=False,
-                N0plants='', N0pols='', release='', Bssvar_period=0.1, 
-                Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
+                N0plants='', N0pols='', release='', Bssvar_data = ''):
+#                 Bssvar_period=0.1, 
+#                 Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
         self.filename = filename
         self.year_periods = year_periods 
         self.hay_foodweb = hay_foodweb
@@ -44,15 +45,29 @@ class SimulationConditions():
         self.N0plants = N0plants
         self.N0pols = N0pols
         self.release = release
+        self.Bssvar_data = Bssvar_data
+         
+class MaximaValues():
+    def __init__(self,maxa_individuos, maxb_individuos, max_reff, min_reff,\
+    max_requs, min_requs):
+        self.maxa_individuos = maxa_individuos
+        self.maxb_individuos = maxb_individuos
+        self.max_reff = max_reff
+        self.min_reff = min_reff
+        self.max_requs = max_requs
+        self.min_requs = min_requs
+        
+class BlossomVariability():
+    def __init__(self, Bssvar_period, Bssvar_sd, Bssvar_modulationtype_list,
+                 Bssvar_species):
         self.Bssvar_period = Bssvar_period
         self.Bssvar_sd = Bssvar_sd
-        self.Bssvar_modulationtype_list = copy.deepcopy(Bssvar_modulationtype_list)
-        self.Bssvar_species = copy.deepcopy(Bssvar_species)
+        self.Bssvar_modulationtype_list = Bssvar_modulationtype_list
+        self.Bssvar_species = Bssvar_species
         
 class SimulationReturnValues():
     def __init__(self, Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, 
-                 rb_eff, ra_equs, rb_equs, maxa_individuos, maxb_individuos, 
-                 max_reff, min_reff, max_requs, min_requs, systemextinction, 
+                 rb_eff, ra_equs, rb_equs, mval, systemextinction, 
                  pBssvar_species):
         self.Nindividuals_a = Nindividuals_a
         self.Nindividuals_b = Nindividuals_b
@@ -61,12 +76,7 @@ class SimulationReturnValues():
         self.rb_eff = copy.deepcopy(rb_eff)
         self.ra_equs = copy.deepcopy(ra_equs)
         self.rb_equs = copy.deepcopy(ra_equs)
-        self.maxa_individuos = maxa_individuos
-        self.maxb_individuos = maxb_individuos
-        self.max_reff = max_reff
-        self.min_reff = min_reff
-        self.max_requs = max_requs
-        self.min_requs = min_requs
+        self.maxminval = mval
         self.pBssvar_species = copy.deepcopy(pBssvar_species)
 
 class CanalInfo():
@@ -120,9 +130,8 @@ def dlmreadlike(inputfile, direntrada):
         return(mtx_input)
     except IOError:
         print('The datafile %s is missing!' % inputfile)
-        return(0)
+        return(-1)
  
-#def dlmwritelike(inputfile, nperiod, Nin, dirsalida, os):
 def dlmwritelike(input_file,sim_cond, nperiod, Nin):
     dsal = sim_cond.dirsal.replace('\\', '/')
     nsal = 'output_data_' + input_file + '_' + sim_cond.os +\
@@ -159,16 +168,15 @@ def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild,
 
 def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs, 
                     rb_equs):   
-    maxa_individuos = np.max(Nindividuals_a)
-    maxb_individuos = np.max(Nindividuals_b)
-    max_reff = max(np.max([ra_eff]), np.max([rb_eff]))
-    min_reff = min(np.min([ra_eff]), np.min([rb_eff]))
-    max_requs = max(np.max([ra_equs]), np.max([rb_equs]))
-    min_requs = min(np.min([ra_equs]), np.min([rb_equs]))
-    return maxa_individuos, maxb_individuos, max_reff, min_reff,\
-           max_requs, min_requs
+    mval = MaximaValues(np.max(Nindividuals_a),np.max(Nindividuals_b),
+                         max(np.max([ra_eff]), np.max([rb_eff])),
+                         min(np.min([ra_eff]), np.min([rb_eff])),
+                         max(np.max([ra_equs]), np.max([rb_equs])),
+                         min(np.min([ra_equs]), np.min([rb_equs])) )
+    return(mval)
 
-def start_report(ldev_inf, filename, com, year_periods, algorithm, release):
+def start_report(ldev_inf, filename, com, year_periods, algorithm, release, 
+                 hay_foodweb):
     inform_user(ldev_inf, \
       "Binomial simulated mutualistic interaction. Input file: %s" % (filename))
     inform_user(ldev_inf, 60 * '=')
@@ -176,6 +184,8 @@ def start_report(ldev_inf, filename, com, year_periods, algorithm, release):
     inform_user(ldev_inf, 'Span: %d years' % (year_periods))
     inform_user(ldev_inf, 'ALGORITHM: ' + algorithm)
     inform_user(ldev_inf, 'Release ' + (("%.02f") % (release / 100)))
+    if hay_foodweb:
+        inform_user(ldev_inf, 'Food web superimposed') 
 
 
 def create_results_filename(sim_cond,string_file):

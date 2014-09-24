@@ -30,7 +30,6 @@ class StartQT4(QtGui.QMainWindow):
         self.Bssvar_sd = 0.0
         self.Bssvar_Type_linear_slope = 1.0
         self.Bssvar_Type_sin_period = 50
-
         self.filename = ""
         self.input_file = ""
         self.ui = Ui_Form()
@@ -78,7 +77,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Bssvar_Type_linear.clicked.connect(self.select_linearModulation)
         self.ui.ClearBlossom.clicked.connect(self.clear_blossom_pars)
         self.ui.ClearBssvar.clicked.connect(self.clear_Bssvar_pars)
-           
+
     def select_LApproach_abs(self):
         self.algorithm = 'Logistic_abs'
         
@@ -250,9 +249,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Close_Button.setEnabled(0)
         self.ui.Error_msg.setText("")
         self.ui.URL_report.setText("Running")
-        
         displayinic = 0
-        #dirsalida = 'output\\'
         input_fname_raw = self.input_file.replace('_b.txt',
                                            '_a.txt').replace('_c.txt', '_a.txt')
         aux = input_fname_raw.split('_a.txt')
@@ -274,7 +271,7 @@ class StartQT4(QtGui.QMainWindow):
         pb = self.txtfld2float(self.ui.plants_blossom.text())
         pb_sd = self.txtfld2float(self.ui.plants_blossom_sd.text())
         self.Bssvar_period = self.txtfld2float(self.ui.Bssvar_period.text())
-        self.Bssvar_sd = self.txtfld2float(self.ui.Bssvar_sd.text())            
+        self.Bssvar_sd = self.txtfld2float(self.ui.Bssvar_sd.text())
         self.Bssvar_modulationtype_list = []
         self.Bssvar_modulationtype_list.append(self.typeofmodulation)
         if (self.typeofmodulation == 'linear'):
@@ -291,7 +288,11 @@ class StartQT4(QtGui.QMainWindow):
                 auxspec = self.ui.Bssvar_species.text().split(',')
                 listb = self.create_list_species_affected(auxspec)
             self.Bssvar_species = listb
-        # External perturbation data
+        Blossomvar_data = sgcom.BlossomVariability(self.Bssvar_period,
+                                                    self.Bssvar_sd,
+                                                self.Bssvar_modulationtype_list,
+                                                self.Bssvar_species)
+        # External perturbation datacom.
         plants_extinction = self.fetch_pert_data(self.ui.pl_ext_period,
                                             self.ui.pl_ext_spike,
                                             self.ui.pl_ext_start,
@@ -312,34 +313,40 @@ class StartQT4(QtGui.QMainWindow):
             listb = self.create_list_species_affected(auxspec)
             blossom_perturbation = listb
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
-                        year_periods = self.ciclos, 
-                        hay_foodweb = self.haypred, hay_superpredadores = haysup,
-                        data_save = outputdatasave, dirtrabajo = dirs, 
-                        direntrada = self.dirent, dirsal = self.dirsal,
-                        eliminarenlaces = el, pl_ext = plants_extinction, 
-                        pol_ext = pols_extinction, os = output_suffix, 
-                        fichreport = fichr, com = comentario, 
-                        algorithm = self.algorithm, plants_blossom_prob = pb, 
-                        plants_blossom_sd = pb_sd, 
-                        plants_blossom_type = self.typeofblossom, 
-                        blossom_pert_list=blossom_perturbation,
-                        release=self.release, Bssvar_period=self.Bssvar_period,
-                        Bssvar_sd=self.Bssvar_sd,
-                        Bssvar_modulationtype_list = self.Bssvar_modulationtype_list,
-                        Bssvar_species=self.Bssvar_species)  
-        sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)      
-        self.ui.label_report.setText("Report file: ")
-        self.ui.URL_report.setText(linkname)
+                year_periods = self.ciclos, 
+                hay_foodweb = self.haypred, hay_superpredadores = haysup,
+                data_save = outputdatasave, dirtrabajo = dirs, 
+                direntrada = self.dirent, dirsal = self.dirsal,
+                eliminarenlaces = el, pl_ext = plants_extinction, 
+                pol_ext = pols_extinction, os = output_suffix, 
+                fichreport = fichr, com = comentario, 
+                algorithm = self.algorithm, plants_blossom_prob = pb, 
+                plants_blossom_sd = pb_sd, 
+                plants_blossom_type = self.typeofblossom, 
+                blossom_pert_list=blossom_perturbation,
+                release=self.release,
+                Bssvar_data = Blossomvar_data )  
         self.ui.Run_Button.setEnabled(1)
-        self.ui.Close_Button.setEnabled(1)
-        self.ui.URL_outputs.setText("<a href='file:///" +\
-                                    reportpath.replace('\\', '/') +\
-                                    "'>See all results</a>")       
-        sggraph.mutual_render(simulation_params, sim_ret_val, displayinic,
-                            self.ciclos * sgGL.DAYS_YEAR)
-        if self.haypred:
-            sggraph.food_render(simulation_params, sim_ret_val, displayinic, 
+        self.ui.Close_Button.setEnabled(1)       
+        try:
+            sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
+            pass
+        except:
+            self.lista_err.append("Simulation stopped, see details")
+            self.error_exit()
+            self.repaint()
+                 
+        else:   
+            self.ui.label_report.setText("Report file: ")
+            self.ui.URL_report.setText(linkname)
+            self.ui.URL_outputs.setText("<a href='file:///" +\
+                                        reportpath.replace('\\', '/') +\
+                                        "'>See all results</a>")       
+            sggraph.mutual_render(simulation_params, sim_ret_val, displayinic,
                                 self.ciclos * sgGL.DAYS_YEAR)
+            if self.haypred:
+                sggraph.food_render(simulation_params, sim_ret_val, displayinic, 
+                                    self.ciclos * sgGL.DAYS_YEAR)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)

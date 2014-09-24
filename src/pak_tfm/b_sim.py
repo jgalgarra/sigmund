@@ -28,6 +28,7 @@ TOL_EXTINCTION = -0.001
 invperiod = 1 / sgGL.DAYS_YEAR
 count_collapse_years = 0
 
+
 def signfunc(x):
     if abs(x) == x:
         return(1)
@@ -323,44 +324,43 @@ def calc_compatib_plantas(numspecies, probcoinc, blossom_pert_list):
             lcomp.append(1.0)
     return np.array(lcomp)       
 
-def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
-                    Bssvar_species, Bssvar_modulationtype_list, numspecies_a,
+def init_blossom_pertubation_params(BssDat, numspecies_a,
                     year_periods, ldev_inf):
     # Blossom variability analysis
     global pendiente, periodo
     pBssvar_species = []
     pendiente = periodo = 0 
-    hay_bssvar = (Bssvar_sd > 0.0) & (len(Bssvar_species) > 0)
+    hay_bssvar = (BssDat.Bssvar_sd > 0.0) & (len(BssDat.Bssvar_species) > 0)
     if (hay_bssvar):
-        if (Bssvar_modulationtype_list[0] == 'linear'):
-            strvalor = (", Slope %0.2f " % (Bssvar_modulationtype_list[1]))
+        if (BssDat.Bssvar_modulationtype_list[0] == 'linear'):
+            strvalor = (", Slope %0.2f " % (BssDat.Bssvar_modulationtype_list[1]))
         else:
-            if (Bssvar_modulationtype_list[0] == 'sin'):
-                strvalor = (", Period %0.2f " % (Bssvar_modulationtype_list[1]))
+            if (BssDat.Bssvar_modulationtype_list[0] == 'sin'):
+                strvalor = (", Period %0.2f " % (BssDat.Bssvar_modulationtype_list[1]))
             else:
                 strvalor = ''
-        straff = (". Affected species:%s" % (Bssvar_species))
+        straff = (". Affected species:%s" % (BssDat.Bssvar_species))
         sgcom.inform_user(ldev_inf, "Blossom variability active. Period: %0.2f (%% of year), Initial moment standard dev.: %0.04f (%% of year), Type: %s%s%s "\
-                % (Bssvar_period, Bssvar_sd, Bssvar_modulationtype_list[0], 
+                % (BssDat.Bssvar_period, BssDat.Bssvar_sd, BssDat.Bssvar_modulationtype_list[0], 
                    strvalor, straff))
-        if (str(Bssvar_species[0]).upper() == 'ALL'):
+        if (str(BssDat.Bssvar_species[0]).upper() == 'ALL'):
             listaspecies = list(range(numspecies_a))
         else:
-            listaspecies = [i-1 for i in Bssvar_species]
+            listaspecies = [i-1 for i in BssDat.Bssvar_species]
             
         bssvar_allones = np.ones((year_periods,), dtype=float)
         for i in range(numspecies_a):
             if i in listaspecies:
-                if (Bssvar_modulationtype_list[0] == 'None'):
-                    varspecies = calcbssvarespecie(Bssvar_period, Bssvar_sd,
+                if (BssDat.Bssvar_modulationtype_list[0] == 'None'):
+                    varspecies = calcbssvarespecie(BssDat.Bssvar_period, BssDat.Bssvar_sd,
                                            bss_pert_no_modulation, year_periods)
-                elif (Bssvar_modulationtype_list[0] == 'linear'):
-                    pendiente = float(Bssvar_modulationtype_list[1])
-                    varspecies = calcbssvarespecie(Bssvar_period, Bssvar_sd,
+                elif (BssDat.Bssvar_modulationtype_list[0] == 'linear'):
+                    pendiente = float(BssDat.Bssvar_modulationtype_list[1])
+                    varspecies = calcbssvarespecie(BssDat.Bssvar_period, BssDat.Bssvar_sd,
                                            bss_pert_lineal, year_periods)
-                elif (Bssvar_modulationtype_list[0] == 'sin'):
-                    periodo = int(Bssvar_modulationtype_list[1])
-                    varspecies = calcbssvarespecie(Bssvar_period, Bssvar_sd,
+                elif (BssDat.Bssvar_modulationtype_list[0] == 'sin'):
+                    periodo = int(BssDat.Bssvar_modulationtype_list[1])
+                    varspecies = calcbssvarespecie(BssDat.Bssvar_period, BssDat.Bssvar_sd,
                                            bss_pert_sinusoidal, year_periods)            
                 pBssvar_species.append(np.array(varspecies))
             else:
@@ -368,19 +368,19 @@ def init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
     return pBssvar_species, hay_bssvar, pendiente, periodo
 
 def calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a, nrows_b, ncols_b,
-                               numspecies_b, plants_blossom_type, 
-                               plants_blossom_prob, plants_blossom_sd, 
+                               numspecies_b, 
+                               sim_cond,
                                blossom_pert_list):
-    if (plants_blossom_type == 'Binary'):
+    if (sim_cond.plants_blossom_type == 'Binary'):
         lcompatibplantas = calc_compatib_plantas(numspecies_a, 
-                                                 plants_blossom_prob, 
+                                                 sim_cond.plants_blossom_prob, 
                                                  blossom_pert_list)
     else:
         lcompatibplantas = []
         for g in range(0, numspecies_a):
             if g+1 in blossom_pert_list:
-                lcompatibplantas.append(abs(np.random.normal(plants_blossom_prob, 
-                                                         plants_blossom_sd, 1)))
+                lcompatibplantas.append(abs(np.random.normal(sim_cond.plants_blossom_prob, 
+                                                sim_cond.plants_blossom_sd, 1)))
             else:
                 lcompatibplantas.append(1)
     minputchar_a_mask = np.ones([nrows_a, ncols_a])
@@ -450,24 +450,28 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldev_inf, lfich_inf,
         sgcom.inform_user(lfich_inf, "Predators matrix d: <a href='file:///" +\
                           dt + "/input/" + filename_d + "' target=_BLANK>" +\
                           filename_d + "<a><br>")
-        l_minputchar_c = sgcom.dlmreadlike(filename_c, direntrada)
-        minputchar_c = np.array(l_minputchar_c, dtype=float)
-        nrows_c = len(minputchar_c)
-        ncols_c = len(minputchar_c[0])
-        numspecies_c = ncols_c
-        sgcom.inform_user(ldev_inf, "Predator species : %d" % numspecies_c)
-        for n in range(numspecies_c):
-            rowNindividuals_c.append(int(minputchar_c[nrows_c - 3][n]))
-            K_c.append(int(minputchar_c[nrows_c - 2][n]))
-            r_c.append(minputchar_c[nrows_c - 1][n])
-            r_cperiod.append(calc_r_periodo_vh(minputchar_c[nrows_c - 1][n], 
-                                               invperiod))
-        Nindividuals_c.append(rowNindividuals_c)
-        l_minputchar_d = sgcom.dlmreadlike(filename_d, direntrada)
-        minputchar_d = np.array(l_minputchar_d, dtype=float)
-        nrows_d = len(minputchar_d)
-        ncols_d = len(minputchar_d[0])
-        numspecies_d = ncols_d
+        try:
+            l_minputchar_c = sgcom.dlmreadlike(filename_c, direntrada)
+            minputchar_c = np.array(l_minputchar_c, dtype=float)
+            nrows_c = len(minputchar_c)
+            ncols_c = len(minputchar_c[0])
+            numspecies_c = ncols_c
+        except:
+            print("INPUT FILE BAD FORMAT")
+        else:
+            sgcom.inform_user(ldev_inf, "Predator species : %d" % numspecies_c)
+            for n in range(numspecies_c):
+                rowNindividuals_c.append(int(minputchar_c[nrows_c - 3][n]))
+                K_c.append(int(minputchar_c[nrows_c - 2][n]))
+                r_c.append(minputchar_c[nrows_c - 1][n])
+                r_cperiod.append(calc_r_periodo_vh(minputchar_c[nrows_c - 1][n], 
+                                                   invperiod))
+            Nindividuals_c.append(rowNindividuals_c)
+            l_minputchar_d = sgcom.dlmreadlike(filename_d, direntrada)
+            minputchar_d = np.array(l_minputchar_d, dtype=float)
+            nrows_d = len(minputchar_d)
+            ncols_d = len(minputchar_d[0])
+            numspecies_d = ncols_d
     return Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d
 
 def init_random_links_removal(eliminarenlaces, periods, ldev_inf, minputchar_a):
@@ -482,17 +486,14 @@ def init_random_links_removal(eliminarenlaces, periods, ldev_inf, minputchar_a):
     return periodoborr
 
 def init_blossom_perturbations_conditions(year_periods, blossom_pert_list, 
-                                          Bssvar_period, Bssvar_sd,
-                                          Bssvar_modulationtype_list,
-                                          Bssvar_species, ldev_inf,
+                                          Bssvar_data, ldev_inf,
                                           numspecies_a):
     if (blossom_pert_list[0] == 'ALL'):
         bloss_species = list(range(0, numspecies_a + 1))
     else:
         bloss_species = blossom_pert_list[:]
     pBssvar_species, hay_bssvar, pendiente, periodo =\
-                    init_blossom_pertubation_params(Bssvar_period, Bssvar_sd,
-                                   Bssvar_species,Bssvar_modulationtype_list,
+                    init_blossom_pertubation_params(Bssvar_data,
                                    numspecies_a, year_periods, ldev_inf)
     return bloss_species, hay_bssvar, pBssvar_species
 
@@ -507,27 +508,6 @@ def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
     ldev_inf, lfich_inf = sgcom.open_info_channels(verbose, fichreport, 'w')
     return ldev_inf, lfich_inf, periods, systemextinction, May, haymut,\
            model_r_alpha, count_collapse_years
-
-# def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
-#                            name_guild, N0_guild, lfich_inf):
-#     filename_x = filename + str_guild
-#     dt = dirtrabajo.replace('\\', '/')
-#     sgcom.inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
-#                       "/input/" + filename_x + "' target=_BLANK>" +\
-#                       filename_x + "<a>")
-#     l_minputchar_x = sgcom.dlmreadlike(filename_x, direntrada)
-#     ''' If N0_guild provided by command line'''
-#     if len(N0_guild) > 0:
-#         l_minputchar_x[-sgGL.LINES_INFO_MATRIX][0] = int(N0_guild)
-#     minputchar_x = np.array(l_minputchar_x, dtype=float)
-#     try:
-#         nrows_x = len(minputchar_x)
-#     except:
-#         print("INPUT FILE BAD FORMAT")
-#     ncols_x = len(minputchar_x[0])
-#     numspecies_x = ncols_x
-#     return numspecies_x, minputchar_x, nrows_x, ncols_x
-
 
 def init_blossom_perturbation_lists(plants_blossom_prob, blossom_pert_list, 
                                     numspecies_a):
@@ -626,7 +606,7 @@ def bino_mutual(sim_cond = ''):
     tinic = time()
     sgcom.start_report(sgGL.ldev_inf, sim_cond.filename, sim_cond.com, 
                        sim_cond.year_periods, sim_cond.algorithm, 
-                       sim_cond.release)        
+                       sim_cond.release, sim_cond.hay_foodweb)        
     numspecies_a, minputchar_a, nrows_a, ncols_a = \
                                 sgcom.read_simulation_matrix(sim_cond.filename, 
                                                            sim_cond.dirtrabajo,
@@ -651,12 +631,15 @@ def bino_mutual(sim_cond = ''):
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
     Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
-                                  predators_param_init(sim_cond.filename, 
-                                                       sim_cond.hay_foodweb,
-                                                       sim_cond.direntrada, 
-                                                       sgGL.ldev_inf,
-                                                       sgGL.lfich_inf,
-                                         sim_cond.dirtrabajo.replace('\\', '/'))  
+                                      predators_param_init(sim_cond.filename, 
+                                                           sim_cond.hay_foodweb,
+                                                           sim_cond.direntrada, 
+                                                           sgGL.ldev_inf,
+                                                           sgGL.lfich_inf,
+                                             sim_cond.dirtrabajo.replace('\\', '/'))
+#         except:
+#             print('Food web data missing !')
+#             return(0)
     add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
                                      sim_cond.plants_blossom_sd,
                                      sim_cond.plants_blossom_type, 
@@ -683,13 +666,10 @@ def bino_mutual(sim_cond = ''):
     # Extinction analysis. Blossom pertubations   
     bloss_species, hay_bssvar, pBssvar_species = \
           init_blossom_perturbations_conditions(sim_cond.year_periods, 
-                                                sim_cond.blossom_pert_list,
-                                                sim_cond.Bssvar_period, 
-                                                sim_cond.Bssvar_sd, 
-                                                sim_cond.Bssvar_modulationtype_list,
-                                                sim_cond.Bssvar_species, 
-                                                sgGL.ldev_inf,
-                                                numspecies_a)
+                                sim_cond.blossom_pert_list,
+                                sim_cond.Bssvar_data, 
+                                sgGL.ldev_inf,
+                                numspecies_a)
          
     for k in range (periods - 1):
         ''' The compatibilty matrixes masks are created when the year starts '''         
@@ -705,9 +685,6 @@ def bino_mutual(sim_cond = ''):
                          "ALARM !!!. System will collapse. Day %d (year %d)" %\
                          (k, k // sgGL.DAYS_YEAR))
                     if sim_cond.exit_on_extinction:
-#                         return(Nindividuals_a, Nindividuals_b, Nindividuals_c,
-#                                ra_eff, rb_eff, ra_equs, ra_equs, 
-#                                0, 0, 0, 0, 0, 0, systemextinction)
                         sim_ret_val = sgcom.SimulationReturnValues(
                                               Nindividuals_a, Nindividuals_b, 
                                               Nindividuals_c, ra_eff, rb_eff, 
@@ -718,9 +695,10 @@ def bino_mutual(sim_cond = ''):
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas =\
                       calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a,
                             nrows_b, ncols_b, numspecies_b, 
-                            sim_cond.plants_blossom_type,
-                            sim_cond.plants_blossom_prob, 
-                            sim_cond.plants_blossom_sd, 
+                            sim_cond,
+#                             sim_cond.plants_blossom_type,
+#                             sim_cond.plants_blossom_prob, 
+#                             sim_cond.plants_blossom_sd, 
                             blossom_pert_list=bloss_species[:])
             minpeq_a, minpeq_b = calc_perturbed_coeffs(k, hay_bssvar, 
                                                   pBssvar_species, minputchar_a,
@@ -760,8 +738,7 @@ def bino_mutual(sim_cond = ''):
                                        Nindividuals_a, numspecies_b, 
                                        Nindividuals_b, K_c, Nindividuals_c, r_c,
                                        numspecies_c, minputchar_d, j, k)
-    maxa_individuos, maxb_individuos, max_reff, min_reff,\
-    max_requs, min_requs = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
+    maxminval = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
     tfin = time()    
     sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, sim_cond, tfin, tinic, 
@@ -769,10 +746,8 @@ def bino_mutual(sim_cond = ''):
                      rb_eff, rb_equs, Nindividuals_c)
     sim_ret_val = sgcom.SimulationReturnValues(Nindividuals_a, Nindividuals_b, 
                                                Nindividuals_c, ra_eff, rb_eff, 
-                                               ra_equs, rb_equs, 
-                                               maxa_individuos, maxb_individuos,
-                                               max_reff, min_reff, max_requs, 
-                                               min_requs, systemextinction, 
+                                               ra_equs, rb_equs, maxminval, 
+                                               systemextinction, 
                                                pBssvar_species)
     return(sim_ret_val)
             

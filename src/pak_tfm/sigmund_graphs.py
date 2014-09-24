@@ -110,11 +110,13 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
                simulation_params.filename, dpi=resolucion, 
                figsize=(ancho, alto))
     ax = plt.subplot(nrows, 2, 1)
-    pintasubplot(sig_ret_val.Nindividuals_a, 0, sig_ret_val.maxa_individuos, 
+    pintasubplot(sig_ret_val.Nindividuals_a, 0, 
+                 sig_ret_val.maxminval.maxa_individuos, 
                  displayinic, periods, factorescala, 
                  numspecies_a, 'Plants', 'Individuals')
     ax = plt.subplot(nrows, 2, 3)
-    pintasubplot(sig_ret_val.ra_eff, sig_ret_val.min_reff, sig_ret_val.max_reff,
+    pintasubplot(sig_ret_val.ra_eff, sig_ret_val.maxminval.min_reff, 
+                 sig_ret_val.maxminval.max_reff,
                  displayinic, periods, factorescala, numspecies_a, '', 
                  'Efficient growth rate')
     plt.xlabel('Years')
@@ -134,11 +136,14 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
                      periodsinyears = True) 
         plt.xlabel('Years')    
     ax = plt.subplot(nrows, 2, 2)
-    pintasubplot(sig_ret_val.Nindividuals_b, 0, sig_ret_val.maxb_individuos, 
+    pintasubplot(sig_ret_val.Nindividuals_b, 0, 
+                 sig_ret_val.maxminval.maxb_individuos, 
                  displayinic, periods, factorescala,
                  numspecies_b, 'Polllinators', '')
     ax = plt.subplot(nrows, 2, 4)
-    pintasubplot(sig_ret_val.rb_eff, sig_ret_val.min_reff, sig_ret_val.max_reff,
+    pintasubplot(sig_ret_val.rb_eff, 
+                 sig_ret_val.maxminval.min_reff, 
+                 sig_ret_val.maxminval.max_reff,
                  displayinic, periods, factorescala,
                  numspecies_b, '', '')
     plt.xlabel('Years')
@@ -188,7 +193,7 @@ def food_render(simulation_params, sig_ret_val, displayinic, periods,
         plt.plot(x, graf, color=cm.Set1(i / (numspecies_a)),
                  lw=calc_lw_width(numspecies_a))
     a = plt.gca()
-    a.set_ylim([0, factorescala * sig_ret_val.maxa_individuos])
+    a.set_ylim([0, factorescala * sig_ret_val.maxminval.maxa_individuos])
     if numspecies_b < 11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
@@ -206,7 +211,7 @@ def food_render(simulation_params, sig_ret_val, displayinic, periods,
         plt.plot(x, graf, color=cm.Paired(i / (numspecies_b)),
                  lw=calc_lw_width(numspecies_b))
     a = plt.gca()
-    a.set_ylim([0, factorescala * sig_ret_val.maxb_individuos])
+    a.set_ylim([0, factorescala * sig_ret_val.maxminval.maxb_individuos])
     if numspecies_b < 11:
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
