@@ -256,7 +256,6 @@ class StartQT4(QtGui.QMainWindow):
         input_fname_raw = self.input_file.replace('_b.txt',
                                            '_a.txt').replace('_c.txt', '_a.txt')
         aux = input_fname_raw.split('_a.txt')
-        print(input_fname_raw,' ',self.dirent)
         input_fname = aux[0]
         self.repaint()
         output_suffix = self.ui.output_suffix.text()
