@@ -196,7 +196,6 @@ class StartQT4(QtGui.QMainWindow):
     def fetch_pert_data(self, xx_ext_period, xx_ext_spike, xx_ext_start, 
                         xx_ext_rate, xx_ext_numperiod, xx_ext_species):
         ret_extinction = {}
-        print(xx_ext_period.text())
         if len(xx_ext_period.text())>0:
             try:
                 ret_extinction['period'] = int( float(xx_ext_period.text())\
@@ -205,9 +204,6 @@ class StartQT4(QtGui.QMainWindow):
                 ret_extinction['start'] = int(xx_ext_start.text())
                 ret_extinction['rate'] = float(xx_ext_rate.text())
                 ret_extinction['numperiod'] = int(xx_ext_numperiod.text())
-                
-                print(ret_extinction['period'])
-                print (''.join([str(item) for item in ret_extinction]))
                 if (xx_ext_species.text().upper() == 'ALL'):
                     ret_extinction['species'] = ['ALL']
                 else:
@@ -241,7 +237,7 @@ class StartQT4(QtGui.QMainWindow):
         try:
             self.ciclos = int(self.ui.ciclos.text())
         except:            
-            self.lista_err.append("ERROR: bad Days format ")
+            self.lista_err.append("ERROR: bad cycles format ")
             self.error_exit()
             return    
         self.ui.label_report.setText("")
@@ -327,15 +323,15 @@ class StartQT4(QtGui.QMainWindow):
                 release=self.release,
                 Bssvar_data = Blossomvar_data )  
         self.ui.Run_Button.setEnabled(1)
-        self.ui.Close_Button.setEnabled(1)       
+        self.ui.Close_Button.setEnabled(1)    
+#         sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
         try:
             sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
             pass
         except:
             self.lista_err.append("Simulation stopped, see details")
             self.error_exit()
-            self.repaint()
-                 
+            self.repaint() 
         else:   
             self.ui.label_report.setText("Report file: ")
             self.ui.URL_report.setText(linkname)

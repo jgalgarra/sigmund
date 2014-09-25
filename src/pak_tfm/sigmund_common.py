@@ -79,6 +79,18 @@ class SimulationReturnValues():
         self.maxminval = mval
         self.pBssvar_species = copy.deepcopy(pBssvar_species)
 
+class ExternalPerturbationConditions():
+    def __init__(self,nperpl, inicioextplantas, periodoextpl, spikepl, 
+                 nperpol, inicioextpol, periodoextpol, spikepol):
+        self.nperpl = nperpl
+        self.inicioextplantas = inicioextplantas
+        self.periodoextpl = periodoextpl
+        self.spikepl = spikepl
+        self.nperpol = nperpol
+        self.inicioextpol = inicioextpol
+        self.periodoextpol = periodoextpol
+        self.spikepol = spikepol
+        
 class CanalInfo():
     """ CanalInfo is a wrapper of status information channels such as stdout and
     the report file """

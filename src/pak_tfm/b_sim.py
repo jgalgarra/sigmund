@@ -191,8 +191,7 @@ def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp,spikep,k):
             cuentaper = cuentaper + 1
     return r_m, cuentaper
 
-def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods, 
-                                      inicioextplantas, inicioextpolin, 
+def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,  
                                       hayextplantas, hayextpolin, 
                                       ldev_inf, lfich_inf):
     if hayextplantas:
@@ -204,15 +203,18 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
-        inicioextpolin = pol_ext['start'] * sgGL.DAYS_YEAR
+        inicioextpol = pol_ext['start'] * sgGL.DAYS_YEAR
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
         sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pol_ext['species'])+1), periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
-        inicioextpolin = nperpol = periodoextpol = spikepol = 0
-    return nperpl, inicioextplantas, periodoextpl, spikepl, nperpol,\
-           inicioextpolin, periodoextpol, spikepol
+        inicioextpol = nperpol = periodoextpol = spikepol = 0
+    perturbation_conditions = sgcom.ExternalPerturbationConditions(nperpl, 
+                                        inicioextplantas, periodoextpl, spikepl,
+                                        nperpol, inicioextpol, periodoextpol,
+                                        spikepol)
+    return(perturbation_conditions)
 
 def bss_pert_sinusoidal(val):
     global periodo, sd
@@ -544,7 +546,7 @@ def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
 def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, 
                                      numspecies_b):
     global cuentaperpl, cuentaperpol
-    inicioextplantas = inicioextpolin = cuentaperpl = cuentaperpol = 0
+    cuentaperpl = cuentaperpol = 0
     hayextplantas = len(pl_ext) > 0
     hayextpolin = len(pol_ext) > 0
     j = 0
@@ -558,7 +560,7 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
             pol_ext['species'] = list(range(0, numspecies_b))
         else:
             pol_ext['species'] = [i-1 for i in pol_ext['species']]
-    return inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j
+    return hayextplantas, hayextpolin, j
 
 def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
                             ra_equs, rb_equs, ra_eff, rb_eff):
@@ -568,7 +570,6 @@ def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
         ra_xx, rb_xx = ra_eff, rb_eff
     else:
         ra_xx, rb_xx = ra_equs, rb_equs;
-    # if (k>3*sgGL.DAYS_YEAR) and ((np.array(lcompatibplantas)< plants_blossom_prob).sum()==0) and \
     if (k > 3 * sgGL.DAYS_YEAR) and not(forced_extinctions_in_course) and\
             (ra_xx[k - 1] > TOL_EXTINCTION).sum() == 0 and \
             (rb_xx[k - 1] > TOL_EXTINCTION).sum() == 0:
@@ -637,9 +638,6 @@ def bino_mutual(sim_cond = ''):
                                                            sgGL.ldev_inf,
                                                            sgGL.lfich_inf,
                                              sim_cond.dirtrabajo.replace('\\', '/'))
-#         except:
-#             print('Food web data missing !')
-#             return(0)
     add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
                                      sim_cond.plants_blossom_sd,
                                      sim_cond.plants_blossom_type, 
@@ -647,21 +645,18 @@ def bino_mutual(sim_cond = ''):
                                      sgGL.ldev_inf, numspecies_a,
                                      rowNindividuals_a, numspecies_b,
                                      rowNindividuals_b)
-    
     # Random links removal 
     periodoborr = init_random_links_removal(sim_cond.eliminarenlaces, periods, 
                                             sgGL.ldev_inf, minputchar_a)            
     # Extinction analysis. Forced death rate increases
-    inicioextplantas, inicioextpolin, hayextplantas, hayextpolin, j =\
-                               init_external_perturbation_lists(
+#     inicioextplantas, inicioextpol, hayextplantas, hayextpolin, j =\
+    hayextplantas, hayextpolin, j =init_external_perturbation_lists(
                                                      sim_cond.pl_ext, 
                                                      sim_cond.pol_ext,
                                                      numspecies_a, numspecies_b)     
-    nperpl, inicioextplantas, periodoextpl, spikepl, nperpol, inicioextpolin,\
-    periodoextpol, spikepol = init_forced_external_pertubations(sim_cond.pl_ext,
+    pert_cond = init_forced_external_pertubations(sim_cond.pl_ext,
                                     sim_cond.pol_ext, sim_cond.year_periods, 
-                                    inicioextplantas,
-                                    inicioextpolin, hayextplantas, hayextpolin,
+                                    hayextplantas, hayextpolin,
                                     sgGL.ldev_inf, sgGL.lfich_inf)
     # Extinction analysis. Blossom pertubations   
     bloss_species, hay_bssvar, pBssvar_species = \
@@ -720,8 +715,9 @@ def bino_mutual(sim_cond = ''):
                                minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, 
                                Nindividuals_a, numspecies_b, Nindividuals_b, 
                                Nindividuals_c, minputchar_c, numspecies_c, 
-                               inicioextplantas, hayextplantas, nperpl, 
-                               periodoextpl, spikepl, k, model_r_alpha, 
+                               pert_cond.inicioextplantas, hayextplantas, 
+                               pert_cond.nperpl, pert_cond.periodoextpl, 
+                               pert_cond.spikepl, k, model_r_alpha, 
                                sgGL.ldev_inf) for n in range(numspecies_a)]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, sim_cond.algorithm, 
@@ -730,8 +726,9 @@ def bino_mutual(sim_cond = ''):
                                minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, 
                                Nindividuals_b, numspecies_a, Nindividuals_a,
                                Nindividuals_c, minputchar_c, numspecies_c,
-                               inicioextpolin, hayextpolin, nperpol, 
-                               periodoextpol, spikepol, k, model_r_alpha, 
+                               pert_cond.inicioextpol, hayextpolin, pert_cond.nperpol, 
+                               pert_cond.periodoextpol, pert_cond.spikepol, k, 
+                               model_r_alpha, 
                                sgGL.ldev_inf) for n in range(numspecies_b)]
         predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,

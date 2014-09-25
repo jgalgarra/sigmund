@@ -111,8 +111,8 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
                figsize=(ancho, alto))
     ax = plt.subplot(nrows, 2, 1)
     pintasubplot(sig_ret_val.Nindividuals_a, 0, 
-                 sig_ret_val.maxminval.maxa_individuos, 
-                 displayinic, periods, factorescala, 
+                 sig_ret_val.maxminval.maxa_individuos,  displayinic, periods, 
+                 factorescala, 
                  numspecies_a, 'Plants', 'Individuals')
     ax = plt.subplot(nrows, 2, 3)
     pintasubplot(sig_ret_val.ra_eff, sig_ret_val.maxminval.min_reff, 
@@ -243,7 +243,6 @@ def food_render(simulation_params, sig_ret_val, displayinic, periods,
                 bbox_inches=0)
     plt.close()
     sgcom.inform_user(sgGL.lfich_inf, "<P align=left><br>Foodweb effect picture<br>")
-#    dt = simulation_params.dirtrabajo.replace('\\', '/');
     sgcom.inform_user(sgGL.lfich_inf,\
                       "<IMG SRC=file:///%s ALIGN=LEFT  width=1200 BORDER=0>" %\
                       str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal)) 
