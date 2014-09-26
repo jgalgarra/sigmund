@@ -6,6 +6,8 @@
 import sys
 import os
 import b_sim
+import json
+import pickle
 import sigmund_GLOBALS as sgGL
 import sigmund_release as sgRL
 import sigmund_graphs as sggraph
@@ -13,6 +15,8 @@ import sigmund_common as sgcom
 # from PyQt4 import QtCore, QtGui
 from bino_form import *
 import re
+
+global simulation_params
 
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -32,19 +36,6 @@ class StartQT4(QtGui.QMainWindow):
         self.Bssvar_Type_sin_period = 50
         self.filename = ""
         self.input_file = ""
-        self.ui = Ui_Form()
-        self.ui.setupUi(self)
-        self.setWindowTitle('SIGMUND ' + "%0.2f " % (self.release / 100) +\
-                             self.daterelease)
-        self.setWindowIcon(QtGui.QIcon('upm.gif'))
-        self.ui.ciclos.setText(str(self.ciclos))
-        self.ui.plants_blossom.setText(str(self.plants_blossom))
-        self.ui.plants_blossom_sd.setText(str(self.plants_blossom_sd))
-        self.ui.Bssvar_period.setText(str(self.Bssvar_period))
-        self.ui.Bssvar_sd.setText(str(self.Bssvar_sd))
-        self.ui.Bssvar_Type_linear_slope.setText(str(self.Bssvar_Type_linear_slope))
-        self.ui.Bssvar_Type_sin_period.setText(str(self.Bssvar_Type_sin_period))
-        self.ui.blossom_pert_species.setText('ALL')
         self.haymut = False
         self.haypred = False
         self.May = False
@@ -54,6 +45,24 @@ class StartQT4(QtGui.QMainWindow):
         self.dirsal = 'output/'
         self.dirent = 'input/'
         self.dirs = os.path.dirname(self.dirsal)
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+        self.setWindowTitle('SIGMUND ' + "%0.2f " % (self.release / 100) +\
+                             self.daterelease)
+        self.setWindowIcon(QtGui.QIcon('upm.gif'))
+        self.ui.TOM_None_Button.clicked.connect(self.select_No_mutualism)
+        self.ui.TOM_LAp_vh_Button.clicked.connect(self.select_LApproach_vh)
+        self.ui.TOM_LAp_abs_Button.clicked.connect(self.select_LApproach_abs)
+        self.ui.TOM_LAp_u_Button.clicked.connect(self.select_LApproach_u)
+        self.ui.TOM_May_Button.clicked.connect(self.select_May)
+        self.ui.blossom_pert_species.setText('ALL')
+        self.ui.BType_Binary.clicked.connect(self.select_BinaryBlossom)
+        self.ui.BType_Gaussian.clicked.connect(self.select_GaussianBlossom)
+        self.ui.Bssvar_Type_none.clicked.connect(self.select_NoneModulation)
+        self.ui.Bssvar_Type_sin.clicked.connect(self.select_sinModulation)
+        self.ui.Bssvar_Type_linear.clicked.connect(self.select_linearModulation)
+        self.ui.ClearBlossom.clicked.connect(self.clear_blossom_pars)
+        self.ui.ClearBssvar.clicked.connect(self.clear_Bssvar_pars)
         QtCore.QObject.connect(self.ui.inputfile, 
                                QtCore.SIGNAL("returnPressed()"), self.add_entry)
         QtCore.QObject.connect(self.ui.ciclos, 
@@ -64,57 +73,75 @@ class StartQT4(QtGui.QMainWindow):
                                self.add_entry)
         QtCore.QObject.connect(self.ui.select_input_file, 
                                QtCore.SIGNAL("clicked()"), self.select_file)
+        QtCore.QObject.connect(self.ui.select_simulation, 
+                               QtCore.SIGNAL("clicked()"), 
+                               self.select_stored_simulation)
+        QtCore.QObject.connect(self.ui.save_simulation, 
+                               QtCore.SIGNAL("clicked()"), 
+                               self.save_simulation_file)
+        self.update_ui()
+
+    def update_ui(self):
+        self.ui.ciclos.setText(str(self.ciclos))
+        self.ui.plants_blossom.setText(str(self.plants_blossom))
+        self.ui.plants_blossom_sd.setText(str(self.plants_blossom_sd))
+        self.ui.Bssvar_period.setText(str(self.Bssvar_period))
+        self.ui.Bssvar_sd.setText(str(self.Bssvar_sd))
+        self.ui.Bssvar_Type_linear_slope.setText(str(self.Bssvar_Type_linear_slope))
+        self.ui.Bssvar_Type_sin_period.setText(str(self.Bssvar_Type_sin_period))
         self.ui.inputfile.setEnabled(False)
-        self.ui.TOM_None_Button.clicked.connect(self.select_No_mutualism)
-        self.ui.TOM_LAp_vh_Button.clicked.connect(self.select_LApproach_vh)
-        self.ui.TOM_LAp_abs_Button.clicked.connect(self.select_LApproach_abs)
-        self.ui.TOM_LAp_u_Button.clicked.connect(self.select_LApproach_u)
-        self.ui.TOM_May_Button.clicked.connect(self.select_May)
-        self.ui.BType_Binary.clicked.connect(self.select_BinaryBlossom)
-        self.ui.BType_Gaussian.clicked.connect(self.select_GaussianBlossom)
-        self.ui.Bssvar_Type_none.clicked.connect(self.select_NoneModulation)
-        self.ui.Bssvar_Type_sin.clicked.connect(self.select_sinModulation)
-        self.ui.Bssvar_Type_linear.clicked.connect(self.select_linearModulation)
-        self.ui.ClearBlossom.clicked.connect(self.clear_blossom_pars)
-        self.ui.ClearBssvar.clicked.connect(self.clear_Bssvar_pars)
+        self.ui.simulation_file.setEnabled(False)
+        self.repaint()
 
     def select_LApproach_abs(self):
         self.algorithm = 'Logistic_abs'
+        self.ui.TOM_LAp_abs_Button.setChecked(True)
         
     def select_LApproach_vh(self):
         self.algorithm = 'Verhulst'
+        self.ui.TOM_LAp_vh_Button.setChecked(True)
         
     def select_LApproach_u(self):
         self.algorithm = 'Logistic_u'
+        self.ui.TOM_LAp_u_Button.setChecked(True)
         
     def select_No_mutualism(self):
         self.algorithm = 'NoMutualism'
+        self.ui.TOM_None_Button.setChecked(True)
         
     def select_May(self):
         self.algorithm = 'May'
+        self.ui.TOM_May_Button.setChecked(True)
         
     def select_BinaryBlossom(self):
         self.typeofblossom = 'Binary'
         self.ui.plants_blossom_sd.setEnabled(0)
+        self.ui.BType_Binary.setChecked(True)
+        self.ui.BType_Gaussian.setChecked(False)
     
     def select_GaussianBlossom(self):
         self.typeofblossom = 'Gaussian'
         self.ui.plants_blossom_sd.setEnabled(1)
+        self.ui.BType_Gaussian.setChecked(True)
+        self.ui.BType_Binary.setChecked(False)
         
     def select_NoneModulation(self):
         self.typeofmodulation = 'None'
         self.ui.Bssvar_Type_sin_period.setEnabled(0)
         self.ui.Bssvar_Type_linear_slope.setEnabled(0)
+        self.ui.Bssvar_Type_none.setChecked(True)
         
     def select_sinModulation(self):
         self.typeofmodulation = 'sin'
         self.ui.Bssvar_Type_sin_period.setEnabled(1)
         self.ui.Bssvar_Type_linear_slope.setEnabled(0)
+        self.ui.Bssvar_Type_sin.setChecked(True)
         
     def select_linearModulation(self):
         self.typeofmodulation = 'linear'
         self.ui.Bssvar_Type_sin_period.setEnabled(0)
         self.ui.Bssvar_Type_linear_slope.setEnabled(1)
+        self.ui.Bssvar_Type_linear.setChecked(True)
         
     def clear_blossom_pars(self):
         self.ui.BType_Binary.setChecked(True)    
@@ -150,32 +177,150 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Error_msg.setText("<html><head/><body><p align=center><span style=' font-size:12pt; font-weight:600; color:#ff0000;'>" +\
                                   texto_aux + "</span></p></body></html>")
         self.lista_err = []     
-            
-    def select_file(self):
-        self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
-                                                          self.input_dir)
-        a = self.filename.replace('\\', '/ ').split('/');
-        self.input_file = a[-1]
-        self.ui.inputfile.setText(self.input_file)
-        self.ui.inputfile.setEnabled(False)
+  
+    def listspecies2text(self,objlist):
+        return(str(objlist).replace('[','').replace(']','').replace('\'',''))
+  
+  
+    def select_stored_simulation(self):
+        self.simulation_file = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
+                                                          self.dirent+sgGL.SIMFILES_PATH,filter='*.sim')
+        if len(self.simulation_file) == 0:
+            return
+        a = self.simulation_file.replace('\\', '/ ').split('/');
+        self.simulation_file = a[-1]
+        self.ui.simulation_file.setText(self.simulation_file)
+        self.ui.simulation_file.setEnabled(False)
         self.ui.Run_Button.setEnabled(1)
-        # Checking input file existence
         try:
-            fh = open(self.filename, "r")
+            fh = open(self.dirent+sgGL.SIMFILES_PATH+self.simulation_file, "rb")
         except IOError:
-            self.lista_err.append("ERROR: can\'t open file " + self.input_file)
+            self.lista_err.append("ERROR: can\'t open file " + \
+                                  self.simulation_file)
             self.error_exit()
             return
         else:
             fh.close()
-            input_fname_raw = self.input_file.replace('_b.txt', '_a.txt').\
+            with open(self.dirent+sgGL.SIMFILES_PATH+self.simulation_file, 'rb') as f:
+                storedsim = pickle.load(f)
+                fentrada = storedsim.dirtrabajo + '\\' +storedsim.direntrada+\
+                           storedsim.filename+'_a.txt'.replace('\\', '/ ')
+                self.input_file = fentrada
+                self.filename = storedsim.filename+'_a.txt'
+                self.ui.inputfile.setText(self.filename)
+                self.load_file_data(self.filename,storedsim.direntrada)
+                self.ciclos = storedsim.year_periods
+                if (storedsim.hay_foodweb):
+                    self.ui.foodweb_checkbox.setChecked(True)
+                if (storedsim.data_save):
+                    self.ui.save_output_checkbox.setChecked(True)
+                if len(storedsim.os)>0:
+                    self.ui.output_suffix.setText(storedsim.os)
+                if len(storedsim.com)>0:
+                    self.ui.Comments_text.setPlainText(storedsim.com)            
+                if (storedsim.algorithm == 'NoMutualism'):
+                    self.select_No_mutualism()
+                elif (storedsim.algorithm == 'Verhulst'):
+                    self.select_LApproach_vh()
+                elif (storedsim.algorithm == 'Logistic_abs'):
+                    self.select_LApproach_abs()
+                elif (storedsim.algorithm == 'Logistic_u'):
+                    self.select_LApproach_u()
+                elif (storedsim.algorithm == 'May'):
+                    self.select_May()
+                self.plants_blossom = storedsim.plants_blossom_prob
+                self.plants_blossom_type = storedsim.plants_blossom_type
+                if (self.plants_blossom_type == 'Gaussian'):
+                    self.select_GaussianBlossom()
+                if (self.plants_blossom_type == 'Binary'):
+                    self.select_BinaryBlossom()
+                self.ui.blossom_pert_species.setText(self.listspecies2text(storedsim.blossom_pert_list))
+                self.plants_blossom_sd = storedsim.plants_blossom_sd
+                self.typeofblossom = storedsim.plants_blossom_type
+                self.Bssvar_period = storedsim.Bssvar_data.Bssvar_period
+                self.Bssvar_sd = storedsim.Bssvar_data.Bssvar_sd
+                self.typeofmodulation = 'None'
+                self.Bssvar_modulationtype_list = storedsim.Bssvar_data.Bssvar_modulationtype_list
+                self.ui.Bssvar_species.setText(self.listspecies2text(storedsim.Bssvar_data.Bssvar_species))
+                if storedsim.Bssvar_data.Bssvar_modulationtype_list[0]=='linear':
+                    self.Bssvar_Type_linear_slope = storedsim.Bssvar_data.Bssvar_modulationtype_list[1]
+                    self.typeofmodulation = 'linear'
+                    self.select_linearModulation()
+                if storedsim.Bssvar_data.Bssvar_modulationtype_list[0]=='sin':
+                    self.Bssvar_Type_sin_period = storedsim.Bssvar_data.Bssvar_modulationtype_list[1]
+                    self.typeofmodulation = 'sin'
+                    self.select_sinModulation()
+                if storedsim.Bssvar_data.Bssvar_modulationtype_list[0]=='None':
+                    self.typeofmodulation = 'None'
+                    self.select_NoneModulation()
+                if len(storedsim.pl_ext):
+                    self.ui.pl_ext_species.setText(self.listspecies2text(storedsim.pl_ext['species']))   
+                    self.ui.pl_ext_period.setText(str(storedsim.pl_ext['period']//sgGL.DAYS_YEAR))
+                    self.ui.pl_ext_spike.setText(str(storedsim.pl_ext['spike']))
+                    self.ui.pl_ext_start.setText(str(storedsim.pl_ext['start']))
+                    self.ui.pl_ext_rate.setText(str(storedsim.pl_ext['rate']))
+                    self.ui.pl_ext_numperiod.setText(str(storedsim.pl_ext['numperiod']))
+                if len(storedsim.pol_ext):
+                    self.ui.pol_ext_species.setText(self.listspecies2text(storedsim.pol_ext['species']))   
+                    self.ui.pol_ext_period.setText(str(storedsim.pol_ext['period']//sgGL.DAYS_YEAR))
+                    self.ui.pol_ext_spike.setText(str(storedsim.pol_ext['spike']))
+                    self.ui.pol_ext_start.setText(str(storedsim.pol_ext['start']))
+                    self.ui.pol_ext_rate.setText(str(storedsim.pol_ext['rate']))
+                    self.ui.pol_ext_numperiod.setText(str(storedsim.pol_ext['numperiod']))
+                self.haypred = storedsim.hay_foodweb
+                self.algorithm = storedsim.algorithm
+                self.update_ui()
+
+    def get_root_file_name(self, name):
+        return(name.replace('_b.txt', '_a.txt').replace('_c.txt', '_a.txt'))
+        
+    def load_file_data(self,selected_filename,selected_path):    
+        try:
+            fh = open(selected_path+selected_filename, "r")
+        except IOError:
+            self.lista_err.append("ERROR: can\'t open file " + selected_filename)
+            self.error_exit()
+            return
+        else:
+            fh.close()
+            self.input_fname_raw = selected_filename.replace('_b.txt', '_a.txt').\
                                                 replace('_c.txt', '_a.txt')
-            l_minputchar_x = sgcom.dlmreadlike(input_fname_raw, self.dirent)
+            self.input_fname_raw = self.get_root_file_name(selected_filename)
+            l_minputchar_x = sgcom.dlmreadlike(self.input_fname_raw, selected_path)
             numspecies_a = len(l_minputchar_x) - sgGL.LINES_INFO_MATRIX
             numspecies_b = len(l_minputchar_x[0])
             self.ui.species_number.setText("Plant species: %d  Pollinator species: %d" %\
                              (numspecies_a, numspecies_b))
+
             self.repaint()
+    
+    def select_file(self):
+        self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
+                                                          self.input_dir)
+        if len(self.filename) == 0:
+            return
+        a = self.filename.replace('\\', '/ ').split('/');
+        self.input_file = a[-1]
+        self.ui.inputfile.setText(self.input_file)
+        self.ui.inputfile.setEnabled(False)
+        self.load_file_data(self.input_file,self.dirent) 
+        self.ui.Run_Button.setEnabled(1)
+    
+    def save_simulation_file(self):
+        """
+        Create and show the Save FileDialog
+        """
+        a = self.ui.inputfile.text()
+        a = self.get_root_file_name(a)
+        a = a.split('_a.txt')
+        output_suffix = self.ui.output_suffix.text()
+        simfile_name =  self.input_dir+'/'+sgGL.SIMFILES_PATH + a[0] + '_' +\
+                                  self.create_file_suffix(output_suffix)+ '.sim'
+        simulation_selected_filename = QtGui.QFileDialog.getSaveFileName(self,
+                "Save simulation parameters",
+                simfile_name)
+        if len(simulation_selected_filename)>0:
+            simulation_params.write2file(simulation_selected_filename)
 
     def create_list_species_affected(self, auxspec):
         auxlspec = []
@@ -229,7 +374,11 @@ class StartQT4(QtGui.QMainWindow):
             el = float(textfield)
         return el
 
-    def add_entry(self): 
+    def create_file_suffix(self,output_suffix):
+        return('_'.join([self.algorithm,output_suffix,str(int(self.ciclos))]) )
+    
+    def add_entry(self):
+        global simulation_params
         try:
             os.stat(self.dirs)
         except:
@@ -244,22 +393,20 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Run_Button.setEnabled(0)
         self.ui.Close_Button.setEnabled(0)
         self.ui.Error_msg.setText("")
-        self.ui.URL_report.setText("Running")
         displayinic = 0
-        input_fname_raw = self.input_file.replace('_b.txt',
+        self.input_fname_raw = self.input_file.replace('_b.txt',
                                            '_a.txt').replace('_c.txt', '_a.txt')
-        aux = input_fname_raw.split('_a.txt')
+        aux = self.input_fname_raw.split('/')
+        aux = aux[-1].split('_a.txt')
         input_fname = aux[0]
-        self.repaint()
         output_suffix = self.ui.output_suffix.text()
         comentario = self.ui.Comments_text.toPlainText()
         dirs = os.path.dirname(sys.argv[0])
-        reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))
-        fichr = reportpath + 'rep_' + input_fname + '_' + self.algorithm +\
-                     '_' + output_suffix + '_' + str(int(self.ciclos)) + '.html'
+        reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))         
+        fichr = reportpath + 'rep_' + input_fname +'_'+\
+                self.create_file_suffix(output_suffix)+ '.html'
         dispfichsal = fichr.split('/')
         linkname = '<a href=file:///' + fichr + '>' + dispfichsal[-1] + '</a>'
-        print("%s" % comentario)
         outputdatasave = self.ui.save_output_checkbox.checkState() > 0
         self.haypred = self.ui.foodweb_checkbox.checkState() > 0
         haysup = 0
@@ -322,11 +469,14 @@ class StartQT4(QtGui.QMainWindow):
                 blossom_pert_list=blossom_perturbation,
                 release=self.release,
                 Bssvar_data = Blossomvar_data )  
+#         simulation_params.write2file()
         self.ui.Run_Button.setEnabled(1)
-        self.ui.Close_Button.setEnabled(1)    
-#         sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
+        self.ui.Close_Button.setEnabled(1)
+        self.ui.URL_report.setText("Running")
+        self.repaint()
+        sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
         try:
-            sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
+            #sim_ret_val = b_sim.bino_mutual (sim_cond = simulation_params)
             pass
         except:
             self.lista_err.append("Simulation stopped, see details")
@@ -343,6 +493,7 @@ class StartQT4(QtGui.QMainWindow):
             if self.haypred:
                 sggraph.food_render(simulation_params, sim_ret_val, displayinic, 
                                     self.ciclos * sgGL.DAYS_YEAR)
+            self.ui.save_simulation.setEnabled(True)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)

@@ -8,6 +8,7 @@ import sys
 import numpy as np
 import datetime
 import copy
+import pickle
 import sigmund_GLOBALS as sgGL
 
 class SimulationConditions():
@@ -19,8 +20,6 @@ class SimulationConditions():
                 plants_blossom_sd=0.01, plants_blossom_type='Binary', 
                 blossom_pert_list='', verbose=True, exit_on_extinction=False,
                 N0plants='', N0pols='', release='', Bssvar_data = ''):
-#                 Bssvar_period=0.1, 
-#                 Bssvar_sd=0.0, Bssvar_modulationtype_list=[], Bssvar_species=[]):
         self.filename = filename
         self.year_periods = year_periods 
         self.hay_foodweb = hay_foodweb
@@ -46,6 +45,10 @@ class SimulationConditions():
         self.N0pols = N0pols
         self.release = release
         self.Bssvar_data = Bssvar_data
+    
+    def write2file(self,filesim):
+        with open(filesim, 'wb') as outfile:
+            pickle.dump(self, outfile, pickle.HIGHEST_PROTOCOL)
          
 class MaximaValues():
     def __init__(self,maxa_individuos, maxb_individuos, max_reff, min_reff,\

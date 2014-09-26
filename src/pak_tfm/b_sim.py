@@ -691,9 +691,6 @@ def bino_mutual(sim_cond = ''):
                       calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a,
                             nrows_b, ncols_b, numspecies_b, 
                             sim_cond,
-#                             sim_cond.plants_blossom_type,
-#                             sim_cond.plants_blossom_prob, 
-#                             sim_cond.plants_blossom_sd, 
                             blossom_pert_list=bloss_species[:])
             minpeq_a, minpeq_b = calc_perturbed_coeffs(k, hay_bssvar, 
                                                   pBssvar_species, minputchar_a,
