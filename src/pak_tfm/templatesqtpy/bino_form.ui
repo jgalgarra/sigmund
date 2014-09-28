@@ -1296,11 +1296,6 @@
      <cstring>inputfile</cstring>
     </property>
    </widget>
-   <zorder>BType_Binary</zorder>
-   <zorder>BType_Gaussian</zorder>
-   <zorder>plants_blossom_sd</zorder>
-   <zorder>label_21</zorder>
-   <zorder>Modulation</zorder>
   </widget>
   <widget class="QLabel" name="label_20">
    <property name="geometry">
@@ -1674,6 +1669,22 @@
     <string>Save simulation</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="clear_all_simparams">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>580</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Clear All</string>
+   </property>
+  </widget>
   <zorder>inputfile</zorder>
   <zorder>Close_Button</zorder>
   <zorder>Run_Button</zorder>
@@ -1740,6 +1751,7 @@
   <zorder>select_simulation</zorder>
   <zorder>simulation_file</zorder>
   <zorder>save_simulation</zorder>
+  <zorder>clear_all_simparams</zorder>
  </widget>
  <resources/>
  <connections>

@@ -8,6 +8,7 @@ This module includes the mutualist algorithm
 import numpy as np
 from time import time
 import math
+import copy
 import cProfile
 import sigmund_GLOBALS as sgGL
 import sigmund_common as sgcom
@@ -199,7 +200,7 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %0.2f, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])+1), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %0.2f, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
@@ -207,7 +208,7 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pol_ext['species'])+1), periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pol_ext['species'])), periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
     else:
         inicioextpol = nperpol = periodoextpol = spikepol = 0
     perturbation_conditions = sgcom.ExternalPerturbationConditions(nperpl, 
@@ -547,20 +548,22 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
                                      numspecies_b):
     global cuentaperpl, cuentaperpol
     cuentaperpl = cuentaperpol = 0
+    inner_pl_ext = copy.deepcopy(pl_ext)
+    inner_pol_ext = copy.deepcopy(pol_ext)
     hayextplantas = len(pl_ext) > 0
     hayextpolin = len(pol_ext) > 0
     j = 0
     if hayextplantas:
         if (pl_ext['species'][0] == 'ALL'):
-            pl_ext['species'] = list(range(0, numspecies_a))
+            inner_pl_ext['species'] = list(range(0, numspecies_a))
         else:
-            pl_ext['species'] = [i-1 for i in pl_ext['species']]
+            inner_pl_ext['species'] = [i-1 for i in pl_ext['species']]
     if hayextpolin: 
         if (pol_ext['species'][0] == 'ALL'):
-            pol_ext['species'] = list(range(0, numspecies_b))
+            inner_pol_ext['species'] = list(range(0, numspecies_b))
         else:
-            pol_ext['species'] = [i-1 for i in pol_ext['species']]
-    return hayextplantas, hayextpolin, j
+            inner_pol_ext['species'] = [i-1 for i in pol_ext['species']]
+    return hayextplantas, hayextpolin, inner_pl_ext, inner_pol_ext, j
 
 def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
                             ra_equs, rb_equs, ra_eff, rb_eff):
@@ -650,7 +653,7 @@ def bino_mutual(sim_cond = ''):
                                             sgGL.ldev_inf, minputchar_a)            
     # Extinction analysis. Forced death rate increases
 #     inicioextplantas, inicioextpol, hayextplantas, hayextpolin, j =\
-    hayextplantas, hayextpolin, j =init_external_perturbation_lists(
+    hayextplantas, hayextpolin, inner_pl_ext, inner_pol_ext, j =init_external_perturbation_lists(
                                                      sim_cond.pl_ext, 
                                                      sim_cond.pol_ext,
                                                      numspecies_a, numspecies_b)     
@@ -707,7 +710,7 @@ def bino_mutual(sim_cond = ''):
                                           sgGL.ldev_inf)
         [populations_evolution(n, "Plant", 
                                numspecies_a, sim_cond.algorithm, 
-                               sim_cond.hay_foodweb, sim_cond.pl_ext, 
+                               sim_cond.hay_foodweb, inner_pl_ext, 
                                May, haymut, ra_eff, ra_equs, 
                                minpeq_a, j, cAlpha_a, Alpha_a, r_a, rd_a, 
                                Nindividuals_a, numspecies_b, Nindividuals_b, 
@@ -718,7 +721,7 @@ def bino_mutual(sim_cond = ''):
                                sgGL.ldev_inf) for n in range(numspecies_a)]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, sim_cond.algorithm, 
-                               sim_cond.hay_foodweb, sim_cond.pol_ext, 
+                               sim_cond.hay_foodweb, inner_pol_ext, 
                                May, haymut, rb_eff, rb_equs,
                                minpeq_b, j, cAlpha_b, Alpha_b, r_b, rd_b, 
                                Nindividuals_b, numspecies_a, Nindividuals_a,

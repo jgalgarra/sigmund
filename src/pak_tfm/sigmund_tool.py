@@ -21,32 +21,9 @@ global simulation_params
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
-        self.hay_error = False
-        self.lista_err = []
-        self.input_dir = './input'
-        self.ciclos = 100
-        self.release = sgRL.RELEASE_NUMBER
-        self.daterelease = sgRL.RELEASE_STRING
-        self.plants_blossom = 1.00
-        self.plants_blossom_sd = 0.01
-        self.typeofblossom = 'Binary'
-        self.Bssvar_period = 0.1
-        self.Bssvar_sd = 0.0
-        self.Bssvar_Type_linear_slope = 1.0
-        self.Bssvar_Type_sin_period = 50
-        self.filename = ""
-        self.input_file = ""
-        self.haymut = False
-        self.haypred = False
-        self.May = False
-        self.algorithm = 'Verhulst'
-        self.typeofmodulation = 'None'
-        self.Bssvar_modulationtype_list = []
-        self.dirsal = 'output/'
-        self.dirent = 'input/'
-        self.dirs = os.path.dirname(self.dirsal)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
+        self.set_default_params()
         self.setWindowTitle('SIGMUND ' + "%0.2f " % (self.release / 100) +\
                              self.daterelease)
         self.setWindowIcon(QtGui.QIcon('upm.gif'))
@@ -63,6 +40,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Bssvar_Type_linear.clicked.connect(self.select_linearModulation)
         self.ui.ClearBlossom.clicked.connect(self.clear_blossom_pars)
         self.ui.ClearBssvar.clicked.connect(self.clear_Bssvar_pars)
+        self.ui.clear_all_simparams.clicked.connect(self.clear_all_pars)
         QtCore.QObject.connect(self.ui.inputfile, 
                                QtCore.SIGNAL("returnPressed()"), self.add_entry)
         QtCore.QObject.connect(self.ui.ciclos, 
@@ -81,6 +59,28 @@ class StartQT4(QtGui.QMainWindow):
                                self.save_simulation_file)
         self.update_ui()
 
+    def set_default_params(self):
+        self.hay_error = False
+        self.lista_err = []
+        self.input_dir = './input'
+        self.ciclos = 100
+        self.release = sgRL.RELEASE_NUMBER
+        self.daterelease = sgRL.RELEASE_STRING
+        self.filename = ""
+        self.input_file = ""
+        self.input_fname_raw = ""
+        self.haymut = False
+        self.haypred = False
+        self.May = False
+        self.algorithm = 'Verhulst'
+        self.typeofmodulation = 'None'
+        self.Bssvar_modulationtype_list = []
+        self.dirsal = 'output/'
+        self.dirent = 'input/'
+        self.dirs = os.path.dirname(self.dirsal)
+        self.clear_blossom_pars()
+        self.clear_Bssvar_pars()
+        
     def update_ui(self):
         self.ui.ciclos.setText(str(self.ciclos))
         self.ui.plants_blossom.setText(str(self.plants_blossom))
@@ -89,6 +89,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Bssvar_sd.setText(str(self.Bssvar_sd))
         self.ui.Bssvar_Type_linear_slope.setText(str(self.Bssvar_Type_linear_slope))
         self.ui.Bssvar_Type_sin_period.setText(str(self.Bssvar_Type_sin_period))
+        self.ui.inputfile.setText(self.input_fname_raw)
         self.ui.inputfile.setEnabled(False)
         self.ui.simulation_file.setEnabled(False)
         self.repaint()
@@ -146,6 +147,7 @@ class StartQT4(QtGui.QMainWindow):
     def clear_blossom_pars(self):
         self.ui.BType_Binary.setChecked(True)    
         self.ui.BType_Binary.clicked.connect(self.select_BinaryBlossom)
+        self.typeofblossom = 'Binary'
         self.ui.blossom_pert_species.setText('ALL')
         self.plants_blossom = 1.00
         self.ui.plants_blossom.setText('1.0')
@@ -167,6 +169,37 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.Bssvar_Type_sin_period.setText(str(self.Bssvar_Type_sin_period))
         self.ui.Bssvar_species.setText('')
         
+    def clear_pert_data(self):
+        self.ui.pl_ext_period.setText('')
+        self.ui.pl_ext_spike.setText('')
+        self.ui.pl_ext_numperiod.setText('')
+        self.ui.pl_ext_rate.setText('')
+        self.ui.pl_ext_start.setText('')
+        self.ui.pl_ext_species.setText('')
+        self.ui.pol_ext_period.setText('')
+        self.ui.pol_ext_spike.setText('')
+        self.ui.pol_ext_numperiod.setText('')
+        self.ui.pol_ext_rate.setText('')
+        self.ui.pol_ext_start.setText('')
+        self.ui.pol_ext_species.setText('')
+        
+            
+    def clear_all_pars(self):
+        self.set_default_params()
+        self.select_LApproach_vh()
+        self.clear_pert_data()
+        self.ui.random_removal.setText('')
+        self.ui.output_suffix.setText('')
+        self.ui.Comments_text.setPlainText('')
+        self.ui.simulation_file.setText('')
+        self.ui.inputfile.setText('')
+        self.ui.foodweb_checkbox.setChecked(False)
+        self.ui.save_output_checkbox.setChecked(False)
+        self.ui.Run_Button.setEnabled(0)
+        self.ui.clear_all_simparams.setEnabled(0)
+        self.ui.save_simulation.setEnabled(0)
+        self.update_ui()
+        
     def error_exit(self):
         texto_aux = ""
         for i in self.lista_err:
@@ -180,6 +213,12 @@ class StartQT4(QtGui.QMainWindow):
   
     def listspecies2text(self,objlist):
         return(str(objlist).replace('[','').replace(']','').replace('\'',''))
+    
+    def listinnerspecies2text(self,inputlist,numspecies):
+        if len(inputlist)==numspecies:
+            return('ALL')
+        else:
+            return ','.join([str(i+1) for i in inputlist])
   
   
     def select_stored_simulation(self):
@@ -208,8 +247,12 @@ class StartQT4(QtGui.QMainWindow):
                 self.input_file = fentrada
                 self.filename = storedsim.filename+'_a.txt'
                 self.ui.inputfile.setText(self.filename)
-                self.load_file_data(self.filename,storedsim.direntrada)
+                numspecies_a, numspecies_b = self.load_file_data(self.filename,storedsim.direntrada)
                 self.ciclos = storedsim.year_periods
+                if (storedsim.eliminarenlaces==0):
+                    self.ui.random_removal.setText('')
+                else:
+                    self.ui.random_removal.setText(str(storedsim.eliminarenlaces))
                 if (storedsim.hay_foodweb):
                     self.ui.foodweb_checkbox.setChecked(True)
                 if (storedsim.data_save):
@@ -254,7 +297,7 @@ class StartQT4(QtGui.QMainWindow):
                     self.typeofmodulation = 'None'
                     self.select_NoneModulation()
                 if len(storedsim.pl_ext):
-                    self.ui.pl_ext_species.setText(self.listspecies2text(storedsim.pl_ext['species']))   
+                    self.ui.pl_ext_species.setText(self.listspecies2text(storedsim.pl_ext['species']))
                     self.ui.pl_ext_period.setText(str(storedsim.pl_ext['period']//sgGL.DAYS_YEAR))
                     self.ui.pl_ext_spike.setText(str(storedsim.pl_ext['spike']))
                     self.ui.pl_ext_start.setText(str(storedsim.pl_ext['start']))
@@ -291,8 +334,8 @@ class StartQT4(QtGui.QMainWindow):
             numspecies_b = len(l_minputchar_x[0])
             self.ui.species_number.setText("Plant species: %d  Pollinator species: %d" %\
                              (numspecies_a, numspecies_b))
-
             self.repaint()
+            return(numspecies_a, numspecies_b)
     
     def select_file(self):
         self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
@@ -303,7 +346,7 @@ class StartQT4(QtGui.QMainWindow):
         self.input_file = a[-1]
         self.ui.inputfile.setText(self.input_file)
         self.ui.inputfile.setEnabled(False)
-        self.load_file_data(self.input_file,self.dirent) 
+        numspecies_a, numspecies_b = self.load_file_data(self.input_file,self.dirent) 
         self.ui.Run_Button.setEnabled(1)
     
     def save_simulation_file(self):
@@ -337,7 +380,7 @@ class StartQT4(QtGui.QMainWindow):
                 listb.append(j)    
         listb = sorted(set(listb))   
         return listb
-    
+            
     def fetch_pert_data(self, xx_ext_period, xx_ext_spike, xx_ext_start, 
                         xx_ext_rate, xx_ext_numperiod, xx_ext_species):
         ret_extinction = {}
@@ -448,7 +491,6 @@ class StartQT4(QtGui.QMainWindow):
                                             self.ui.pol_ext_rate,
                                             self.ui.pol_ext_numperiod,
                                             self.ui.pol_ext_species)
-        blossom_perturbation = {}        
         if (self.ui.blossom_pert_species.text().upper() == 'ALL'):
             blossom_perturbation = ['ALL']
         else:
@@ -494,6 +536,7 @@ class StartQT4(QtGui.QMainWindow):
                 sggraph.food_render(simulation_params, sim_ret_val, displayinic, 
                                     self.ciclos * sgGL.DAYS_YEAR)
             self.ui.save_simulation.setEnabled(True)
+            self.ui.clear_all_simparams.setEnabled(True)
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)

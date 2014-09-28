@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'bino_form.ui'
 #
-# Created: Fri Sep 26 20:15:01 2014
+# Created: Sun Sep 28 12:34:45 2014
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -472,6 +472,10 @@ class Ui_Form(object):
         self.save_simulation.setEnabled(False)
         self.save_simulation.setGeometry(QtCore.QRect(20, 580, 131, 21))
         self.save_simulation.setObjectName(_fromUtf8("save_simulation"))
+        self.clear_all_simparams = QtGui.QPushButton(Form)
+        self.clear_all_simparams.setEnabled(False)
+        self.clear_all_simparams.setGeometry(QtCore.QRect(160, 580, 131, 21))
+        self.clear_all_simparams.setObjectName(_fromUtf8("clear_all_simparams"))
         self.label_2.setBuddy(self.label_2)
         self.label_4.setBuddy(self.inputfile)
         self.label_5.setBuddy(self.inputfile)
@@ -574,4 +578,5 @@ class Ui_Form(object):
         self.Bssvar_Type_sin.setText(QtGui.QApplication.translate("Form", "sin", None, QtGui.QApplication.UnicodeUTF8))
         self.select_simulation.setText(QtGui.QApplication.translate("Form", "Load simulation", None, QtGui.QApplication.UnicodeUTF8))
         self.save_simulation.setText(QtGui.QApplication.translate("Form", "Save simulation", None, QtGui.QApplication.UnicodeUTF8))
+        self.clear_all_simparams.setText(QtGui.QApplication.translate("Form", "Clear All", None, QtGui.QApplication.UnicodeUTF8))
 
