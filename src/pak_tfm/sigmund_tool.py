@@ -1,8 +1,3 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Here we provide the necessary imports.
-# The basic GUI widgets are located in QtGui module. 
 import sys
 import os
 import b_sim
@@ -212,18 +207,13 @@ class StartQT4(QtGui.QMainWindow):
         self.lista_err = []     
   
     def listspecies2text(self,objlist):
-        return(str(objlist).replace('[','').replace(']','').replace('\'',''))
-    
-    def listinnerspecies2text(self,inputlist,numspecies):
-        if len(inputlist)==numspecies:
-            return('ALL')
-        else:
-            return ','.join([str(i+1) for i in inputlist])
-  
+        return(str(objlist).replace('[','').replace(']','').replace('\'',''))  
   
     def select_stored_simulation(self):
-        self.simulation_file = QtGui.QFileDialog.getOpenFileName(self, 'Open File',
-                                                          self.dirent+sgGL.SIMFILES_PATH,filter='*.sim')
+        self.simulation_file = QtGui.QFileDialog.getOpenFileName(self, 
+                                                          'Open File',
+                                        self.dirent+sgGL.SIMFILES_PATH,
+                                                          filter='*.sim')
         if len(self.simulation_file) == 0:
             return
         a = self.simulation_file.replace('\\', '/ ').split('/');
@@ -240,14 +230,16 @@ class StartQT4(QtGui.QMainWindow):
             return
         else:
             fh.close()
-            with open(self.dirent+sgGL.SIMFILES_PATH+self.simulation_file, 'rb') as f:
+            with open(self.dirent+sgGL.SIMFILES_PATH+self.simulation_file, 
+                      'rb') as f:
                 storedsim = pickle.load(f)
                 fentrada = storedsim.dirtrabajo + '\\' +storedsim.direntrada+\
                            storedsim.filename+'_a.txt'.replace('\\', '/ ')
                 self.input_file = fentrada
                 self.filename = storedsim.filename+'_a.txt'
                 self.ui.inputfile.setText(self.filename)
-                numspecies_a, numspecies_b = self.load_file_data(self.filename,storedsim.direntrada)
+                numspecies_a, numspecies_b = self.load_file_data(self.filename,
+                                                          storedsim.direntrada)
                 self.ciclos = storedsim.year_periods
                 if (storedsim.eliminarenlaces==0):
                     self.ui.random_removal.setText('')
