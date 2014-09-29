@@ -356,22 +356,6 @@ class StartQT4(QtGui.QMainWindow):
                 simfile_name)
         if len(simulation_selected_filename)>0:
             simulation_params.write2file(simulation_selected_filename)
-
-    def create_list_species_affected(self, auxspec):
-        auxlspec = []
-        for numspe in auxspec:
-            if len(numspe) == 1:
-                auxlspec.append([int(numspe)])
-            else:
-                rango = numspe.split(':')
-                auxlspec.append([j for j in range(int(rango[0]), 1 +\
-                                                   int(rango[-1]))])
-        listb = []
-        for subla in auxlspec:
-            for j in list(subla):
-                listb.append(j)    
-        listb = sorted(set(listb))   
-        return listb
             
     def fetch_pert_data(self, xx_ext_period, xx_ext_spike, xx_ext_start, 
                         xx_ext_rate, xx_ext_numperiod, xx_ext_species):
@@ -384,14 +368,9 @@ class StartQT4(QtGui.QMainWindow):
                 ret_extinction['start'] = int(xx_ext_start.text())
                 ret_extinction['rate'] = float(xx_ext_rate.text())
                 ret_extinction['numperiod'] = int(xx_ext_numperiod.text())
-                if (xx_ext_species.text().upper() == 'ALL'):
-                    ret_extinction['species'] = ['ALL']
-                else:
-                    auxspec = xx_ext_species.text().split(',')
-                    listb = self.create_list_species_affected(auxspec)
-                    ret_extinction['species'] = listb
+                ret_extinction['species']  = sgcom.create_list_species_affected(xx_ext_species.text())
             except:         
-                self.lista_err.append("ERROR: bad plant extinction format")
+                self.lista_err.append("ERROR: bad forced perturbation format")
                 self.error_exit()
                 self.ui.Run_Button.setEnabled(1)
                 self.ui.Close_Button.setEnabled(1)
@@ -457,15 +436,10 @@ class StartQT4(QtGui.QMainWindow):
         else: 
             if (self.typeofmodulation == 'sin'):
                 self.Bssvar_modulationtype_list.append(float(self.ui.Bssvar_Type_sin_period.text()))
-        if (self.ui.Bssvar_species.text().upper() == 'ALL'):
-            self.Bssvar_species = ['ALL']
+        if (len(self.ui.Bssvar_species.text()) == 0):
+            self.Bssvar_species = []
         else:
-            if (len(self.ui.Bssvar_species.text()) == 0):
-                listb = []
-            else:
-                auxspec = self.ui.Bssvar_species.text().split(',')
-                listb = self.create_list_species_affected(auxspec)
-            self.Bssvar_species = listb
+            self.Bssvar_species = sgcom.create_list_species_affected(self.ui.Bssvar_species.text())
         Blossomvar_data = sgcom.BlossomVariability(self.Bssvar_period,
                                                     self.Bssvar_sd,
                                                 self.Bssvar_modulationtype_list,
@@ -483,12 +457,7 @@ class StartQT4(QtGui.QMainWindow):
                                             self.ui.pol_ext_rate,
                                             self.ui.pol_ext_numperiod,
                                             self.ui.pol_ext_species)
-        if (self.ui.blossom_pert_species.text().upper() == 'ALL'):
-            blossom_perturbation = ['ALL']
-        else:
-            auxspec = self.ui.blossom_pert_species.text().split(',')
-            listb = self.create_list_species_affected(auxspec)
-            blossom_perturbation = listb
+        blossom_perturbation = sgcom.create_list_species_affected(self.ui.blossom_pert_species.text())
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
                 year_periods = self.ciclos, 
                 hay_foodweb = self.haypred, hay_superpredadores = haysup,

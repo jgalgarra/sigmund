@@ -200,7 +200,12 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpl = pl_ext['numperiod']
         periodoextpl = pl_ext['period']
         spikepl = round(periodoextpl * pl_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Plants species %s, period (years): %0.2f, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pl_ext['species'])), periodoextpl / sgGL.DAYS_YEAR, nperpl, pl_ext['spike'], float(pl_ext['rate']), pl_ext['start']))
+        species_list_text = sgcom.create_list_species_affected(','.join([str(i) for i in pl_ext['species']] ))
+        sgcom.inform_user(ldev_inf, 
+                          "Perturbations. Plants species %s, period (years): %0.2f, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d"\
+                          % (species_list_text, periodoextpl / sgGL.DAYS_YEAR, 
+                             nperpl, pl_ext['spike'], float(pl_ext['rate']), 
+                             pl_ext['start']))
     else:
         inicioextplantas = nperpl = periodoextpl = spikepl = 0
     if hayextpolin:
@@ -208,7 +213,13 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
         nperpol = pol_ext['numperiod']
         periodoextpol = pol_ext['period']
         spikepol = round(periodoextpol * pol_ext['spike'])
-        sgcom.inform_user(ldev_inf, "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d" % (str(np.array(pol_ext['species'])), periodoextpol / sgGL.DAYS_YEAR, nperpol, pol_ext['spike'], float(pol_ext['rate']), pol_ext['start']))
+        species_list_text = sgcom.create_list_species_affected(','.join([str(i) for i in pol_ext['species']] ))
+        sgcom.inform_user(ldev_inf, 
+                          "Perturbations. Pollinators species %s, period (years): %d, numperiods: %d, spike (fraction of period): %0.2f, rate: %.03f, start (year): %d"\
+                          % (species_list_text, periodoextpol / sgGL.DAYS_YEAR, 
+                             nperpol, pol_ext['spike'], float(pol_ext['rate']), 
+                             pol_ext['start']))
+        
     else:
         inicioextpol = nperpol = periodoextpol = spikepol = 0
     perturbation_conditions = sgcom.ExternalPerturbationConditions(nperpl, 
@@ -449,10 +460,10 @@ def predators_param_init(filename, hay_foodweb, direntrada, ldev_inf, lfich_inf,
         filename_d = filename + '_d.txt'
         sgcom.inform_user(lfich_inf, "Predators matrix c: <a href='file:///" +\
                           dt + "/input/" + filename_c + "' target=_BLANK>" +\
-                          filename_c + "<a><br>")
+                          filename_c + "<a>")
         sgcom.inform_user(lfich_inf, "Predators matrix d: <a href='file:///" +\
                           dt + "/input/" + filename_d + "' target=_BLANK>" +\
-                          filename_d + "<a><br>")
+                          filename_d + "<a>")
         try:
             l_minputchar_c = sgcom.dlmreadlike(filename_c, direntrada)
             minputchar_c = np.array(l_minputchar_c, dtype=float)
@@ -531,6 +542,9 @@ def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
     sgcom.inform_user(ldev_inf, "Plant species: %d" % numspecies_a)
     sgcom.inform_user(ldev_inf, "Plant initial populations %s" %\
                       rowNindividuals_a)
+    sgcom.inform_user(ldev_inf, "Pollinator species: %d" % numspecies_b)
+    sgcom.inform_user(ldev_inf, 
+                      "Pollinator initial populations %s" % rowNindividuals_b)
     if (plants_blossom_type == 'Binary'):
         sgcom.inform_user(ldev_inf,
                 "Blossom probability %s, type %s. Plant affected species:%s" %\
@@ -540,9 +554,7 @@ def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
                 "Blossom probability, type %s, mean %s, standard dev. %s. Plant affected species:%s" %\
                 (plants_blossom_type, plants_blossom_prob, plants_blossom_sd, 
                  str(blossom_pert_list)))
-    sgcom.inform_user(ldev_inf, "Pollinator species: %d" % numspecies_b)
-    sgcom.inform_user(ldev_inf, 
-                      "Pollinator initial populations %s" % rowNindividuals_b)
+    
 
 def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, 
                                      numspecies_b):
@@ -634,13 +646,7 @@ def bino_mutual(sim_cond = ''):
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
-    Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
-                                      predators_param_init(sim_cond.filename, 
-                                                           sim_cond.hay_foodweb,
-                                                           sim_cond.direntrada, 
-                                                           sgGL.ldev_inf,
-                                                           sgGL.lfich_inf,
-                                             sim_cond.dirtrabajo.replace('\\', '/'))
+    
     add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
                                      sim_cond.plants_blossom_sd,
                                      sim_cond.plants_blossom_type, 
@@ -648,6 +654,7 @@ def bino_mutual(sim_cond = ''):
                                      sgGL.ldev_inf, numspecies_a,
                                      rowNindividuals_a, numspecies_b,
                                      rowNindividuals_b)
+   
     # Random links removal 
     periodoborr = init_random_links_removal(sim_cond.eliminarenlaces, periods, 
                                             sgGL.ldev_inf, minputchar_a)            
@@ -668,7 +675,13 @@ def bino_mutual(sim_cond = ''):
                                 sim_cond.Bssvar_data, 
                                 sgGL.ldev_inf,
                                 numspecies_a)
-         
+    Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
+                                      predators_param_init(sim_cond.filename, 
+                                                           sim_cond.hay_foodweb,
+                                                           sim_cond.direntrada, 
+                                                           sgGL.ldev_inf,
+                                                           sgGL.lfich_inf,
+                                             sim_cond.dirtrabajo.replace('\\', '/'))
     for k in range (periods - 1):
         ''' The compatibilty matrixes masks are created when the year starts '''         
         if not(k % sgGL.DAYS_YEAR):  # Much faster than if ((k%sgGL.DAYS_YEAR)==0)     

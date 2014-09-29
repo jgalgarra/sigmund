@@ -190,6 +190,25 @@ def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs,
                          min(np.min([ra_equs]), np.min([rb_equs])) )
     return(mval)
 
+
+def create_list_species_affected(speciestext):
+    if (str(speciestext) == 'ALL'):
+        return(list(['ALL']))
+    auxspec = speciestext.split(',')
+    auxlspec = []
+    for numspe in auxspec:
+        if len(numspe) == 1:
+            auxlspec.append([int(numspe)])
+        else:
+            rango = numspe.split(':')
+            auxlspec.append([j for j in range(int(rango[0]), 1+int(rango[-1]))])
+    listb = []
+    for subla in auxlspec:
+        for j in list(subla):
+            listb.append(j)    
+    listb = sorted(set(listb))   
+    return listb
+
 def start_report(ldev_inf, filename, com, year_periods, algorithm, release, 
                  hay_foodweb):
     inform_user(ldev_inf, \
