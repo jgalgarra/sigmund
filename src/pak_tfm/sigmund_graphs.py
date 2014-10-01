@@ -149,7 +149,7 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
     plt.xlabel('Years')
     dt = simulation_params.dirtrabajo.replace('\\', '/');    
     nsal = 'output_pict_plantsandpols_' + simulation_params.filename +\
-           '_' + simulation_params.algorithm + '_' + simulation_params.os +\
+           '_' + simulation_params.algorithm + '_' + simulation_params.output_suff +\
            '_' + str(years) + '.png'
     plt.savefig(str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal), 
                 bbox_inches=0)
@@ -236,7 +236,7 @@ def food_render(simulation_params, sig_ret_val, displayinic, periods,
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
     nsal = 'output_pict_foodweb_' + simulation_params.filename + '_' +\
-            simulation_params.algorithm + '_' + simulation_params.os +\
+            simulation_params.algorithm + '_' + simulation_params.output_suff +\
            '_' + str(periods) + '.png'
     dt = simulation_params.dirtrabajo.replace('\\', '/');
     plt.savefig(str(dt + '/' + simulation_params.dirsal.replace('\\', '/') + nsal), 

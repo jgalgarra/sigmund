@@ -700,7 +700,7 @@ def bino_mutual(sim_cond = ''):
                                               Nindividuals_a, Nindividuals_b, 
                                               Nindividuals_c, ra_eff, rb_eff, 
                                               ra_equs, rb_equs, 
-                                              0, 0, 0, 0, 0, 0, 
+                                              [], 
                                               systemextinction, pBssvar_species)
                         return(sim_ret_val)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas =\

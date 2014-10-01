@@ -70,8 +70,8 @@ class StartQT4(QtGui.QMainWindow):
         self.algorithm = 'Verhulst'
         self.typeofmodulation = 'None'
         self.Bssvar_modulationtype_list = []
-        self.dirsal = 'output/'
-        self.dirent = 'input/'
+        self.dirsal = sgGL.OUTPUTILES_PATH
+        self.dirent = sgGL.INPUTFILES_PATH
         self.dirs = os.path.dirname(self.dirsal)
         self.clear_blossom_pars()
         self.clear_Bssvar_pars()
@@ -249,8 +249,8 @@ class StartQT4(QtGui.QMainWindow):
                     self.ui.foodweb_checkbox.setChecked(True)
                 if (storedsim.data_save):
                     self.ui.save_output_checkbox.setChecked(True)
-                if len(storedsim.os)>0:
-                    self.ui.output_suffix.setText(storedsim.os)
+                if len(storedsim.output_suff)>0:
+                    self.ui.output_suffix.setText(storedsim.output_suff)
                 if len(storedsim.com)>0:
                     self.ui.Comments_text.setPlainText(storedsim.com)            
                 if (storedsim.algorithm == 'NoMutualism'):
@@ -318,8 +318,8 @@ class StartQT4(QtGui.QMainWindow):
             return
         else:
             fh.close()
-            self.input_fname_raw = selected_filename.replace('_b.txt', '_a.txt').\
-                                                replace('_c.txt', '_a.txt')
+#             self.input_fname_raw = selected_filename.replace('_b.txt', '_a.txt').\
+#                                                 replace('_c.txt', '_a.txt')
             self.input_fname_raw = self.get_root_file_name(selected_filename)
             l_minputchar_x = sgcom.dlmreadlike(self.input_fname_raw, selected_path)
             numspecies_a = len(l_minputchar_x) - sgGL.LINES_INFO_MATRIX
@@ -350,7 +350,8 @@ class StartQT4(QtGui.QMainWindow):
         a = a.split('_a.txt')
         output_suffix = self.ui.output_suffix.text()
         simfile_name =  self.input_dir+'/'+sgGL.SIMFILES_PATH + a[0] + '_' +\
-                                  self.create_file_suffix(output_suffix)+ '.sim'
+             sgcom.create_file_suffix(self.algorithm,output_suffix,self.ciclos)+\
+                        '.sim'
         simulation_selected_filename = QtGui.QFileDialog.getSaveFileName(self,
                 "Save simulation parameters",
                 simfile_name)
@@ -388,8 +389,8 @@ class StartQT4(QtGui.QMainWindow):
             el = float(textfield)
         return el
 
-    def create_file_suffix(self,output_suffix):
-        return('_'.join([self.algorithm,output_suffix,str(int(self.ciclos))]) )
+#     def create_file_suffix(self,output_suffix):
+#         return('_'.join([self.algorithm,output_suffix,str(int(self.ciclos))]) )
     
     def add_entry(self):
         global simulation_params
@@ -416,9 +417,11 @@ class StartQT4(QtGui.QMainWindow):
         output_suffix = self.ui.output_suffix.text()
         comentario = self.ui.Comments_text.toPlainText()
         dirs = os.path.dirname(sys.argv[0])
-        reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))         
-        fichr = reportpath + 'rep_' + input_fname +'_'+\
-                self.create_file_suffix(output_suffix)+ '.html'
+        reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))
+        file_suffix = sgcom.create_file_suffix(self.algorithm,output_suffix,self.ciclos)
+        fichr = sgcom.create_fichreport_name(reportpath,input_fname,file_suffix)     
+#         fichr = reportpath + 'rep_' + input_fname +'_'+\
+#                 self.create_file_suffix(output_suffix)+ '.html'
         dispfichsal = fichr.split('/')
         linkname = '<a href=file:///' + fichr + '>' + dispfichsal[-1] + '</a>'
         outputdatasave = self.ui.save_output_checkbox.checkState() > 0
@@ -464,7 +467,7 @@ class StartQT4(QtGui.QMainWindow):
                 data_save = outputdatasave, dirtrabajo = dirs, 
                 direntrada = self.dirent, dirsal = self.dirsal,
                 eliminarenlaces = el, pl_ext = plants_extinction, 
-                pol_ext = pols_extinction, os = output_suffix, 
+                pol_ext = pols_extinction, output_suff = output_suffix, 
                 fichreport = fichr, com = comentario, 
                 algorithm = self.algorithm, plants_blossom_prob = pb, 
                 plants_blossom_sd = pb_sd, 

@@ -15,10 +15,11 @@ class SimulationConditions():
     def __init__(self, filename ='', year_periods = '', hay_foodweb = False, 
                 hay_superpredadores = False ,
                 data_save='', dirtrabajo ='', direntrada='', dirsal='',
-                eliminarenlaces=0, pl_ext=[], pol_ext=[], os='', fichreport='',
-                com='', algorithm='MoMutualism', plants_blossom_prob=1.0,
-                plants_blossom_sd=0.01, plants_blossom_type='Binary', 
-                blossom_pert_list='', verbose=True, exit_on_extinction=False,
+                eliminarenlaces=0, pl_ext=[], pol_ext=[], output_suff ='', 
+                fichreport = '', com = '', algorithm = 'MoMutualism', 
+                plants_blossom_prob = 1.0, plants_blossom_sd = 0.01, 
+                plants_blossom_type = 'Binary', blossom_pert_list = '', 
+                verbose = True, exit_on_extinction = False,
                 N0plants='', N0pols='', release='', Bssvar_data = ''):
         self.filename = filename
         self.year_periods = year_periods 
@@ -31,7 +32,7 @@ class SimulationConditions():
         self.eliminarenlaces = eliminarenlaces
         self.pl_ext = copy.deepcopy(pl_ext)
         self.pol_ext = copy.deepcopy(pol_ext)
-        self.os = os
+        self.output_suff = output_suff
         self.fichreport = fichreport
         self.com = com
         self.algorithm = algorithm
@@ -72,6 +73,7 @@ class SimulationReturnValues():
     def __init__(self, Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, 
                  rb_eff, ra_equs, rb_equs, mval, systemextinction, 
                  pBssvar_species):
+        self.systemextinction = systemextinction
         self.Nindividuals_a = Nindividuals_a
         self.Nindividuals_b = Nindividuals_b
         self.Nindividuals_c = Nindividuals_c
@@ -149,7 +151,7 @@ def dlmreadlike(inputfile, direntrada):
  
 def dlmwritelike(input_file,sim_cond, nperiod, Nin):
     dsal = sim_cond.dirsal.replace('\\', '/')
-    nsal = 'output_data_' + input_file + '_' + sim_cond.os +\
+    nsal = 'output_data_' + input_file + '_' + sim_cond.output_suff + '_'+\
            str(nperiod) + '.txt'
     print ("Output file %s" % dsal + nsal)
     salida = open(dsal + nsal, 'w', encoding='utf-8')
@@ -162,7 +164,7 @@ def dlmwritelike(input_file,sim_cond, nperiod, Nin):
     return(nsal)
 
 def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild, 
-                           name_guild, N0_guild, lfich_inf = ''):
+                           name_guild, N0_guild, lfich_inf = ''):    
     filename_x = filename + str_guild
     dt = dirtrabajo.replace('\\', '/')
     inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
@@ -221,6 +223,11 @@ def start_report(ldev_inf, filename, com, year_periods, algorithm, release,
     if hay_foodweb:
         inform_user(ldev_inf, 'Food web superimposed') 
 
+def create_file_suffix(algorithm,output_suffix,ciclos):
+    return('_'.join([algorithm,output_suffix,str(int(ciclos))]) )
+
+def create_fichreport_name(reportpath,input_fname,file_suffix):
+    return reportpath + 'rep_' + input_fname +'_'+file_suffix+ '.html'
 
 def create_results_filename(sim_cond,string_file):
     return sim_cond.filename + '_' + sim_cond.algorithm + string_file
