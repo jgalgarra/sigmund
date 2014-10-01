@@ -154,7 +154,7 @@ blossom_pert_list = spars.blossom_pert_list
 release=spars.release
 Bssvar_data = spars.Bssvar_data
 
-if len(conditions.sim_years)>0:
+if conditions.sim_years>0:
     year_periods = int(conditions.sim_years)
 if len(conditions.dsdir)>0:
     dirsal = dirsal + conditions.dsdir +'/'
