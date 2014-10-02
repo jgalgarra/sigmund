@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 import b_sim
@@ -417,7 +417,8 @@ class StartQT4(QtGui.QMainWindow):
         input_fname = aux[0]
         output_suffix = self.ui.output_suffix.text()
         comentario = self.ui.Comments_text.toPlainText()
-        dirs = os.path.dirname(sys.argv[0])
+        #dirs = os.path.dirname(sys.argv[0])
+        dirs = os.getcwd()
         reportpath = os.path.join(dirs, self.dirsal.replace('\\', '/'))
         file_suffix = sgcom.create_file_suffix(self.algorithm,output_suffix,self.ciclos)
         fichr = sgcom.create_fichreport_name(reportpath,input_fname,file_suffix)     
@@ -492,7 +493,7 @@ class StartQT4(QtGui.QMainWindow):
         else:   
             self.ui.label_report.setText("Report file: ")
             self.ui.URL_report.setText(linkname)
-            self.ui.URL_outputs.setText("<a href='file:///" +os.getcwd()+\
+            self.ui.URL_outputs.setText("<a href='file:///" +\
                                         reportpath.replace('\\', '/') +\
                                         "'>See all results</a>")       
             sggraph.mutual_render(simulation_params, sim_ret_val, displayinic,

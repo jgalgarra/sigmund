@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import pickle
 import b_sim
@@ -42,7 +42,7 @@ parser.add_argument('-v', action='store_true', default=False,
                     dest='verbose',
                     help='Verbose output')
 
-parser.add_argument('-years', action='store', dest='sim_years', default = 0,
+parser.add_argument('-years', action='store', dest='sim_years', default = '',
                     help='Simulation span in years')
 
 parser.add_argument('-fw', action='store_true', default=False,
@@ -155,7 +155,7 @@ blossom_pert_list = spars.blossom_pert_list
 release=spars.release
 Bssvar_data = spars.Bssvar_data
 
-if conditions.sim_years>0:
+if len(conditions.sim_years)>0:
     year_periods = int(conditions.sim_years)
 if len(conditions.dsdir)>0:
     dirsal = dirsal + conditions.dsdir +'/'
