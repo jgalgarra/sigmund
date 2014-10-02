@@ -491,7 +491,7 @@ class StartQT4(QtGui.QMainWindow):
         else:   
             self.ui.label_report.setText("Report file: ")
             self.ui.URL_report.setText(linkname)
-            self.ui.URL_outputs.setText("<a href='file:///" +\
+            self.ui.URL_outputs.setText("<a href='file:///" +os.getcwd()+\
                                         reportpath.replace('\\', '/') +\
                                         "'>See all results</a>")       
             sggraph.mutual_render(simulation_params, sim_ret_val, displayinic,
