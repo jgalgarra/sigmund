@@ -194,7 +194,7 @@ def find_max_values(Nindividuals_a, Nindividuals_b, ra_eff, rb_eff, ra_equs,
 
 
 def create_list_species_affected(speciestext):
-    if (str(speciestext) == 'ALL'):
+    if (str(speciestext).upper() == 'ALL'):
         return(list(['ALL']))
     auxspec = speciestext.split(',')
     auxlspec = []

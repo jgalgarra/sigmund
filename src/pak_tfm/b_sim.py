@@ -502,7 +502,7 @@ def init_random_links_removal(eliminarenlaces, periods, ldev_inf, minputchar_a):
 def init_blossom_perturbations_conditions(year_periods, blossom_pert_list, 
                                           Bssvar_data, ldev_inf,
                                           numspecies_a):
-    if (blossom_pert_list[0] == 'ALL'):
+    if (blossom_pert_list[0].upper() == 'ALL'):
         bloss_species = list(range(0, numspecies_a + 1))
     else:
         bloss_species = blossom_pert_list[:]
@@ -566,12 +566,12 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
     hayextpolin = len(pol_ext) > 0
     j = 0
     if hayextplantas:
-        if (pl_ext['species'][0] == 'ALL'):
+        if (pl_ext['species'][0].upper() == 'ALL'):
             inner_pl_ext['species'] = list(range(0, numspecies_a))
         else:
             inner_pl_ext['species'] = [i-1 for i in pl_ext['species']]
     if hayextpolin: 
-        if (pol_ext['species'][0] == 'ALL'):
+        if (pol_ext['species'][0].upper() == 'ALL'):
             inner_pol_ext['species'] = list(range(0, numspecies_b))
         else:
             inner_pol_ext['species'] = [i-1 for i in pol_ext['species']]
