@@ -20,15 +20,13 @@ global model_r_alpha
 global hay_bssvar
 global pendiente, sd, periodo, numanyos
 global count_collapse_years
-global LIMIT_COLLAPSE_YEARS
-global TOL_EXTINCTION
+#global LIMIT_COLLAPSE_YEARS
+global init_collapse_years
+global pert_sinusoid
+
 global forced_extinctions_in_course
 
-LIMIT_COLLAPSE_YEARS = 8
-TOL_EXTINCTION = -0.001
 invperiod = 1 / sgGL.DAYS_YEAR
-count_collapse_years = 0
-
 
 def signfunc(x):
     if abs(x) == x:
@@ -229,7 +227,8 @@ def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,
     return(perturbation_conditions)
 
 def bss_pert_sinusoidal(val):
-    global periodo, sd
+    global periodo, sd, pert_sinusoid
+    pert_sinusoid = True
     modifier = 0.5 * (1.0001 + np.sin((2 * np.pi / periodo) * val))
     return np.random.normal(1, sd * modifier)
 
@@ -276,8 +275,8 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                           hayext, nper, periodoext, spike, k, model_r_a, 
                           ldev_inf):
     global cuentaperpl, cuentaperpol
-    r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_p = \
-                                            init_params_population(r_p, rd_p, n)
+    r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados,\
+                                  pop_p =  init_params_population(r_p, rd_p, n)
     if (Nindividuals_p[k, n]):  # Much faster than (Nindividuals_p[k][n] > 0)
         if hayext:
             if (strtype == 'Plant') & (cuentaperpl < nper):
@@ -512,16 +511,19 @@ def init_blossom_perturbations_conditions(year_periods, blossom_pert_list,
     return bloss_species, hay_bssvar, pBssvar_species
 
 def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
+    global pert_sinusoid
+    pert_sinusoid = False
     count_collapse_years = 0
     systemextinction = False
     periods = year_periods * sgGL.DAYS_YEAR
+    init_collapse = round(sgGL.IGNORE_INIT_COLLAPSE*year_periods)
     May = algorithm == 'May'
     haymut = algorithm != 'NoMutualism'
     model_r_alpha = algorithm == 'Verhulst' or algorithm == 'NoMutualism'
     Logistic_abs = algorithm == 'Logistic_abs'
     ldev_inf, lfich_inf = sgcom.open_info_channels(verbose, fichreport, 'w')
     return ldev_inf, lfich_inf, periods, systemextinction, May, haymut,\
-           model_r_alpha, count_collapse_years
+           model_r_alpha, count_collapse_years, init_collapse
 
 def init_blossom_perturbation_lists(plants_blossom_prob, blossom_pert_list, 
                                     numspecies_a):
@@ -566,12 +568,12 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
     hayextpolin = len(pol_ext) > 0
     j = 0
     if hayextplantas:
-        if (pl_ext['species'][0].upper() == 'ALL'):
+        if (str(pl_ext['species'][0]).upper() == 'ALL'):
             inner_pl_ext['species'] = list(range(0, numspecies_a))
         else:
             inner_pl_ext['species'] = [i-1 for i in pl_ext['species']]
     if hayextpolin: 
-        if (pol_ext['species'][0].upper() == 'ALL'):
+        if (str(pol_ext['species'][0]).upper() == 'ALL'):
             inner_pol_ext['species'] = list(range(0, numspecies_b))
         else:
             inner_pol_ext['species'] = [i-1 for i in pol_ext['species']]
@@ -580,16 +582,20 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
 def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
                             ra_equs, rb_equs, ra_eff, rb_eff):
     global count_collapse_years
+    if (pert_sinusoid):
+        min_collapse_trigger = round(sgGL.FACT_COLLAPSE_SIN * sgGL.MIN_COLLAPSE_YEARS)
+    else:
+        min_collapse_trigger = sgGL.MIN_COLLAPSE_YEARS
     systemextinction = False
     if (algorithm == 'Verhulst'):
         ra_xx, rb_xx = ra_eff, rb_eff
     else:
         ra_xx, rb_xx = ra_equs, rb_equs;
-    if (k > 3 * sgGL.DAYS_YEAR) and not(forced_extinctions_in_course) and\
-            (ra_xx[k - 1] > TOL_EXTINCTION).sum() == 0 and \
-            (rb_xx[k - 1] > TOL_EXTINCTION).sum() == 0:
+    if (k > init_collapse_years* sgGL.DAYS_YEAR) and not(forced_extinctions_in_course) and\
+            (ra_xx[k - 1] > sgGL.TOL_EXTINCTION).sum() == 0 and \
+            (rb_xx[k - 1] > sgGL.TOL_EXTINCTION).sum() == 0:
         count_collapse_years += 1
-        if count_collapse_years >= LIMIT_COLLAPSE_YEARS:
+        if count_collapse_years >= min_collapse_trigger:
                 systemextinction = True
     else:
         count_collapse_years = max(0, count_collapse_years - 0.5)
@@ -614,9 +620,10 @@ def bino_mutual(sim_cond = ''):
     global pendiente, blossomperiod, sd, periodo
     global count_collapse_years
     global forced_extinctions_in_course
+    global init_collapse_years
     
     sgGL.ldev_inf, sgGL.lfich_inf, periods, systemextinction,\
-    May, haymut, model_r_alpha, count_collapse_years = \
+    May, haymut, model_r_alpha, count_collapse_years, init_collapse_years = \
        init_simulation_environment(sim_cond.year_periods, sim_cond.fichreport, 
                                    sim_cond.algorithm, sim_cond.verbose)    
     tinic = time()
