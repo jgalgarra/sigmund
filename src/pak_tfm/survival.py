@@ -8,8 +8,8 @@ for i in range(0,no_experiments):
     rrate = 0.7
     b = subprocess.check_output(com_base+str(rrate), shell=True)
     if str(b).find("EXTINCTION") == -1:
-      print("remove links "+str(rrate)+" survival")
-      survival_success += 1
+        print("remove links "+str(rrate)+" survival")
+        survival_success += 1
     else:
-      print("remove links "+str(rrate)+" extinction")
+        print("remove links "+str(rrate)+" extinction")
 print("Experiments "+str(no_experiments)+"/ Network survived " + str(survival_success)+" times")

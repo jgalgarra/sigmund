@@ -8,6 +8,7 @@ LINES_INFO_MATRIX = 5
 INPUTFILES_PATH = 'input/'
 OUTPUTILES_PATH = 'output/'
 SIMFILES_PATH = 'simfiles/'
+OUTPUTDATA_PREFIX = 'output_data_'
 
 if __name__ == '__main__':
     pass

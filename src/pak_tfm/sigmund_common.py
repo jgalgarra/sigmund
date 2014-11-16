@@ -151,7 +151,7 @@ def dlmreadlike(inputfile, direntrada):
  
 def dlmwritelike(input_file,sim_cond, nperiod, Nin):
     dsal = sim_cond.dirsal.replace('\\', '/')
-    nsal = 'output_data_' + input_file + '_' + sim_cond.output_suff + '_'+\
+    nsal = sgGL.OUTPUTDATA_PREFIX + input_file + '_' + sim_cond.output_suff + '_'+\
            str(nperiod) + '.txt'
     print ("Output file %s" % dsal + nsal)
     salida = open(dsal + nsal, 'w', encoding='utf-8')
@@ -168,7 +168,7 @@ def read_simulation_matrix(filename, dirtrabajo, direntrada, str_guild,
     filename_x = filename + str_guild
     dt = dirtrabajo.replace('\\', '/')
     inform_user(lfich_inf, name_guild + " matrix: <a href='file:///" + dt +\
-                      "/input/" + filename_x + "' target=_BLANK>" +\
+                      "/"+ sgGL.INPUTFILES_PATH + filename_x + "' target=_BLANK>" +\
                       filename_x + "<a>")
     l_minputchar_x = dlmreadlike(filename_x, direntrada)
     ''' If N0_guild provided by command line'''

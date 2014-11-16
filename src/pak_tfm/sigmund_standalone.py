@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import argparse
 import pickle
 import b_sim
@@ -8,20 +8,8 @@ import sigmund_GLOBALS as sgGL
 import sigmund_release as sgRL
 import sigmund_common as sgcom
 import sigmund_graphs as sggraph
+import sgtools_common as sgtcom
 
-def read_file_input(simulation_file):
-    path_sims = sgGL.INPUTFILES_PATH+sgGL.SIMFILES_PATH
-    try:
-        fh = open(path_sims+simulation_file, "rb")
-    except IOError:
-        print(simulation_file+' not found')
-        return
-    else:
-        fh.close()
-        with open(path_sims+simulation_file, 'rb') as f:
-            storedsim = pickle.load(f)
-            return(storedsim)
-            
 
 def modify_float_par(condition,threshold,value):
     if float(condition)>threshold:
@@ -131,7 +119,7 @@ parser.add_argument('-pol_ext_species', action='store', dest='pol_ext_species', 
     
 conditions = parser.parse_args()
 
-spars = read_file_input(conditions.simfile_name)
+spars = sgtcom.read_file_input(conditions.simfile_name)
 
 filename = spars.filename
 year_periods = spars.year_periods 
