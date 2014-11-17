@@ -20,11 +20,11 @@ global model_r_alpha
 global hay_bssvar
 global pendiente, sd, periodo, numanyos
 global count_collapse_years
+global forced_extinctions_in_course
 #global LIMIT_COLLAPSE_YEARS
 global init_collapse_years
 global pert_sinusoid
 
-global forced_extinctions_in_course
 
 invperiod = 1 / sgGL.DAYS_YEAR
 
@@ -193,6 +193,8 @@ def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp,spikep,k):
 def init_forced_external_pertubations(pl_ext, pol_ext, yearperiods,  
                                       hayextplantas, hayextpolin, 
                                       ldev_inf, lfich_inf):
+    global forced_extinctions_in_course
+    forced_extinctions_in_course = False
     if hayextplantas:
         inicioextplantas = pl_ext['start'] * sgGL.DAYS_YEAR
         nperpl = pl_ext['numperiod']
@@ -516,7 +518,7 @@ def init_simulation_environment(year_periods, fichreport, algorithm, verbose):
     count_collapse_years = 0
     systemextinction = False
     periods = year_periods * sgGL.DAYS_YEAR
-    init_collapse = round(sgGL.IGNORE_INIT_COLLAPSE*year_periods)
+    init_collapse = max (100*(year_periods>100),round(sgGL.IGNORE_INIT_COLLAPSE*year_periods))
     May = algorithm == 'May'
     haymut = algorithm != 'NoMutualism'
     model_r_alpha = algorithm == 'Verhulst' or algorithm == 'NoMutualism'
@@ -581,19 +583,24 @@ def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a,
 
 def check_system_extinction(algorithm, k, lcompatibplantas, plants_blossom_prob,
                             ra_equs, rb_equs, ra_eff, rb_eff):
-    global count_collapse_years
+    global count_collapse_years, forced_extinctions_in_course
+    if (k <= init_collapse_years* sgGL.DAYS_YEAR):
+        return(False)
     if (pert_sinusoid):
         min_collapse_trigger = round(sgGL.FACT_COLLAPSE_SIN * sgGL.MIN_COLLAPSE_YEARS)
     else:
         min_collapse_trigger = sgGL.MIN_COLLAPSE_YEARS
     systemextinction = False
     if (algorithm == 'Verhulst'):
-        ra_xx, rb_xx = ra_eff, rb_eff
+        ra_xx, rb_xx = ra_eff[k-1], rb_eff[k-1]
     else:
-        ra_xx, rb_xx = ra_equs, rb_equs;
-    if (k > init_collapse_years* sgGL.DAYS_YEAR) and not(forced_extinctions_in_course) and\
-            (ra_xx[k - 1] > sgGL.TOL_EXTINCTION).sum() == 0 and \
-            (rb_xx[k - 1] > sgGL.TOL_EXTINCTION).sum() == 0:
+        ra_xx, rb_xx = ra_equs[k-1], rb_equs[k-1]
+    # Ignore extincted species
+    ra_xx = ra_xx[ra_xx!=0]
+    rb_xx = rb_xx[rb_xx!=0]
+    #print(k,init_collapse_years* sgGL.DAYS_YEAR,count_collapse_years,(ra_xx > sgGL.TOL_EXTINCTION).sum())
+    if not(forced_extinctions_in_course) and (ra_xx> sgGL.TOL_EXTINCTION).sum() == 0 and \
+            (rb_xx> sgGL.TOL_EXTINCTION).sum() == 0:
         count_collapse_years += 1
         if count_collapse_years >= min_collapse_trigger:
                 systemextinction = True
