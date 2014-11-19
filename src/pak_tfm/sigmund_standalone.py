@@ -1,11 +1,9 @@
-
+#!/usr/bin/env python3
 import argparse
-import pickle
 import b_sim
 import os
 import sys
 import sigmund_GLOBALS as sgGL
-import sigmund_release as sgRL
 import sigmund_common as sgcom
 import sigmund_graphs as sggraph
 import sgtools_common as sgtcom
