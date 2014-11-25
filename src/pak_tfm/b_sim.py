@@ -232,15 +232,15 @@ def bss_pert_sinusoidal(val):
     global periodo, sd, pert_sinusoid
     pert_sinusoid = True
     modifier = 0.5 * (1.0001 + np.sin((2 * np.pi / periodo) * val))
-    return np.random.normal(1, sd * modifier)
+    return 1 + np.random.normal(0, sd * modifier)
 
 def bss_pert_lineal(val):
     modifier = 1 + pendiente * (val / numanyos)
-    return np.random.normal(1, sd * modifier)
+    return 1 + np.random.normal(0, sd * modifier)
 
 def bss_pert_no_modulation(val):
     global sd
-    return(np.random.normal(1, sd))
+    return(1 + np.random.normal(0, sd))
 
 def calcbssvarespecie(valblossomperiod, valsd, funct, nys):
     global numanyos, sd, blossomperiod
