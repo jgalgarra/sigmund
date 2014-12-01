@@ -47,15 +47,22 @@ if len(conditions.pl_species)>0:
 com_base =  "python sigmund_standalone.py -simfile "+ simfile +\
             " -stop -Bssvarper 0.1 -years "+ year_periods +\
             " -Bssvartype None -Bssvarspecies "+pl
-
+number_extinction = 0
 for j in range(int(Bssvarsdini),int(Bssvarsdfin),int(Bssvarsdstep)):
-    survival_success = 0
-    for i in range(0,int(number_experiments)):
-        comando = com_base + " -Bssvarsd "+str(j/1000)
-        b = subprocess.check_output(comando, shell=True)
-        if str(b).find("EXTINCTION") == -1:
-            survival_success += 1
-#            print("SURVIVED. Survival rate "+str(survival_success/(i+1)))
-#        else:
-#            print("EXTINCTION. Survival rate "+str(survival_success/(i+1)))
+    # After two consecutive extinctions we assume systems has entered a 
+    # permanent extinction region
+    if (number_extinction < 3):
+        survival_success = 0
+        for i in range(0,int(number_experiments)):
+            comando = com_base + " -Bssvarsd "+str(j/1000)
+            b = subprocess.check_output(comando, shell=True)
+            if str(b).find("EXTINCTION") == -1:
+                survival_success += 1
+    #            print("SURVIVED. Survival rate "+str(survival_success/(i+1)))
+    #        else:
+    #            print("EXTINCTION. Survival rate "+str(survival_success/(i+1)))
+        if (survival_success == 0):
+            number_extinction += 1
+    else:
+            survival_success = 0 
     print(str(j/10000)+"\t"+number_experiments+"\t" + str(survival_success))
