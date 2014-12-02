@@ -45,7 +45,7 @@ if len(conditions.pl_species)>0:
     pl = conditions.pl_species
 
 com_base =  "python sigmund_standalone.py -simfile "+ simfile +\
-            " -stop -Bssvarper 0.1 -years "+ year_periods +\
+            " -stop -years "+ year_periods +\
             " -Bssvartype None -Bssvarspecies "+pl
 number_extinction = 0
 for j in range(int(Bssvarsdini),int(Bssvarsdfin),int(Bssvarsdstep)):
