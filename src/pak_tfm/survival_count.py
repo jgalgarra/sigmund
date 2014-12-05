@@ -12,7 +12,10 @@ parser.add_argument('-years', action='store', dest='sim_years', default = '',
                     help='Simulation span in years')
                     
 parser.add_argument('-numexper', action='store', dest='num_exper', default = '',
-                    help='Number of experiments by simulation')             
+                    help='Number of experiments by simulation')
+
+parser.add_argument('-Bssvarper', action='store', dest='Bssvarper', default = '',
+                     help='Blossom variability period')
                     
 parser.add_argument('-Bssvarsdini', action='store', dest='Bssvarsd_ini', default = '',
                     help='Bssvarsdini')  
@@ -35,6 +38,8 @@ if len(conditions.sim_years)>0:
     year_periods = conditions.sim_years
 if len(conditions.num_exper)>0:
     number_experiments = conditions.num_exper
+if len(conditions.Bssvarper)>0:
+    Bssvarper = conditions.Bssvarper
 if len(conditions.Bssvarsd_ini)>0:
     Bssvarsdini = conditions.Bssvarsd_ini
 if len(conditions.Bssvarsd_fin)>0:
@@ -45,8 +50,8 @@ if len(conditions.pl_species)>0:
     pl = conditions.pl_species
 
 com_base =  "python sigmund_standalone.py -simfile "+ simfile +\
-            " -stop -years "+ year_periods +\
-            " -Bssvartype None -Bssvarspecies "+pl
+            " -stop -years "+ year_periods + " -Bssvarper "+ Bssvarper +\
+            " -Bssvartype None -Bssvarspecies "+ pl
 number_extinction = 0
 for j in range(int(Bssvarsdini),int(Bssvarsdfin),int(Bssvarsdstep)):
     # After two consecutive extinctions we assume systems has entered a 
