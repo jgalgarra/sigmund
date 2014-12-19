@@ -51,7 +51,7 @@ if len(conditions.pl_species)>0:
 
 com_base =  "python sigmund_standalone.py -simfile "+ simfile +\
             " -stop -years "+ year_periods + " -Bssvarper "+ Bssvarper +\
-            " -Bssvartype None -Bssvarspecies "+ pl
+            " -Bssvarspecies "+ pl
 number_extinction = 0
 for j in range(int(Bssvarsdini),int(Bssvarsdfin),int(Bssvarsdstep)):
     # After two consecutive extinctions we assume systems has entered a 
