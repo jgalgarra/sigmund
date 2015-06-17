@@ -1,1 +1,1 @@
-C:\Python32\Lib\site-packages\PyQt4\uic\pyuic.py bino_form.ui -o bino_form.py
+C:\Anaconda3\Lib\site-packages\PyQt4\uic\pyuic.py bino_form.ui -o bino_form.py
