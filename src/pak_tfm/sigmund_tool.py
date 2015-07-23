@@ -362,12 +362,13 @@ class StartQT4(QtGui.QMainWindow):
     def fetch_pert_data(self, xx_ext_period, xx_ext_spike, xx_ext_start, 
                         xx_ext_rate, xx_ext_numperiod, xx_ext_species):
         ret_extinction = {}
+
         if len(xx_ext_period.text())>0:
             try:
                 ret_extinction['period'] = int( float(xx_ext_period.text())\
                                               * sgGL.DAYS_YEAR)
                 ret_extinction['spike'] = float(xx_ext_spike.text())
-                ret_extinction['start'] = int(xx_ext_start.text())
+                ret_extinction['start'] = float(xx_ext_start.text())
                 ret_extinction['rate'] = float(xx_ext_rate.text())
                 ret_extinction['numperiod'] = int(xx_ext_numperiod.text())
                 ret_extinction['species']  = sgcom.create_list_species_affected(xx_ext_species.text())
@@ -462,6 +463,7 @@ class StartQT4(QtGui.QMainWindow):
                                             self.ui.pol_ext_rate,
                                             self.ui.pol_ext_numperiod,
                                             self.ui.pol_ext_species)
+
         blossom_perturbation = sgcom.create_list_species_affected(self.ui.blossom_pert_species.text())
         simulation_params = sgcom.SimulationConditions(filename = input_fname, 
                 year_periods = self.ciclos, 
@@ -477,6 +479,7 @@ class StartQT4(QtGui.QMainWindow):
                 blossom_pert_list=blossom_perturbation,
                 release=self.release,
                 Bssvar_data = Blossomvar_data )  
+        
 #         simulation_params.write2file()
         self.ui.Run_Button.setEnabled(1)
         self.ui.Close_Button.setEnabled(1)

@@ -1,1 +1,6 @@
-c:\Python32\python -m cProfile sigmund_tool.py > logkk.txt
+C:\Anaconda3\python -m cProfile sigmund_tool.py > logkk.txt
+
+Con cprofilev
+
+C:\Anaconda3\python -m cprofilev sigmund_tool.py
+http://localhost:4000

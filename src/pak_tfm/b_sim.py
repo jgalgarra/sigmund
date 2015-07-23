@@ -7,6 +7,7 @@ This module includes the mutualist algorithm
 '''
 import numpy as np
 from time import time
+from scipy.stats import binom
 import math
 import copy
 import cProfile
@@ -24,6 +25,7 @@ global forced_extinctions_in_course
 #global LIMIT_COLLAPSE_YEARS
 global init_collapse_years
 global pert_sinusoid
+global range_species_a, range_species_b
 
 
 invperiod = 1 / sgGL.DAYS_YEAR
@@ -41,7 +43,9 @@ def calc_r_periodo(Ranual, invperiod):
     return(math.pow(1 + Ranual, invperiod) - 1)
 
 def calc_r_periodo_vh(Ranual, invperiod):
-    return(math.pow(1 + Ranual, invperiod) - 1)
+    return(math.pow(1 + Ranual, invperiod ) - 1)
+    #return(np.power(1 + Ranual, invperiod) - 1)
+    #return (1+Ranual)**invperiod -1
 
 def cuentaenlaces(mat_in):
     cuenta = 0;
@@ -80,10 +84,11 @@ def deletion_links_effect(k, periodoborr, minputchar_a, minputchar_b,
 def val_mutMay(r_species, beta, period, N1, N2, K1):
     rspneq = calc_r_periodo_vh(abs(r_species), invperiod)
     betaMay = beta * K1 / abs(r_species)
-    termEq = round(betaMay * N1 * N2 / K1)
+    termEq_abs = abs(round(betaMay * N1 * N2 / K1))
     rMay = betaMay * N2 / K1
-    if (abs(termEq) > 1):
-        incEq = np.random.binomial(round(abs(termEq)), -math.expm1(-rspneq)) 
+    if (termEq_abs > 1):
+        #incEq = np.random.binomial(round(abs(termEq)), -math.expm1(-rspneq)) 
+        incEq = np.random.binomial(termEq_abs, -math.expm1(-rspneq)) 
     else:
         incEq = 0
     ret = [incEq, rMay]
@@ -101,17 +106,29 @@ def ciclo_May(r_species, rM, inctermMay, Nindivs, K):
     ret = [Nindivs + signfunc(termEq) * incEq + abs(inctermMay),\
            signfunc(termEq) * rcal]
     return(ret)
+
                
 def ciclo_verhulst(rtot_species, reqsum, Nindivs, cAlpha, Alpha):
-    roz = (Alpha + cAlpha * reqsum) * Nindivs
-    rcal = rtot_species - roz
-    rspneq = calc_r_periodo_vh(rcal, invperiod) if (rcal >= 0)\
-             else calc_r_periodo_vh(-rcal, invperiod)
-    incNmalth = np.random.binomial(Nindivs, -math.expm1(-rspneq))
-    if (rcal > 0):
-        inc_pop = Nindivs + incNmalth 
-    else:
-        inc_pop = Nindivs - incNmalth
+    rcal = rtot_species - (Alpha + cAlpha * reqsum) * Nindivs
+    inc_pop = Nindivs
+    absrcal = rcal
+    rcalpos = (rcal>0)
+    if not(rcalpos):
+        absrcal = -absrcal
+    # IF rcal is tiny, what happens when populations are stable return
+    # zero. Approximation to speed up algorithm
+    if absrcal>sgGL.IGNORE_REFF:
+    #if absrcal*Nindivs>sgGL.IGNORE_REFF:
+        rspneq = calc_r_periodo_vh(rcal, invperiod) if (rcal >= 0)\
+                  else calc_r_periodo_vh(-rcal, invperiod)
+        p_period = -math.expm1(-rspneq)
+        #incNmalth = np.random.poisson(p_period*Nindivs)
+        incNmalth = np.random.binomial(Nindivs, p_period)
+        #incNmalth = binom.rvs(Nindivs, p_period)
+        if rcalpos:
+            inc_pop += incNmalth 
+        else:
+            inc_pop -= incNmalth          
     return([inc_pop, rcal])     
 
 def ciclo_new_model(rtot_species, Nindivs, invK, L_abs):
@@ -121,7 +138,7 @@ def ciclo_new_model(rtot_species, Nindivs, invK, L_abs):
     elif L_abs :  # |reff| correction
         rcal += (rtot_species * Nindivs * invK)      
     rspneq = calc_r_periodo_vh(rcal, invperiod) if (rcal >= 0)\
-             else calc_r_periodo_vh(-rcal, invperiod)
+             else calc_r_periodo_vh(-rcal, invperiod)         
     incNmalth = np.random.binomial(Nindivs, -math.expm1(-rspneq))
     if (rcal > 0):
         inc_pop = Nindivs + incNmalth 
@@ -171,11 +188,11 @@ def init_lists_pop(periods, numspecies_p, minputchar_p):
     return rowNindividuals_p, Alpha_p, cAlpha_p, r_p, rd_p, Nindividuals_p, \
                                 rp_eff, rp_equs
 
-def init_params_population(r_p, rd_p, n):
-    r_eqsum = term_May = rMay = p_devorados = rtot_p = 0
-    r_muerte = rd_p[n]
-    pop_ini = 0
-    return r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_ini
+# def init_params_population(r_p, rd_p, n):
+#     r_eqsum = term_May = rMay = p_devorados = rtot_p = 0
+#     r_muerte = rd_p[n]
+#     pop_ini = 0
+#     return r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados, pop_ini
 
 def perturbation(pl_ext, n, rd_p, cuentaperp, inicioextp, periodoextp,spikep,k):
     global forced_extinctions_in_course
@@ -277,8 +294,8 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                           hayext, nper, periodoext, spike, k, model_r_a, 
                           ldev_inf):
     global cuentaperpl, cuentaperpol
-    r_muerte, r_eqsum, term_May, rMay, rtot_p, p_devorados,\
-                                  pop_p =  init_params_population(r_p, rd_p, n)
+    r_eqsum = p_devorados = rtot_p = pop_p = 0
+    r_muerte = rd_p[n]
     if (Nindividuals_p[k, n]):  # Much faster than (Nindividuals_p[k][n] > 0)
         if hayext:
             if (strtype == 'Plant') & (cuentaperpl < nper):
@@ -292,12 +309,17 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
         if haymut:
             r_eqsum = np.dot(minputchar_p[0:numspecies_q, n],\
                              Nindividuals_q[k, :])
-        elif (May):
-            for j in range(numspecies_q):
-                r_eqsum, term_May, rMay = calc_mutualism_params(minputchar_p,
-                                    Alpha_p, Nindividuals_p, Nindividuals_q,
-                                    r_eqsum, term_May, rMay, k, j, n, r_p,
-                                    r_muerte)
+
+ 
+#         CODIGO OBSOLETO, May eliminado
+#
+#         elif (May):
+#             for j in range(numspecies_q):
+#                 r_eqsum, term_May, rMay = calc_mutualism_params(minputchar_p,
+#                                     Alpha_p, Nindividuals_p, Nindividuals_q,
+#                                     r_eqsum, term_May, rMay, k, j, n, r_p,
+#                                     r_muerte)
+ 
         rtot_p = r_p[n] + r_eqsum - r_muerte        
         # Efecto de los depredadores
         if hay_foodweb:
@@ -307,26 +329,30 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                                                      minputchar_c, 
                                                      numspecies_c, n, k)
         # New algorithm
-        if (model_r_a):
-            retl = ciclo_verhulst(rtot_p, r_eqsum,
-                                  Nindividuals_p[k, n], cAlpha_p[n], Alpha_p[n])
-        elif not (May):
-            retl = ciclo_new_model(rtot_p, Nindividuals_p[k, n],
-                                   1 / Alpha_p[n], Logistic_abs)
-        else:
-            retl = ciclo_May(r_p[n] - r_muerte, rMay, term_May,
-                             Nindividuals_p[k, n], Alpha_p[n])           
+#        if (model_r_a):
+        retl = ciclo_verhulst(rtot_p, r_eqsum, Nindividuals_p[k, n], 
+                              cAlpha_p[n], Alpha_p[n])
+         
+#         Codigo obsoleto que contemplaba los modelos viejos 
+#             
+#         elif not (May):
+#             retl = ciclo_new_model(rtot_p, Nindividuals_p[k, n],
+#                                    1 / Alpha_p[n], Logistic_abs)
+#         else:
+#             retl = ciclo_May(r_p[n] - r_muerte, rMay, term_May,
+#                              Nindividuals_p[k, n], Alpha_p[n])
+                                            
         pop_p = retl[0] - p_devorados
         if not(pop_p):
             sgcom.inform_user(ldev_inf,
                               "Day %d (year %d). %s species %d extincted" %\
                               (k, k // sgGL.DAYS_YEAR, strtype, 
                                int_to_ext_rep(n)))
-    Nindividuals_p[k + 1][n] = pop_p
+    Nindividuals_p[k + 1, n] = pop_p
     if (pop_p):
-        rp_eff[k + 1][n], rp_eq[k + 1][n] = retl[1], rtot_p
+        rp_eff[k + 1, n], rp_eq[k + 1, n] = retl[1], rtot_p
     else:
-        rp_eff[k + 1][n], rp_eq[k + 1][n] = rp_eff[k][n], rp_eq[k][n]
+        rp_eff[k + 1, n], rp_eq[k + 1, n] = rp_eff[k, n], rp_eq[k, n]
     rp_eff[0, ] = rp_eff[1, ]
     return 0  
 
@@ -364,7 +390,8 @@ def init_blossom_pertubation_params(BssDat, numspecies_a,
             listaspecies = [i-1 for i in BssDat.Bssvar_species]
             
         bssvar_allones = np.ones((year_periods,), dtype=float)
-        for i in range(numspecies_a):
+        #for i in range(numspecies_a):
+        for i in range_species_a:
             if i in listaspecies:
                 if (BssDat.Bssvar_modulationtype_list[0] == 'None'):
                     varspecies = calcbssvarespecie(BssDat.Bssvar_period, BssDat.Bssvar_sd,
@@ -417,11 +444,11 @@ def predators_population_evolution(hay_foodweb, ldev_inf, numspecies_a,
             coef_bij_matrix = c_devorados = r_eqsum = 0
             signo = signfunc(r_c[n])
             if (Nindividuals_c[k][n] > 0):
-                for j in range(numspecies_a):
+                for j in range_species_a:
                     coef_bij_matrix = Nindividuals_a[k][j] * minputchar_d[j][n]
                     r_eqsum += coef_bij_matrix
                 
-                for j in range(numspecies_b):
+                for j in range_species_b:
                     coef_bij_matrix = Nindividuals_b[k][j] *\
                                       minputchar_d[j + numspecies_a][n]
                     r_eqsum += coef_bij_matrix
@@ -432,6 +459,7 @@ def predators_population_evolution(hay_foodweb, ldev_inf, numspecies_a,
                 if term_c > 1:
                     incPredatoria = np.random.binomial(term_c, 
                                                -math.expm1(-rperiodequivalente))
+                                               
                 else:
                     incPredatoria = 0
                 incNmalth = np.random.binomial(Nindividuals_c[k][n], 
@@ -503,7 +531,7 @@ def init_random_links_removal(eliminarenlaces, periods, ldev_inf, minputchar_a):
 def init_blossom_perturbations_conditions(year_periods, blossom_pert_list, 
                                           Bssvar_data, ldev_inf,
                                           numspecies_a):
-    if (blossom_pert_list[0].upper() == 'ALL'):
+    if (str(blossom_pert_list[0]).upper() == 'ALL'):
         bloss_species = list(range(0, numspecies_a + 1))
     else:
         bloss_species = blossom_pert_list[:]
@@ -563,6 +591,7 @@ def add_report_simulation_conditions(plants_blossom_prob, plants_blossom_sd,
 def init_external_perturbation_lists(pl_ext, pol_ext, numspecies_a, 
                                      numspecies_b):
     global cuentaperpl, cuentaperpol
+
     cuentaperpl = cuentaperpol = 0
     inner_pl_ext = copy.deepcopy(pl_ext)
     inner_pol_ext = copy.deepcopy(pol_ext)
@@ -628,6 +657,7 @@ def bino_mutual(sim_cond = ''):
     global count_collapse_years
     global forced_extinctions_in_course
     global init_collapse_years
+    global range_species_a, range_species_b
     
     sgGL.ldev_inf, sgGL.lfich_inf, periods, systemextinction,\
     May, haymut, model_r_alpha, count_collapse_years, init_collapse_years = \
@@ -650,6 +680,7 @@ def bino_mutual(sim_cond = ''):
     lcompatibplantas = init_blossom_perturbation_lists(sim_cond.plants_blossom_prob,
                                                        sim_cond.blossom_pert_list,
                                                        numspecies_a)
+    range_species_a = range(numspecies_a)
     numspecies_b, minputchar_b, nrows_b, ncols_b = \
                         sgcom.read_simulation_matrix(sim_cond.filename, 
                                                sim_cond.dirtrabajo, 
@@ -660,7 +691,7 @@ def bino_mutual(sim_cond = ''):
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
     rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
-    
+    range_species_b = range(numspecies_b)
     add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
                                      sim_cond.plants_blossom_sd,
                                      sim_cond.plants_blossom_type, 
@@ -683,6 +714,7 @@ def bino_mutual(sim_cond = ''):
                                     hayextplantas, hayextpolin,
                                     sgGL.ldev_inf, sgGL.lfich_inf)
     # Extinction analysis. Blossom pertubations   
+
     bloss_species, hay_bssvar, pBssvar_species = \
           init_blossom_perturbations_conditions(sim_cond.year_periods, 
                                 sim_cond.blossom_pert_list,
@@ -745,7 +777,7 @@ def bino_mutual(sim_cond = ''):
                                pert_cond.inicioextplantas, hayextplantas, 
                                pert_cond.nperpl, pert_cond.periodoextpl, 
                                pert_cond.spikepl, k, model_r_alpha, 
-                               sgGL.ldev_inf) for n in range(numspecies_a)]
+                               sgGL.ldev_inf) for n in range_species_a]
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, sim_cond.algorithm, 
                                sim_cond.hay_foodweb, inner_pol_ext, 
@@ -756,7 +788,7 @@ def bino_mutual(sim_cond = ''):
                                pert_cond.inicioextpol, hayextpolin, pert_cond.nperpol, 
                                pert_cond.periodoextpol, pert_cond.spikepol, k, 
                                model_r_alpha, 
-                               sgGL.ldev_inf) for n in range(numspecies_b)]
+                               sgGL.ldev_inf) for n in range_species_b]
         predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,
                                        Nindividuals_a, numspecies_b, 
@@ -764,7 +796,8 @@ def bino_mutual(sim_cond = ''):
                                        numspecies_c, minputchar_d, j, k)
     maxminval = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
-    tfin = time()    
+    tfin = time()   
+     
     sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, sim_cond, tfin, tinic, 
                      periods, Nindividuals_a, ra_eff, ra_equs, Nindividuals_b, 
                      rb_eff, rb_equs, Nindividuals_c)

@@ -15,6 +15,7 @@ INPUTFILES_PATH = 'input/'
 OUTPUTILES_PATH = 'output/'
 SIMFILES_PATH = 'simfiles/'
 OUTPUTDATA_PREFIX = 'output_data_'
+IGNORE_REFF = 0.000001
 
 if __name__ == '__main__':
     pass
