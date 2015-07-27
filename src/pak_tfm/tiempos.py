@@ -6,6 +6,7 @@ Created on 22/07/2015
 
 import math
 import numpy as np
+from time import time
 
 global f1_,f_2
  
@@ -19,6 +20,7 @@ def dummy():
     calc_r_periodo_vh(0.02, invperiod)
 
 if __name__ == '__main__':
+    tini = time() 
     print("inicio")
 #     invperiod = 1/365
 #     f_1 = 2**invperiod
@@ -38,6 +40,10 @@ if __name__ == '__main__':
 #         #np.random.binomial(1000, 0.0001)
 #     print("sumdif",sumdif)
 
-    for i in range(10000000):
-        a = abs(-3.09876)
-    print("fin")
+    
+    [abs(-3.09876) for i in range(10000000)]
+    tfin = time()
+
+    tfin = time()
+    print("Elapsed time %.02f s" % (tfin - tini))
+    

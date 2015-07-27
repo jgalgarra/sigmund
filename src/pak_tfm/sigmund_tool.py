@@ -373,7 +373,7 @@ class StartQT4(QtGui.QMainWindow):
                 ret_extinction['numperiod'] = int(xx_ext_numperiod.text())
                 ret_extinction['species']  = sgcom.create_list_species_affected(xx_ext_species.text())
             except:         
-                self.lista_err.append("ERROR: bad forced perturbation format")
+                self.lista_err.append("ERROR: Incorrect forced perturbation format")
                 self.error_exit()
                 self.ui.Run_Button.setEnabled(1)
                 self.ui.Close_Button.setEnabled(1)
@@ -403,7 +403,7 @@ class StartQT4(QtGui.QMainWindow):
         try:
             self.ciclos = int(self.ui.ciclos.text())
         except:            
-            self.lista_err.append("ERROR: bad cycles format ")
+            self.lista_err.append("ERROR: Incorrect Years format ")
             self.error_exit()
             return    
         self.ui.label_report.setText("")

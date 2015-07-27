@@ -120,21 +120,21 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
                  displayinic, periods, factorescala, numspecies_a, '', 
                  'Efficient growth rate')
     plt.xlabel('Years')
-    if (len(sig_ret_val.pBssvar_species)):
-        for i in range(numspecies_a):
-            graf = [sig_ret_val.pBssvar_species[i][0]]
-            x = [0]
-            for k in range (0, years):
-                graf.append(sig_ret_val.pBssvar_species[i][k])
-                x.append(1 + k)
-        ax = plt.subplot(nrows, 2, 5)
-        listacoefs = np.array(sig_ret_val.pBssvar_species)
-        listacoefs = np.c_[listacoefs[:,0],listacoefs]
-        listacoefs = list(listacoefs.transpose())
-        pintasubplot(listacoefs, 0, 1, displayinic, years, factorescala,
-                     numspecies_a, '', 'Blossom variability coeffs.', 
-                     periodsinyears = True) 
-        plt.xlabel('Years')    
+#     if (len(sig_ret_val.pBssvar_species)):
+#         for i in range(numspecies_a):
+#             graf = [sig_ret_val.pBssvar_species[i][0]]
+#             x = [0]
+#             for k in range (0, years):
+#                 graf.append(sig_ret_val.pBssvar_species[i][k])
+#                 x.append(1 + k)
+#         ax = plt.subplot(nrows, 2, 5)
+#         listacoefs = np.array(sig_ret_val.pBssvar_species)
+#         listacoefs = np.c_[listacoefs[:,0],listacoefs]
+#         listacoefs = list(listacoefs.transpose())
+#         pintasubplot(listacoefs, 0, 1, displayinic, years, factorescala,
+#                      numspecies_a, '', 'Blossom variability coeffs.', 
+#                      periodsinyears = True) 
+#         plt.xlabel('Years')    
     ax = plt.subplot(nrows, 2, 2)
     pintasubplot(sig_ret_val.Nindividuals_b, 0, 
                  sig_ret_val.maxminval.maxb_individuos, 

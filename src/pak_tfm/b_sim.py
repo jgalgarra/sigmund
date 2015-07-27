@@ -7,7 +7,6 @@ This module includes the mutualist algorithm
 '''
 import numpy as np
 from time import time
-from scipy.stats import binom
 import math
 import copy
 import cProfile
@@ -124,7 +123,6 @@ def ciclo_verhulst(rtot_species, reqsum, Nindivs, cAlpha, Alpha):
         p_period = -math.expm1(-rspneq)
         #incNmalth = np.random.poisson(p_period*Nindivs)
         incNmalth = np.random.binomial(Nindivs, p_period)
-        #incNmalth = binom.rvs(Nindivs, p_period)
         if rcalpos:
             inc_pop += incNmalth 
         else:
@@ -329,9 +327,23 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                                                      minputchar_c, 
                                                      numspecies_c, n, k)
         # New algorithm
-#        if (model_r_a):
-        retl = ciclo_verhulst(rtot_p, r_eqsum, Nindividuals_p[k, n], 
-                              cAlpha_p[n], Alpha_p[n])
+
+        # ciclo_verhulst Inline code following Vwn Rossum's advice
+
+        rcal = rtot_p - ( Alpha_p[n] + cAlpha_p[n] * r_eqsum) * Nindividuals_p[k, n]
+        inc_pop = Nindividuals_p[k, n]
+        absrcal = abs(rcal)
+        rcalpos = (absrcal == rcal)
+        # IF rcal is tiny, what happens when populations are stable return
+        # zero. Approximation to speed up algorithm
+        if absrcal>sgGL.IGNORE_REFF:
+            rspneq = math.pow(1 + absrcal, invperiod ) - 1
+            incNmalth = np.random.binomial(Nindividuals_p[k, n], -math.expm1(-rspneq))
+            if rcalpos:
+                inc_pop += incNmalth 
+            else:
+                inc_pop -= incNmalth          
+        pop_p = inc_pop - p_devorados
          
 #         Codigo obsoleto que contemplaba los modelos viejos 
 #             
@@ -341,20 +353,21 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
 #         else:
 #             retl = ciclo_May(r_p[n] - r_muerte, rMay, term_May,
 #                              Nindividuals_p[k, n], Alpha_p[n])
-                                            
-        pop_p = retl[0] - p_devorados
+        # Species extinction                                         
         if not(pop_p):
             sgcom.inform_user(ldev_inf,
                               "Day %d (year %d). %s species %d extincted" %\
                               (k, k // sgGL.DAYS_YEAR, strtype, 
                                int_to_ext_rep(n)))
-    Nindividuals_p[k + 1, n] = pop_p
-    if (pop_p):
-        rp_eff[k + 1, n], rp_eq[k + 1, n] = retl[1], rtot_p
-    else:
-        rp_eff[k + 1, n], rp_eq[k + 1, n] = rp_eff[k, n], rp_eq[k, n]
-    rp_eff[0, ] = rp_eff[1, ]
-    return 0  
+            rp_eff[k + 1:, n], rp_eq[k + 1:, n] = rp_eff[k, n], rp_eq[k, n]
+            return
+        Nindividuals_p[k + 1, n] = pop_p
+#    if (pop_p):
+        rp_eff[k + 1, n], rp_eq[k + 1, n] = rcal, rtot_p
+#     else:
+#         rp_eff[k + 1, n], rp_eq[k + 1, n] = rp_eff[k, n], rp_eq[k, n]
+#    rp_eff[0, ] = rp_eff[1, ]
+#    return 0  
 
 def calc_compatib_plantas(numspecies, probcoinc, blossom_pert_list):
     lcomp = []
@@ -728,7 +741,7 @@ def bino_mutual(sim_cond = ''):
                                                            sgGL.ldev_inf,
                                                            sgGL.lfich_inf,
                                              sim_cond.dirtrabajo.replace('\\', '/'))
-    for k in range (periods - 1):
+    for k in range(periods - 1):
         ''' The compatibilty matrixes masks are created when the year starts '''         
         if not(k % sgGL.DAYS_YEAR):  # Much faster than if ((k%sgGL.DAYS_YEAR)==0)     
             if (not(systemextinction)):
@@ -789,11 +802,14 @@ def bino_mutual(sim_cond = ''):
                                pert_cond.periodoextpol, pert_cond.spikepol, k, 
                                model_r_alpha, 
                                sgGL.ldev_inf) for n in range_species_b]
-        predators_population_evolution(sim_cond.hay_foodweb, 
+        if (sim_cond.hay_foodweb):
+            predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,
                                        Nindividuals_a, numspecies_b, 
                                        Nindividuals_b, K_c, Nindividuals_c, r_c,
                                        numspecies_c, minputchar_d, j, k)
+    ra_eff[0, ] = ra_eff[1, ]
+    rb_eff[0, ] = rb_eff[1, ]
     maxminval = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
     tfin = time()   
