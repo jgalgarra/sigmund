@@ -323,8 +323,8 @@ class StartQT4(QtGui.QMainWindow):
 #                                                 replace('_c.txt', '_a.txt')
             self.input_fname_raw = self.get_root_file_name(selected_filename)
             l_minputchar_x = sgcom.dlmreadlike(self.input_fname_raw, selected_path)
-            numspecies_a = len(l_minputchar_x) - sgGL.LINES_INFO_MATRIX
-            numspecies_b = len(l_minputchar_x[0])
+            numspecies_a = len(l_minputchar_x[0])
+            numspecies_b = len(l_minputchar_x) - sgGL.LINES_INFO_MATRIX
             self.ui.species_number.setText("Plant species: %d  Pollinator species: %d" %\
                              (numspecies_a, numspecies_b))
             self.repaint()

@@ -176,6 +176,7 @@ def init_lists_pop(periods, numspecies_p, minputchar_p):
     Nindividuals_p = np.zeros([periods, numspecies_p])
     rp_eff = np.zeros([periods, numspecies_p], dtype=float)
     rp_equs = np.zeros([periods, numspecies_p], dtype=float)  
+    r_tot_eqsum_p = np.zeros(numspecies_p, dtype=float)
     for n in range(numspecies_p):
         rowNindividuals_p.append(int(minputchar_p[-sgGL.LINES_INFO_MATRIX][n]))
         cAlpha_p.append(float(minputchar_p[-(sgGL.LINES_INFO_MATRIX-1)][n]))
@@ -184,7 +185,7 @@ def init_lists_pop(periods, numspecies_p, minputchar_p):
         rd_p.append(minputchar_p[-(sgGL.LINES_INFO_MATRIX-4)][n])
     Nindividuals_p[0] = np.array(rowNindividuals_p)      
     return rowNindividuals_p, Alpha_p, cAlpha_p, r_p, rd_p, Nindividuals_p, \
-                                rp_eff, rp_equs
+                                rp_eff, rp_equs, r_tot_eqsum_p
 
 # def init_params_population(r_p, rd_p, n):
 #     r_eqsum = term_May = rMay = p_devorados = rtot_p = 0
@@ -289,24 +290,29 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
                           minputchar_p, j, cAlpha_p, Alpha_p, r_p, rd_p, 
                           Nindividuals_p, numspecies_q, Nindividuals_q, 
                           Nindividuals_c, minputchar_c, numspecies_c, inicioext,
-                          hayext, nper, periodoext, spike, k, model_r_a, 
+                          hayext, nper, periodoext, spike, k, model_r_a, r_tot_eqsum_n,
                           ldev_inf):
     global cuentaperpl, cuentaperpol
-    r_eqsum = p_devorados = rtot_p = pop_p = 0
+    
+    p_devorados = rtot_p = pop_p = 0
+    r_eqsum = r_tot_eqsum_n
+    
     r_muerte = rd_p[n]
-    if (Nindividuals_p[k, n]):  # Much faster than (Nindividuals_p[k][n] > 0)
-        if hayext:
-            if (strtype == 'Plant') & (cuentaperpl < nper):
-                r_muerte, cuentaperpl = perturbation(p_ext, n, rd_p[n],
-                                                   cuentaperpl, inicioext,
-                                                   periodoext, spike, k)
-            elif (strtype == 'Pollinator') & (cuentaperpol < nper):
-                r_muerte, cuentaperpol = perturbation(p_ext, n, rd_p[n],
-                                                   cuentaperpol, inicioext,
-                                                   periodoext, spike, k)
-        if haymut:
-            r_eqsum = np.dot(minputchar_p[0:numspecies_q, n],\
-                             Nindividuals_q[k, :])
+    #if (Nindividuals_p[k, n]):  # Much faster than (Nindividuals_p[k][n] > 0)
+    # Function is only executed if Nindividuals_p[k, n]>0
+    if hayext:
+        if (strtype == 'Plant') & (cuentaperpl < nper):
+            r_muerte, cuentaperpl = perturbation(p_ext, n, rd_p[n],
+                                               cuentaperpl, inicioext,
+                                               periodoext, spike, k)
+        elif (strtype == 'Pollinator') & (cuentaperpol < nper):
+            r_muerte, cuentaperpol = perturbation(p_ext, n, rd_p[n],
+                                               cuentaperpol, inicioext,
+                                               periodoext, spike, k)
+    if haymut:
+        r_eqsum = r_tot_eqsum_n
+    else:
+        r_eqsum = 0
 
  
 #         CODIGO OBSOLETO, May eliminado
@@ -318,32 +324,32 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
 #                                     r_eqsum, term_May, rMay, k, j, n, r_p,
 #                                     r_muerte)
  
-        rtot_p = r_p[n] + r_eqsum - r_muerte        
-        # Efecto de los depredadores
-        if hay_foodweb:
-            p_devorados, j, rceff = predators_effect(p_devorados, j, 
-                                                     Nindividuals_p, 
-                                                     Nindividuals_c, 
-                                                     minputchar_c, 
-                                                     numspecies_c, n, k)
-        # New algorithm
+    rtot_p = r_p[n] + r_eqsum - r_muerte        
+    # Predators effect
+    if hay_foodweb:
+        p_devorados, j, rceff = predators_effect(p_devorados, j, 
+                                                 Nindividuals_p, 
+                                                 Nindividuals_c, 
+                                                 minputchar_c, 
+                                                 numspecies_c, n, k)
+    # New algorithm
 
-        # ciclo_verhulst Inline code following Vwn Rossum's advice
+    # ciclo_verhulst Inline code following Vwn Rossum's advice
 
-        rcal = rtot_p - ( Alpha_p[n] + cAlpha_p[n] * r_eqsum) * Nindividuals_p[k, n]
-        inc_pop = Nindividuals_p[k, n]
-        absrcal = abs(rcal)
-        rcalpos = (absrcal == rcal)
-        # IF rcal is tiny, what happens when populations are stable return
-        # zero. Approximation to speed up algorithm
-        if absrcal>sgGL.IGNORE_REFF:
-            rspneq = math.pow(1 + absrcal, invperiod ) - 1
-            incNmalth = np.random.binomial(Nindividuals_p[k, n], -math.expm1(-rspneq))
-            if rcalpos:
-                inc_pop += incNmalth 
-            else:
-                inc_pop -= incNmalth          
-        pop_p = inc_pop - p_devorados
+    rcal = rtot_p - ( Alpha_p[n] + cAlpha_p[n] * r_eqsum) * Nindividuals_p[k, n]
+    inc_pop = Nindividuals_p[k, n]
+    absrcal = abs(rcal)
+    rcalpos = (absrcal == rcal)
+    # IF rcal is tiny, what happens when populations are stable return
+    # zero. Approximation to speed up algorithm
+    if absrcal>sgGL.IGNORE_REFF:
+        rspneq = math.pow(1 + absrcal, invperiod ) - 1
+        incNmalth = np.random.binomial(Nindividuals_p[k, n], -math.expm1(-rspneq))
+        if rcalpos:
+            inc_pop += incNmalth 
+        else:
+            inc_pop -= incNmalth        
+    pop_p = inc_pop - p_devorados
          
 #         Codigo obsoleto que contemplaba los modelos viejos 
 #             
@@ -354,20 +360,16 @@ def populations_evolution(n, strtype, numspecies_p, algorithm, hay_foodweb,
 #             retl = ciclo_May(r_p[n] - r_muerte, rMay, term_May,
 #                              Nindividuals_p[k, n], Alpha_p[n])
         # Species extinction                                         
-        if not(pop_p):
-            sgcom.inform_user(ldev_inf,
-                              "Day %d (year %d). %s species %d extincted" %\
-                              (k, k // sgGL.DAYS_YEAR, strtype, 
-                               int_to_ext_rep(n)))
-            rp_eff[k + 1:, n], rp_eq[k + 1:, n] = rp_eff[k, n], rp_eq[k, n]
-            return
-        Nindividuals_p[k + 1, n] = pop_p
-#    if (pop_p):
-        rp_eff[k + 1, n], rp_eq[k + 1, n] = rcal, rtot_p
-#     else:
-#         rp_eff[k + 1, n], rp_eq[k + 1, n] = rp_eff[k, n], rp_eq[k, n]
-#    rp_eff[0, ] = rp_eff[1, ]
-#    return 0  
+    if not(pop_p):
+        sgcom.inform_user(ldev_inf,
+                          "Day %d (year %d). %s species %d extincted" %\
+                          (k, k // sgGL.DAYS_YEAR, strtype, 
+                           int_to_ext_rep(n)))
+        rp_eff[k + 1:, n], rp_eq[k + 1:, n] = rp_eff[k, n], rp_eq[k, n]
+        return
+    Nindividuals_p[k + 1, n] = pop_p
+    rp_eff[k + 1, n], rp_eq[k + 1, n] = rcal, rtot_p
+
 
 def calc_compatib_plantas(numspecies, probcoinc, blossom_pert_list):
     lcomp = []
@@ -689,7 +691,7 @@ def bino_mutual(sim_cond = ''):
                                                            sim_cond.N0plants, 
                                                            lfich_inf = sgGL.lfich_inf)
     rowNindividuals_a, Alpha_a, cAlpha_a, r_a, rd_a, Nindividuals_a,\
-    ra_eff, ra_equs = init_lists_pop(periods, numspecies_a, minputchar_a)
+    ra_eff, ra_equs, r_tot_eqsum_a = init_lists_pop(periods, numspecies_a, minputchar_a)
     lcompatibplantas = init_blossom_perturbation_lists(sim_cond.plants_blossom_prob,
                                                        sim_cond.blossom_pert_list,
                                                        numspecies_a)
@@ -702,7 +704,7 @@ def bino_mutual(sim_cond = ''):
                                                sim_cond.N0pols, 
                                                lfich_inf = sgGL.lfich_inf)
     rowNindividuals_b, Alpha_b, cAlpha_b, r_b,\
-    rd_b, Nindividuals_b, rb_eff, rb_equs = init_lists_pop(periods, numspecies_b,
+    rd_b, Nindividuals_b, rb_eff, rb_equs, r_tot_eqsum_b = init_lists_pop(periods, numspecies_b,
                                                            minputchar_b)
     range_species_b = range(numspecies_b)
     add_report_simulation_conditions(sim_cond.plants_blossom_prob, 
@@ -780,6 +782,11 @@ def bino_mutual(sim_cond = ''):
                                           minputchar_a, minputchar_b,
                                           minputchar_a_mask, minputchar_b_mask,
                                           sgGL.ldev_inf)
+        if haymut:
+            r_tot_eqsum_a = np.dot(np.transpose(minpeq_a[0:numspecies_b, :]),\
+                         Nindividuals_b[k, :])
+            r_tot_eqsum_b = np.dot(np.transpose(minpeq_b[0:numspecies_a, :]),\
+                         Nindividuals_a[k, :])
         [populations_evolution(n, "Plant", 
                                numspecies_a, sim_cond.algorithm, 
                                sim_cond.hay_foodweb, inner_pl_ext, 
@@ -789,8 +796,9 @@ def bino_mutual(sim_cond = ''):
                                Nindividuals_c, minputchar_c, numspecies_c, 
                                pert_cond.inicioextplantas, hayextplantas, 
                                pert_cond.nperpl, pert_cond.periodoextpl, 
-                               pert_cond.spikepl, k, model_r_alpha, 
-                               sgGL.ldev_inf) for n in range_species_a]
+                               pert_cond.spikepl, k, model_r_alpha, r_tot_eqsum_a[n],
+                               sgGL.ldev_inf) for n in range_species_a if Nindividuals_a[k,n]>0]
+
         [populations_evolution(n, "Pollinator", 
                                numspecies_b, sim_cond.algorithm, 
                                sim_cond.hay_foodweb, inner_pol_ext, 
@@ -800,8 +808,10 @@ def bino_mutual(sim_cond = ''):
                                Nindividuals_c, minputchar_c, numspecies_c,
                                pert_cond.inicioextpol, hayextpolin, pert_cond.nperpol, 
                                pert_cond.periodoextpol, pert_cond.spikepol, k, 
-                               model_r_alpha, 
-                               sgGL.ldev_inf) for n in range_species_b]
+                               model_r_alpha, r_tot_eqsum_b[n],
+                               sgGL.ldev_inf) for n in range_species_b if Nindividuals_b[k,n]>0 ]
+
+
         if (sim_cond.hay_foodweb):
             predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,
