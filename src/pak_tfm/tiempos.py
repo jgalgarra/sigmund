@@ -41,7 +41,10 @@ if __name__ == '__main__':
 #     
     sumdif = 0
     Ranual = 0.02
+    i= 0
+    #while True:
     for i in range(50000):
+    #while (i<50000):
         rp = calc_r_periodo_vh(Ranual, invperiod)
         #rpmc = pow_mclaurin(Ranual, invperiod)
 
@@ -49,12 +52,14 @@ if __name__ == '__main__':
         z = -math.expm1(-rp)
         #bino = np.random.binomial(1000,z)
         apbin = approx_binomial(1000, z)
+        i+=1
+#         if (i==50000):
+#             break
         #sumdif += abs(bino-apbin)
     #print("sumdif",sumdif)
 
 
     tfin = time()
 
-    tfin = time()
     print("Elapsed time %.02f s" % (tfin - tini))
     
