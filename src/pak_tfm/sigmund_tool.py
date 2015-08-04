@@ -14,6 +14,7 @@ import re
 
 global simulation_params
 
+
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)

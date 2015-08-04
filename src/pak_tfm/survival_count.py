@@ -40,6 +40,8 @@ if len(conditions.num_exper)>0:
     number_experiments = conditions.num_exper
 if len(conditions.Bssvarper)>0:
     Bssvarper = conditions.Bssvarper
+else:
+    Bssvarper = '0.1'
 if len(conditions.Bssvarsd_ini)>0:
     Bssvarsdini = conditions.Bssvarsd_ini
 if len(conditions.Bssvarsd_fin)>0:

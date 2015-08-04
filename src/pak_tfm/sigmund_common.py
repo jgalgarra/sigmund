@@ -50,7 +50,9 @@ class SimulationConditions():
     def write2file(self,filesim):
         with open(filesim, 'wb') as outfile:
             pickle.dump(self, outfile, pickle.HIGHEST_PROTOCOL)
-         
+            
+            
+
 class MaximaValues():
     def __init__(self,maxa_individuos, maxb_individuos, max_reff, min_reff,\
     max_requs, min_requs):
@@ -234,9 +236,14 @@ def create_results_filename(sim_cond,string_file):
 
 def end_report(ldev_inf, lfich_inf, sim_cond, tfin, tinic, periods, 
                Nindividuals_a, ra_eff, ra_equs,
-               Nindividuals_b, rb_eff, rb_equs, Nindividuals_c):    
+               Nindividuals_b, rb_eff, rb_equs, Nindividuals_c):
+    ngp = np.average(list(np.extract(Nindividuals_a[0,]>0,ra_equs[1,]))+\
+                     list(np.extract(Nindividuals_b[0,]>0,rb_equs[1,])))
+    inform_user(ldev_inf, "Network growth power %.03f" % ngp ) 
     inform_user(ldev_inf, "Elapsed time %.02f s" % (tfin - tinic))
     speriodos = str(int(periods / sgGL.DAYS_YEAR))
+    with open(sim_cond.dirsal+'/'+create_results_filename(sim_cond,"_ngp.txt"), "wt") as out_file:
+        out_file.write("%.03f" % ngp)
     if (sim_cond.data_save == 1):
         nsal = dlmwritelike(create_results_filename(sim_cond,"_a_populations"), 
                             sim_cond,speriodos, Nindividuals_a)
@@ -271,6 +278,7 @@ def end_report(ldev_inf, lfich_inf, sim_cond, tfin, tinic, periods,
     inform_user(ldev_inf, '')
     inform_user(ldev_inf, 'Created %s' % datetime.datetime.now())
     close_info_channels(lfich_inf)
+
 
 if __name__ == '__main__':
     import doctest
