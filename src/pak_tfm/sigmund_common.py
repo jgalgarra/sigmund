@@ -74,7 +74,7 @@ class BlossomVariability():
 class SimulationReturnValues():
     def __init__(self, Nindividuals_a, Nindividuals_b, Nindividuals_c, ra_eff, 
                  rb_eff, ra_equs, rb_equs, mval, systemextinction, 
-                 pBssvar_species):
+                 pBssvar_species, network_growth_power):
         self.systemextinction = systemextinction
         self.Nindividuals_a = Nindividuals_a
         self.Nindividuals_b = Nindividuals_b
@@ -85,6 +85,7 @@ class SimulationReturnValues():
         self.rb_equs = copy.deepcopy(ra_equs)
         self.maxminval = mval
         self.pBssvar_species = copy.deepcopy(pBssvar_species)
+        self.network_growth_power = network_growth_power
 
 class ExternalPerturbationConditions():
     def __init__(self,nperpl, inicioextplantas, periodoextpl, spikepl, 
@@ -151,17 +152,21 @@ def dlmreadlike(inputfile, direntrada):
         print('The datafile %s is missing!' % inputfile)
         return(-1)
  
-def dlmwritelike(input_file,sim_cond, nperiod, Nin):
+def dlmwritelike(input_file,sim_cond, nperiod, Nin, onecolumn = False):
     dsal = sim_cond.dirsal.replace('\\', '/')
     nsal = sgGL.OUTPUTDATA_PREFIX + input_file + '_' + sim_cond.output_suff + '_'+\
            str(nperiod) + '.txt'
     print ("Output file %s" % dsal + nsal)
-    salida = open(dsal + nsal, 'w', encoding='utf-8')
+    salida = open(dsal + nsal, 'w', encoding='utf-8')    
     for linea in Nin:
-        for i in range(len(linea) - 1):
-            y = "%.012f" % linea[i]
-            salida.write(y + ',')
-        salida.write(str(linea[-1]) + '\n');
+        if onecolumn:
+            y = "%.012f" % linea
+            salida.write(y + '\n')
+        else:
+            for i in range(len(linea) - 1):
+                y = "%.012f" % linea[i]
+                salida.write(y + ',')
+            salida.write(str(linea[-1]) + '\n');
     salida.close()
     return(nsal)
 
@@ -236,14 +241,14 @@ def create_results_filename(sim_cond,string_file):
 
 def end_report(ldev_inf, lfich_inf, sim_cond, tfin, tinic, periods, 
                Nindividuals_a, ra_eff, ra_equs,
-               Nindividuals_b, rb_eff, rb_equs, Nindividuals_c):
-    ngp = np.average(list(np.extract(Nindividuals_a[0,]>0,ra_equs[1,]))+\
-                     list(np.extract(Nindividuals_b[0,]>0,rb_equs[1,])))
-    inform_user(ldev_inf, "Network growth power %.03f" % ngp ) 
+               Nindividuals_b, rb_eff, rb_equs, network_growth_power, Nindividuals_c):
+#     network_growth_power = np.average(list(np.extract(Nindividuals_a[0,]>0,ra_equs[1,]))+\
+#                      list(np.extract(Nindividuals_b[0,]>0,rb_equs[1,])))
+    inform_user(ldev_inf, "Initial Network growth power %.03f" % network_growth_power[1] ) 
     inform_user(ldev_inf, "Elapsed time %.02f s" % (tfin - tinic))
     speriodos = str(int(periods / sgGL.DAYS_YEAR))
-    with open(sim_cond.dirsal+'/'+create_results_filename(sim_cond,"_ngp.txt"), "wt") as out_file:
-        out_file.write("%.03f" % ngp)
+    with open(sim_cond.dirsal+'/'+create_results_filename(sim_cond,"_network_growth_power.txt"), "wt") as out_file:
+        out_file.write("%.03f" % network_growth_power[1])
     if (sim_cond.data_save == 1):
         nsal = dlmwritelike(create_results_filename(sim_cond,"_a_populations"), 
                             sim_cond,speriodos, Nindividuals_a)
@@ -269,6 +274,10 @@ def end_report(ldev_inf, lfich_inf, sim_cond, tfin, tinic, periods,
                            rsal + "' target=_BLANK'>" + rsal + "<a>")
         inform_user(lfich_inf, "Pollinators equivalent rates data: <a href='" +\
                           requsal + "' target=_BLANK'>" + requsal + "<a>")
+        network_growth_powersal = dlmwritelike(create_results_filename(sim_cond,"_npg"), 
+                               sim_cond,speriodos, network_growth_power, onecolumn = True)
+        inform_user(lfich_inf, "Network growth power: <a href='" +\
+                          network_growth_powersal + "' target=_BLANK'>" + network_growth_powersal + "<a>")
         if sim_cond.hay_foodweb:
             nsal = dlmwritelike(create_results_filename(sim_cond,"_c"), 
                                 sim_cond,speriodos, Nindividuals_c)

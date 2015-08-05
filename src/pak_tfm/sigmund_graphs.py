@@ -66,7 +66,7 @@ def display_legend():
 
 def pintasubplot(na, min_value, max_value, displayinic, periods, 
                  factorescala, numspecies, titulo, ylabel, 
-                 periodsinyears = False):
+                 periodsinyears = False, displaylegend = True):
     global ax
     plt.title(titulo)
     plt.ylabel(ylabel)
@@ -76,10 +76,16 @@ def pintasubplot(na, min_value, max_value, displayinic, periods,
         graf = []
         x = []
         for k in range(displayinic, periods):
-            graf.append(na[k][i])
+            if (numspecies == 1):
+                graf.append(na[k])
+            else:
+                graf.append(na[k][i])
             x.append(k)
         if periodsinyears:
-            graf.append(na[-1][i])
+            if numspecies == 1:
+                graf.append(na[-1])
+            else:
+                graf.append(na[-1][i])
             x.append(1+k)
         plt.plot(x, graf, color=cm.Set1(i / (numspecies)), 
                  lw=calc_lw_width(numspecies))
@@ -88,16 +94,17 @@ def pintasubplot(na, min_value, max_value, displayinic, periods,
     a.set_ylim([-0.01 - factorescala * abs(min_value),\
                 factorescala * max_value])
     setxtickssubplot(displayinic, periods, a, periodsinyears)
-    if numspecies < 11:
+    if numspecies < 11 and (displaylegend):
         display_legend()
  
 def mutual_render(simulation_params, sig_ret_val, displayinic, periods,  
                   verbose=True):
     global ax
-    if (len(sig_ret_val.pBssvar_species)):
-        nrows = 3
-    else:
-        nrows = 2
+#     if (len(sig_ret_val.pBssvar_species)):
+#         nrows = 3
+#     else:
+#         nrows = 2
+    nrows = 3
     matplotlib.rc('xtick', labelsize=8) 
     matplotlib.rc('ytick', labelsize=8) 
     years = periods // sgGL.DAYS_YEAR
@@ -135,6 +142,10 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
 #                      numspecies_a, '', 'Blossom variability coeffs.', 
 #                      periodsinyears = True) 
 #         plt.xlabel('Years')    
+
+
+
+
     ax = plt.subplot(nrows, 2, 2)
     pintasubplot(sig_ret_val.Nindividuals_b, 0, 
                  sig_ret_val.maxminval.maxb_individuos, 
@@ -147,6 +158,16 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
                  displayinic, periods, factorescala,
                  numspecies_b, '', '')
     plt.xlabel('Years')
+
+#   Network Growth Power
+    
+    ax = plt.subplot(nrows, 2, 5)
+    pintasubplot(sig_ret_val.network_growth_power, min(sig_ret_val.network_growth_power), 
+                 max(sig_ret_val.network_growth_power), 
+                 displayinic, periods, factorescala,
+                 1, '', 'Network Growth Power', displaylegend = False)
+
+    
     dt = simulation_params.dirtrabajo.replace('\\', '/');    
     nsal = 'output_pict_plantsandpols_' + simulation_params.filename +\
            '_' + simulation_params.algorithm + '_' + simulation_params.output_suff +\

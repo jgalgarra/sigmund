@@ -835,6 +835,7 @@ def bino_mutual(sim_cond = ''):
                                      sgGL.ldev_inf, numspecies_a,
                                      rowNindividuals_a, numspecies_b,
                                      rowNindividuals_b)
+    network_growth_power = np.zeros(periods, dtype=float)
     mut_brake_a = Alpha_a
     mut_brake_b = Alpha_b
     # Random links removal 
@@ -956,6 +957,11 @@ def bino_mutual(sim_cond = ''):
                                model_r_alpha, r_tot_eqsum_b[n], brake_b[n],
                                sgGL.ldev_inf, isplant = False) 
                                for n in range_species_b if Nindividuals_b[k,n]>0 ]
+        if ( np.sum(Nindividuals_a[k,]) + np.sum(Nindividuals_b[k,]) ) > 0:
+            network_growth_power[k+1] = np.average(list(np.extract(Nindividuals_a[k,]>0,ra_equs[k+1,]))+\
+                     list(np.extract(Nindividuals_b[k,]>0,rb_equs[k+1,])))
+        else:
+            network_growth_power[k+1:] = network_growth_power[k]
         if (sim_cond.hay_foodweb):
             predators_population_evolution(sim_cond.hay_foodweb, 
                                        sgGL.ldev_inf, numspecies_a,
@@ -964,17 +970,19 @@ def bino_mutual(sim_cond = ''):
                                        numspecies_c, minputchar_d, j, k)
     ra_eff[0, ] = ra_eff[1, ]
     rb_eff[0, ] = rb_eff[1, ]
+    network_growth_power[0] = network_growth_power[1]
+    network_growth_power = np.transpose(network_growth_power)
     maxminval = sgcom.find_max_values(Nindividuals_a, Nindividuals_b, 
                                            ra_eff, rb_eff, ra_equs, rb_equs)    
-    tfin = time()   
+    tfin = time()
     sgcom.end_report(sgGL.ldev_inf, sgGL.lfich_inf, sim_cond, tfin, tinic, 
                      periods, Nindividuals_a, ra_eff, ra_equs, Nindividuals_b, 
-                     rb_eff, rb_equs, Nindividuals_c)
+                     rb_eff, rb_equs, network_growth_power, Nindividuals_c)
     sim_ret_val = sgcom.SimulationReturnValues(Nindividuals_a, Nindividuals_b, 
                                                Nindividuals_c, ra_eff, rb_eff, 
                                                ra_equs, rb_equs, maxminval, 
                                                systemextinction, 
-                                               pBssvar_species)
+                                               pBssvar_species, network_growth_power)
     return(sim_ret_val)
             
 if __name__ == '__main__':
