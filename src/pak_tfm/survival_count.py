@@ -72,4 +72,4 @@ for j in range(int(Bssvarsdini),int(Bssvarsdfin),int(Bssvarsdstep)):
             number_extinction += 1
     else:
             survival_success = 0 
-    print(str(j/10000)+"\t"+number_experiments+"\t" + str(survival_success))
+    print(str(j/1000)+"\t"+number_experiments+"\t" + str(survival_success))

@@ -878,15 +878,16 @@ def bino_mutual(sim_cond = ''):
                 forced_extinctions_in_course = False
                 if systemextinction:
                     sgcom.inform_user(sgGL.ldev_inf,\
-                         "ALARM !!!. System will collapse. Day %d (year %d)" %\
-                         (k, k // sgGL.DAYS_YEAR))
+                         "ALARM !!!. System will collapse. Day %d (year %d). NGP %0.3f" %\
+                         (k, k // sgGL.DAYS_YEAR,network_growth_power[k]))
                     if sim_cond.exit_on_extinction:
                         sim_ret_val = sgcom.SimulationReturnValues(
                                               Nindividuals_a, Nindividuals_b, 
                                               Nindividuals_c, ra_eff, rb_eff, 
                                               ra_equs, rb_equs, 
                                               [], 
-                                              systemextinction, pBssvar_species)
+                                              systemextinction, pBssvar_species,
+                                              network_growth_power)
                         return(sim_ret_val)
             minputchar_a_mask, minputchar_b_mask, lcompatibplantas =\
                       calc_random_blossom_effect(numspecies_a, nrows_a, ncols_a,
