@@ -1,4 +1,5 @@
-popsenvertical <- function (directory,file1,position,rs="no",grays="no",wl="",intervh=6, intervvpops=5,vcexlegend=0.6,vcaxis=0.75)
+popsenvertical <- function (directory,file1,position,rs="no",grays="no",wl="",intervh=6, 
+                            intervvpops=5,vcexlegend=0.6,vcaxis=0.75, legy = 1.0, legx = 1.0, lgpch = "no", legins= 0.025)
 {
   
   buscamax <- function (directory,filea,fileb)
@@ -29,6 +30,10 @@ popsenvertical <- function (directory,file1,position,rs="no",grays="no",wl="",in
   #print(file2)
   par(mfrow=c(2,1))
   pospops = position
-  s<-pintaspecies(directory,file1,"","Population","Plants",pospops,grays,mmaximo=mx[1],mminimo=mx[2],wlinea=wl,hr=intervh,vr=intervvpops,horizlegend="no",xtitle="Years",caxis=vcaxis,cexlegend=vcexlegend)
-  s<-pintaspecies(directory,file2,"","Population","Pollinators",pospops,grays,mmaximo=mx[1],mminimo=mx[2],wlinea=wl,hr=intervh,vr=intervvpops,horizlegend="no",xtitle="Years",caxis=vcaxis,cexlegend=vcexlegend)
+  s<-pintaspecies(directory,file1,"","Population","Plants",pospops,grays,mmaximo=mx[1],mminimo=mx[2],wlinea=wl,hr=intervh,vr=intervvpops,
+                  horizlegend="no",xtitle="Years",caxis=vcaxis,cexlegend=vcexlegend, leginset = legins,
+                  legy.intersp= legy, legx.intersp = legx, legpch=lgpch)
+  s<-pintaspecies(directory,file2,"","Population","Pollinators",pospops,grays,mmaximo=mx[1],mminimo=mx[2],wlinea=wl,hr=intervh,vr=intervvpops,
+                  horizlegend="no",xtitle="Years",caxis=vcaxis,cexlegend=vcexlegend, leginset = legins,
+                  legy.intersp= legy, legx.intersp = legx,legpch=lgpch)
 }
