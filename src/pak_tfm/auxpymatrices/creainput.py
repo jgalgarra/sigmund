@@ -17,7 +17,7 @@ def completamatrix(mat_nopesada,ncols,n0base,bijbase,alfabase,cibase,rdbase,nchu
         chunkcols = np.array_split(rangecols,nchunks)
         for j in range(1,nchunks):
             for k in chunkcols[j]:
-                mat_completa[:,k] = mat_completa[:,k]*(j+1)
+                mat_completa[:,k] = mat_completa[:,k]*((j+np.log(j))+1)
     # newfila=np.empty(ncols-1); newfila.fill(n0base)
     # Poblaciones iniciales
     mat_completa = np.vstack([mat_completa,n0base])
@@ -35,7 +35,7 @@ def completamatrix(mat_nopesada,ncols,n0base,bijbase,alfabase,cibase,rdbase,nchu
     mat_completa = np.vstack([mat_completa,newfila])
     return(mat_completa)
 
-def construyematrices(nomfich,bijbase = 0.00001,cibase = 0.00001,avgbase=0.05,rdbase = 0.04,randomizenest=0,randomizeall=0,nchunks=0):
+def construyematrices(nomfich,bijbase = 0.000008,cibase = 0.000015,avgbase=0.05,rdbase = 0.04,randomizenest=0,randomizeall=0,nchunks=0):
     my_data = np.genfromtxt(nomfich, delimiter=',')
     nfilas, ncols = my_data.shape
     # Creamos un array vacio con una linea menos y una columna menos para eliminar
@@ -58,8 +58,8 @@ def construyematrices(nomfich,bijbase = 0.00001,cibase = 0.00001,avgbase=0.05,rd
     mat_B = completamatrix(mat_inter.transpose(),nfilas,n0base,bijbase,alfabase,cibase,rdbase,nchunks)
     return(mat_A,mat_B)
 
-nfich='M_PL_010.csv'
-mat_A, mat_B = construyematrices(nfich,bijbase = 0.000003,avgbase=0.02,rdbase = 0.1,randomizenest=0,randomizeall=0,nchunks=8)
+nfich='M_SD_004.csv'
+mat_A, mat_B = construyematrices(nfich,bijbase = 0.0000011,avgbase=0.025,rdbase = 0.045,cibase = 0.000028,randomizenest=0,randomizeall=0,nchunks=80)
 prefix = nfich.split('.')[0]
 #print(prefix)
 np.savetxt(prefix+'_a.txt',mat_A,fmt='%0.08f',delimiter='\t',newline=os.linesep)

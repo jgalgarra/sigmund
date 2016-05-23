@@ -1,0 +1,1 @@
+survival_count.py -simfile M_SD_004_MAX_Verhulst__400.sim -numexper 10 -years 400 -Bssvarsdini 40 -Bssvarsdfin 70 -Bssvarsdstep 10 -pl_species ALL

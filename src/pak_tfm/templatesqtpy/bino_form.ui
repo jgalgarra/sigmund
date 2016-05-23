@@ -1101,72 +1101,12 @@
      <x>20</x>
      <y>90</y>
      <width>191</width>
-     <height>121</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="title">
     <string>Mutualism Model</string>
    </property>
-   <widget class="QRadioButton" name="TOM_LAp_abs_Button">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>161</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Logistic |req|</string>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="TOM_May_Button">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>161</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>May</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="TOM_LAp_u_Button">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>161</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Logistic u(req)</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
    <widget class="QRadioButton" name="TOM_LAp_vh_Button">
     <property name="enabled">
      <bool>true</bool>

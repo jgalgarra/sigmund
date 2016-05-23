@@ -1,8 +1,8 @@
 global RELEASE_NUMBER
 global RELEASE_STRING
 
-RELEASE_NUMBER = 204
-RELEASE_STRING = "July 2015"
+RELEASE_NUMBER = 205
+RELEASE_STRING = "May 2016"
 
 if __name__ == '__main__':
     pass

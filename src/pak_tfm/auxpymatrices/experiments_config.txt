@@ -1,0 +1,30 @@
+SD024 wweak
+construyematrices(nfich,bijbase = 0.0000011,avgbase=0.025,rdbase = 0.045,cibase = 0.000028,randomizenest=0,randomizeall=0,nchunks=80) nuevo
+npg = 0.250
+
+SD024 vweak
+construyematrices(nfich,bijbase = 0.0000015,avgbase=0.025,rdbase = 0.06,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=30)
+npg = 0.262
+
+SD024 weak
+construyematrices(nfich,bijbase = 0.0000023,avgbase=0.025,rdbase = 0.07,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=20)
+npg = 0.393
+
+
+SD024 strong
+construyematrices(nfich,bijbase = 0.000003,avgbase=0.025,rdbase = 0.07,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=20)
+npg = 0.59
+
+
+PL008 vweak
+construyematrices(nfich,bijbase = 0.0000044,avgbase=0.025,rdbase = 0.06,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=30)
+npg = 0.244
+
+PL008 weak
+construyematrices(nfich,bijbase = 0.0000057,avgbase=0.025,rdbase = 0.07,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=30)
+npg = 0.387
+
+
+PL008 strong
+construyematrices(nfich,bijbase = 0.000007,avgbase=0.025,rdbase = 0.07,cibase = 0.000023,randomizenest=0,randomizeall=0,nchunks=30)
+npg = 0.552

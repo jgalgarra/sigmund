@@ -1,6 +1,0 @@
-# SIGMUND 1.5 
-#
-# Simulator of mutualistic interactions
-#
-# (c): Javier Garcia Algarra
-# May, 13th, 2014

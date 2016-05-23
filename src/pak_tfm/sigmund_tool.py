@@ -26,9 +26,9 @@ class StartQT4(QtGui.QMainWindow):
         self.setWindowIcon(QtGui.QIcon('upm.gif'))
         self.ui.TOM_None_Button.clicked.connect(self.select_No_mutualism)
         self.ui.TOM_LAp_vh_Button.clicked.connect(self.select_LApproach_vh)
-        self.ui.TOM_LAp_abs_Button.clicked.connect(self.select_LApproach_abs)
-        self.ui.TOM_LAp_u_Button.clicked.connect(self.select_LApproach_u)
-        self.ui.TOM_May_Button.clicked.connect(self.select_May)
+#        self.ui.TOM_LAp_abs_Button.clicked.connect(self.select_LApproach_abs)
+#        self.ui.TOM_LAp_u_Button.clicked.connect(self.select_LApproach_u)
+#        self.ui.TOM_May_Button.clicked.connect(self.select_May)
         self.ui.blossom_pert_species.setText('ALL')
         self.ui.BType_Binary.clicked.connect(self.select_BinaryBlossom)
         self.ui.BType_Gaussian.clicked.connect(self.select_GaussianBlossom)
@@ -93,7 +93,7 @@ class StartQT4(QtGui.QMainWindow):
 
     def select_LApproach_abs(self):
         self.algorithm = 'Logistic_abs'
-        self.ui.TOM_LAp_abs_Button.setChecked(True)
+#        self.ui.TOM_LAp_abs_Button.setChecked(True)
         
     def select_LApproach_vh(self):
         self.algorithm = 'Verhulst'
@@ -101,7 +101,7 @@ class StartQT4(QtGui.QMainWindow):
         
     def select_LApproach_u(self):
         self.algorithm = 'Logistic_u'
-        self.ui.TOM_LAp_u_Button.setChecked(True)
+#        self.ui.TOM_LAp_u_Button.setChecked(True)
         
     def select_No_mutualism(self):
         self.algorithm = 'NoMutualism'
@@ -109,7 +109,7 @@ class StartQT4(QtGui.QMainWindow):
         
     def select_May(self):
         self.algorithm = 'May'
-        self.ui.TOM_May_Button.setChecked(True)
+#        self.ui.TOM_May_Button.setChecked(True)
         
     def select_BinaryBlossom(self):
         self.typeofblossom = 'Binary'
