@@ -1,6 +1,0 @@
-# Levantar el agente de identificacion la primera vez
-eval `ssh-agent -s`
-# Borra las identidades cacheadas
-ssh-add -D
-# Añadir la clave RSA del usario con el que vamos a trabajar
-ssh-add ~/.ssh/id_rsa_jgalgarra
