@@ -183,7 +183,13 @@ def mutual_render(simulation_params, sig_ret_val, displayinic, periods,
     plt.close()
     
 def calc_lw_width(numspecies):
-    return(0.5)
+    if numspecies <= 15:
+        quita = 0
+    elif numspecies <= 30:
+        quita = 0.5
+    else:
+        quita = 1
+    return(1.5-quita)
 
 def food_render(simulation_params, sig_ret_val, displayinic, periods, 
                 verbose=True):
