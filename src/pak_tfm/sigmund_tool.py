@@ -510,6 +510,7 @@ class StartQT4(QtGui.QMainWindow):
 
 if __name__ == "__main__": 
     app = QtGui.QApplication(sys.argv)
+    
     myapp = StartQT4()
     myapp.show()
     sys.exit(app.exec_())

@@ -10,6 +10,7 @@ import datetime
 import copy
 import pickle
 import sigmund_GLOBALS as sgGL
+import os
 
 class SimulationConditions():
     def __init__(self, filename ='', year_periods = '', hay_foodweb = False, 
@@ -157,6 +158,10 @@ def dlmwritelike(input_file,sim_cond, nperiod, Nin, onecolumn = False):
     nsal = sgGL.OUTPUTDATA_PREFIX + input_file + '_' + sim_cond.output_suff + '_'+\
            str(nperiod) + '.txt'
     print ("Output file %s" % dsal + nsal)
+    
+    if not os.path.exists(dsal):
+        os.makedirs(dsal)
+    
     salida = open(dsal + nsal, 'w', encoding='utf-8')    
     for linea in Nin:
         if onecolumn:
