@@ -218,6 +218,10 @@ class StartQT4(QtGui.QMainWindow):
                                                           filter='*.sim')
         if len(self.simulation_file) == 0:
             return
+        # Change execution path to sigmund_tool.py location
+        rpath = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(rpath.replace('\\', '/'))                   
+            
         a = self.simulation_file.replace('\\', '/ ').split('/');
         self.simulation_file = a[-1]
         self.ui.simulation_file.setText(self.simulation_file)
@@ -336,10 +340,18 @@ class StartQT4(QtGui.QMainWindow):
                                                           self.input_dir)
         if len(self.filename) == 0:
             return
+            
+        # Change execution path to sigmund_tool.py location
+        rpath = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(rpath.replace('\\', '/'))            
+            
         a = self.filename.replace('\\', '/ ').split('/');
         self.input_file = a[-1]
         self.ui.inputfile.setText(self.input_file)
         self.ui.inputfile.setEnabled(False)
+        
+
+        
         numspecies_a, numspecies_b = self.load_file_data(self.input_file,self.dirent) 
         self.ui.Run_Button.setEnabled(1)
     
