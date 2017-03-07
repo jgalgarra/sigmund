@@ -31,14 +31,14 @@ def read_results_file(filename):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-fichout', action='store', dest='fichout_name',
+parser.add_argument('-fichout', action='store', dest='fichout_name',default = '',
                     help='Populations output file with _a suffix')
-    
+                        
 conditions = parser.parse_args()
 
 filename = conditions.fichout_name
 filename_a = filename
-print('filename '+filename_a)
+print('filename '+str(filename_a))
 listmax_a = read_results_file(filename_a)
 print('Plants maxima '+str(listmax_a))
 
