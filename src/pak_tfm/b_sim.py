@@ -775,12 +775,14 @@ def calc_perturbed_coeffs(k, hay_bssvar, pBssvar_species, minputchar_a,
                           minputchar_a_mask, numspecies_a, minputchar_b, 
                           minputchar_b_mask, numspecies_b):
     minpeq_a = minputchar_a * minputchar_a_mask
+    minpeq_b = minputchar_b * minputchar_b_mask
     if hay_bssvar:
         for t in range(0, numspecies_b):
             for l in range (0, numspecies_a):
                 minpeq_a[t, l] = minpeq_a[t, l] *\
                                  pBssvar_species[l][k // sgGL.DAYS_YEAR]
-    minpeq_b = minputchar_b * minputchar_b_mask
+                minpeq_b[l, t] = minpeq_b[l,t] *\
+                                 pBssvar_species[l][k // sgGL.DAYS_YEAR]
     return minpeq_a, minpeq_b
     
     
@@ -859,6 +861,7 @@ def bino_mutual(sim_cond = ''):
                                 sim_cond.Bssvar_data, 
                                 sgGL.ldev_inf,
                                 numspecies_a)
+                                
     Nindividuals_c, minputchar_c, numspecies_c, K_c, r_c, minputchar_d = \
                                       predators_param_init(sim_cond.filename, 
                                                            sim_cond.hay_foodweb,
